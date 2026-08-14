@@ -1,6 +1,6 @@
 # QA Checklist
 
-A website is not complete because the hero looks good. It is complete when the game, content, responsive layout, SEO and attribution all pass.
+A website is not complete because the hero looks good. It is complete only when the game, design, content, On-Page SEO, responsive behavior, performance and attribution all pass.
 
 ## Game Runtime
 
@@ -38,20 +38,117 @@ A website is not complete because the hero looks good. It is complete when the g
 - [ ] No fictional codes, characters, upgrades or modes
 - [ ] FAQ answers match current official information
 - [ ] Release/demo/prototype status is current
+- [ ] Important indexable content exists outside the iframe
+- [ ] Page is not thin filler wrapped around a game player
 
-## SEO
+# Mandatory On-Page SEO Gate
 
-- [ ] Unique page title
-- [ ] Useful meta description
-- [ ] One H1
-- [ ] Logical heading hierarchy
-- [ ] Canonical URL
-- [ ] Open Graph metadata
+A production site cannot pass QA unless every applicable item below passes.
+
+## Search intent and topical clarity
+
+- [ ] Primary game entity is explicitly defined
+- [ ] Primary search intent is explicitly defined
+- [ ] Primary keyword/query is natural and accurate
+- [ ] Homepage opening section makes the game/topic obvious without relying on the iframe
+- [ ] Game name appears naturally in the important page signals
+
+## Title and meta
+
+- [ ] Every important indexable page has a unique descriptive title
+- [ ] Title clearly identifies the game/page intent
+- [ ] No keyword stuffing in title
+- [ ] Every important page has a useful unique meta description
+- [ ] Meta description matches visible page content
+
+## H1 and headings
+
+- [ ] Exactly one normal H1 per page
+- [ ] Homepage H1 clearly identifies the game/topic
+- [ ] H1 is not only a slogan
+- [ ] H2/H3 hierarchy is logical
+- [ ] Headings describe real sections rather than keyword variants
+
+## URL and canonical
+
+- [ ] Production URLs are clean and stable
+- [ ] Every important indexable page has a self-referencing canonical
+- [ ] Canonical uses the intended production URL
+- [ ] No `example.com`, localhost, preview or staging canonical remains in production
+- [ ] Duplicate URL variants are not intentionally indexable
+
+## Content and keyword use
+
+- [ ] Content satisfies the real player intent
+- [ ] Exact game name is used naturally, not mechanically repeated
+- [ ] No fixed keyword-density target is used
+- [ ] No hidden SEO text
+- [ ] No giant keyword footer
+- [ ] No synonym/keyword stuffing blocks
+- [ ] No doorway pages
+- [ ] No near-identical routes targeting the same intent
+- [ ] Multi-page expansion only exists for distinct useful topics
+
+## Internal links
+
+- [ ] Important pages are reachable with normal crawlable `<a href>` links
+- [ ] Anchor text is descriptive where useful
+- [ ] No important orphan pages
+- [ ] Related guides link to one another where it helps users
+
+## Images
+
+- [ ] Informative images have meaningful alt text
+- [ ] Decorative images use empty alt where appropriate
+- [ ] Alt text is not keyword stuffed
+- [ ] Image dimensions/aspect ratio are reserved to reduce layout shift
+- [ ] Likely LCP hero image is not unnecessarily lazy-loaded
+- [ ] Below-the-fold screenshots are lazy-loaded when practical
+- [ ] Site-owned images are compressed
+- [ ] Artwork is not stretched
+
+## Crawlability and semantics
+
+- [ ] `<html lang>` is set correctly
+- [ ] Important content exists in HTML outside the game iframe
+- [ ] Important navigation uses crawlable links
+- [ ] No accidental `noindex`
+- [ ] Production pages/assets are not accidentally blocked by robots rules
+- [ ] Core content does not require a user click to become indexable
+
+## Open Graph and structured data
+
+- [ ] `og:title` is accurate
+- [ ] `og:description` is accurate
+- [ ] `og:url` is set on production pages where used
+- [ ] `og:image` is valid
+- [ ] Twitter/X metadata is added when useful
 - [ ] JSON-LD is accurate
-- [ ] Internal links are valid
-- [ ] Production sitemap exists
-- [ ] Production robots.txt exists
-- [ ] No accidental noindex
+- [ ] No invented ratings, review counts, prices or release dates in structured data
+- [ ] FAQ schema is not treated as guaranteed rich-result traffic
+
+## Sitemap and robots
+
+- [ ] Production `robots.txt` exists
+- [ ] Production `sitemap.xml` exists
+- [ ] Sitemap contains canonical indexable production URLs only
+- [ ] Staging/preview URLs are not in the production sitemap
+
+## Performance / Core Web Vitals readiness
+
+- [ ] Website UI loads before the heavy game payload
+- [ ] Runtime is lazy-loaded after interaction when practical
+- [ ] No unnecessary render-blocking libraries
+- [ ] Non-game JavaScript is kept small
+- [ ] Major media does not cause avoidable layout shift
+- [ ] Production build is ready for LCP/INP/CLS measurement
+
+## Search Console readiness
+
+- [ ] Final canonical domain/URLs are known before deployment-ready status
+- [ ] Sitemap is ready to submit
+- [ ] Site can be verified in Google Search Console
+- [ ] Canonical URLs are ready for URL Inspection / indexing checks
 
 ## Responsive
 
@@ -64,6 +161,7 @@ Test approximately:
 Verify:
 
 - [ ] navigation does not overflow
+- [ ] H1/game title remains readable
 - [ ] hero remains readable
 - [ ] buttons are usable
 - [ ] player height is sufficient
@@ -71,6 +169,7 @@ Verify:
 - [ ] long game names wrap correctly
 - [ ] touch targets are usable
 - [ ] no horizontal scrolling
+- [ ] useful SEO body copy remains readable on mobile
 
 ## Performance
 
@@ -100,4 +199,16 @@ PASS WITH NOTES — deployable, non-blocking caveats documented
 FAIL — blocking issue remains
 ```
 
+Also report:
+
+```text
+Game Embed: PASS | FAIL
+On-Page SEO: PASS | FAIL
+Canonical: <production URL or pending>
+Indexable pages: <list/count>
+Blocking issues: <none or list>
+```
+
 Any broken iframe is a `FAIL` for a play-first build.
+
+Any failed On-Page SEO Gate is a `FAIL` for a production/deployment-ready build.
