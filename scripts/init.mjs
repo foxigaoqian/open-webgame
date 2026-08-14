@@ -30,7 +30,7 @@ const domain = String(args.domain || '').trim();
 const canonical = domain ? `https://${domain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/` : '';
 
 const config = {
-  $schema: '../../schema/open-webgame.schema.json',
+  $schema: 'https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json',
   schemaVersion: '0.2',
   game: {
     name: gameName,
