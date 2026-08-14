@@ -14,6 +14,7 @@ const checks = [
   ['Site Architecture', ['scripts/site-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
   ['On-Page SEO', ['scripts/seo-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
   ['Security', ['scripts/security-audit.mjs', '--config', config, '--html', html]],
+  ...(!offline ? [['HTTP Resources', ['scripts/http-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]]] : []),
   ['Embed', ['scripts/verify-embed.mjs', '--config', config, ...(offline ? ['--offline'] : [])]],
 ];
 
@@ -35,5 +36,5 @@ if (failed) {
 }
 console.log('Deployment-ready: YES');
 console.log(offline
-  ? 'Automated offline gates passed. Run live embed and Playwright browser QA before first production launch.'
-  : 'Automated config/content/site/SEO/security/embed gates passed. Run Playwright browser QA before first production launch.');
+  ? 'Automated offline gates passed. Run live HTTP/embed and Playwright browser QA before first production launch.'
+  : 'Automated config/content/site/SEO/security/HTTP/embed gates passed. Run Playwright browser QA before first production launch.');
