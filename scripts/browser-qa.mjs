@@ -63,51 +63,36 @@ const address = server.address();
 const baseUrl = `http://127.0.0.1:${address.port}`;
 const routePath = home.path === '/' ? '/' : home.path;
 
-const waitForRuntimeFrame = async (page, runtimeUrl, timeoutMs = 10000) => {
-  let origin;
+const runtimeOrigin = (runtimeUrl) => {
   try {
-    origin = new URL(runtimeUrl).origin;
+    return new URL(runtimeUrl).origin;
+  } catch {
+    return '';
+  }
+};
+
+const runtimeUrlMatcher = (runtimeUrl) => {
+  const origin = runtimeOrigin(runtimeUrl);
+  return (url) => Boolean(origin) && url.origin === origin;
+};
+
+const getContentFrame = async (iframeLocator) => {
+  const handle = await iframeLocator.elementHandle();
+  if (!handle) return null;
+  return handle.contentFrame();
+};
+
+const waitForRuntimeNavigation = async (frame, runtimeUrl, timeout = 15000) => {
+  if (!frame || !runtimeOrigin(runtimeUrl)) return false;
+  try {
+    await frame.waitForURL(runtimeUrlMatcher(runtimeUrl), {
+      timeout,
+      waitUntil: 'domcontentloaded',
+    });
+    return true;
   } catch {
     return false;
   }
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    if (page.frames().some((frame) => frame.url().startsWith(origin))) return true;
-    await page.waitForTimeout(250);
-  }
-  return false;
-};
-
-const waitForReloadCycle = (page, targetFrame, runtimeUrl, timeoutMs = 12000) => {
-  let origin;
-  try {
-    origin = new URL(runtimeUrl).origin;
-  } catch {
-    return Promise.resolve(false);
-  }
-
-  return new Promise((resolve) => {
-    let sawBlank = false;
-    let settled = false;
-    const finish = (value) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      page.off('framenavigated', onNavigate);
-      resolve(value);
-    };
-    const onNavigate = (frame) => {
-      if (frame !== targetFrame) return;
-      const url = frame.url();
-      if (url === 'about:blank') {
-        sawBlank = true;
-        return;
-      }
-      if (sawBlank && url.startsWith(origin)) finish(true);
-    };
-    const timer = setTimeout(() => finish(false), timeoutMs);
-    page.on('framenavigated', onNavigate);
-  });
 };
 
 let browser;
@@ -124,9 +109,13 @@ try {
     const page = await context.newPage();
     const pageErrors = [];
     const consoleErrors = [];
+    const requestFailures = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
     page.on('console', (message) => {
       if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+    page.on('requestfailed', (request) => {
+      requestFailures.push(`${request.failure()?.errorText || 'request failed'} ${request.url()}`);
     });
 
     const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -185,44 +174,39 @@ try {
         src = (await iframe.getAttribute('src')) || '';
         if (runtimeUrl && !src.startsWith(runtimeUrl)) errors.push(`${viewport.name}: iframe src does not match embed.runtimeUrl after interaction.`);
 
-        if (runtimeUrl) {
-          const booted = await waitForRuntimeFrame(page, runtimeUrl);
-          if (!booted) errors.push(`${viewport.name}: browser never observed a child frame navigating to the configured runtime origin.`);
+        const contentFrame = await getContentFrame(iframe);
+        if (!contentFrame) {
+          errors.push(`${viewport.name}: browser could not resolve the iframe content frame.`);
+        } else if (runtimeUrl) {
+          const booted = await waitForRuntimeNavigation(contentFrame, runtimeUrl);
+          if (!booted) {
+            const failedAtRuntimeOrigin = requestFailures.filter((item) => item.includes(runtimeOrigin(runtimeUrl))).slice(-3);
+            errors.push(`${viewport.name}: game child frame did not reach the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
+            for (const failure of failedAtRuntimeOrigin) warnings.push(`${viewport.name}: runtime request failure: ${failure}`);
+          }
         }
 
-        if (viewport.name === 'desktop' && runtimeUrl) {
-          try {
-            await page.waitForFunction(
-              (expected) => Array.from(document.querySelectorAll('iframe')).some((node) => node.src.startsWith(expected)),
-              runtimeUrl,
-              { timeout: 10000 },
-            );
-            await page.waitForTimeout(1500);
-          } catch {
-            errors.push('desktop: runtime iframe did not remain attached after loading.');
-          }
-
+        if (viewport.name === 'desktop' && runtimeUrl && contentFrame) {
           const reload = page.getByRole('button', { name: /reload/i }).first();
           if (await reload.count()) {
-            const contentFrame = await iframe.contentFrame();
-            if (!contentFrame) {
-              errors.push('desktop: cannot identify the game child frame before Reload.');
+            const blankNavigation = contentFrame.waitForURL('about:blank', {
+              timeout: 5000,
+              waitUntil: 'commit',
+            }).then(() => true).catch(() => false);
+
+            await reload.click();
+            const sawBlank = await blankNavigation;
+            if (!sawBlank) {
+              errors.push(`desktop: Reload did not navigate the game child frame to about:blank; current frame URL is ${contentFrame.url() || 'empty'}.`);
             } else {
-              const reloadCycle = waitForReloadCycle(page, contentFrame, runtimeUrl);
-              await reload.click();
-              try {
-                await page.waitForFunction(
-                  (expected) => document.querySelector('iframe')?.getAttribute('src')?.startsWith(expected),
-                  runtimeUrl,
-                  { timeout: 10000 },
-                );
-              } catch {
-                errors.push('desktop: Reload did not restore the configured runtime URL.');
-              }
-              if (!(await reloadCycle)) {
-                errors.push('desktop: Reload did not produce an about:blank → runtime child-frame navigation cycle.');
+              const rebooted = await waitForRuntimeNavigation(contentFrame, runtimeUrl, 15000);
+              if (!rebooted) {
+                errors.push(`desktop: Reload did not navigate the same game child frame back to the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
               }
             }
+
+            const afterReload = (await iframe.getAttribute('src')) || '';
+            if (!afterReload.startsWith(runtimeUrl)) errors.push('desktop: Reload did not restore the configured iframe src.');
           } else {
             warnings.push('desktop: no Reload control found.');
           }
