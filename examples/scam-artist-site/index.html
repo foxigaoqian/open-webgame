@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Play Scam Artist Online | Idle Building Game Guide</title>
+<meta name="description" content="Play the Scam Artist browser prototype, learn the core game loop, placement controls, upgrades, automation and beginner tips.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://example.com/">
+<meta property="og:title" content="Play Scam Artist Online">
+<meta property="og:description" content="Build a ridiculous pixel-art scam empire in this idle building prototype.">
+<meta property="og:image" content="https://img.itch.zone/aW1nLzI4Njg1ODc4LnBuZw%3D%3D/original/l497XE.png">
+<meta name="theme-color" content="#17110f">
+<style>
+:root{
+  --ink:#17110f;--ink2:#261713;--card:#302018;--wine:#6e171a;--wine2:#941f24;
+  --gold:#f3bf46;--gold2:#ffdd72;--cash:#91d447;--cream:#f7e8c4;--paper:#ead6a7;
+  --muted:#bda98a;--line:#5b3a29;--shadow:#070403;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:
+  radial-gradient(circle at 15% 0%,rgba(148,31,36,.25),transparent 32rem),
+  radial-gradient(circle at 90% 35%,rgba(145,212,71,.10),transparent 28rem),
+  var(--ink);
+  color:var(--cream);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  line-height:1.55;
+}
+a{color:inherit}
+.shell{width:min(1180px,calc(100% - 28px));margin:auto}
+.nav{
+  position:sticky;top:0;z-index:50;background:rgba(23,17,15,.88);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(243,191,70,.22)
+}
+.navin{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:1000;letter-spacing:-.04em}
+.logo{
+  width:42px;height:42px;display:grid;place-items:center;border:3px solid var(--gold);
+  background:var(--wine);box-shadow:4px 4px 0 #000;font-size:22px;transform:rotate(-2deg)
+}
+.brand span{font-size:clamp(17px,2.5vw,24px)}
+.links{display:flex;gap:22px;align-items:center;font-size:13px;font-weight:800;color:#dfcda9}
+.links a{text-decoration:none}.links a:hover{color:var(--gold)}
+.playpill{
+  background:var(--cash)!important;color:#13200a!important;border:2px solid #b8f26e;
+  padding:10px 16px;box-shadow:3px 3px 0 #000
+}
+.hero{padding:58px 0 34px}
+.heroGrid{display:grid;grid-template-columns:1.08fr .92fr;gap:34px;align-items:center}
+.kicker{color:var(--cash);font-size:13px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(46px,8vw,92px);line-height:.9;margin:12px 0 18px;letter-spacing:-.085em;text-transform:uppercase}
+h1 .gold{color:var(--gold)}
+.lede{max-width:720px;font-size:clamp(16px,2vw,20px);color:#dcc8a7}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:25px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:0 19px;
+  border:2px solid var(--gold);background:var(--gold);color:#241607;text-decoration:none;font-weight:1000;
+  box-shadow:5px 5px 0 #000;cursor:pointer;font-family:inherit;font-size:14px
+}
+.btn.alt{background:transparent;color:var(--cream);border-color:#806047}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:7px 7px 0 #000}
+.heroArt{
+  position:relative;border:3px solid var(--gold);box-shadow:10px 10px 0 #000;background:#100b09;
+  overflow:hidden;min-height:330px
+}
+.heroArt img{width:100%;height:100%;object-fit:cover;display:block;min-height:330px}
+.tape{
+  position:absolute;right:-42px;top:28px;background:var(--cash);color:#16200d;padding:7px 48px;
+  font-weight:1000;transform:rotate(9deg);box-shadow:0 3px 0 #000
+}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:34px}
+.stat{background:#211713;border:1px solid var(--line);padding:14px}
+.stat b{display:block;color:var(--gold);font-size:20px}.stat small{color:var(--muted)}
+.section{padding:46px 0}
+.sechead{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}
+.eyebrow{font-size:12px;color:var(--cash);font-weight:1000;text-transform:uppercase;letter-spacing:.15em}
+h2{margin:4px 0 0;font-size:clamp(27px,4vw,44px);letter-spacing:-.055em;line-height:1}
+.note{color:var(--muted);max-width:590px;font-size:13px}
+.gameWrap{
+  border:3px solid var(--gold);background:#060403;box-shadow:10px 10px 0 #000;overflow:hidden;
+}
+.gamebar{
+  min-height:54px;padding:9px 12px;background:linear-gradient(90deg,var(--wine),#371712);
+  border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.gamebar strong{font-size:13px}
+.gameActions{display:flex;gap:8px}
+.tiny{
+  border:1px solid #c99838;background:#20140d;color:var(--cream);padding:7px 10px;cursor:pointer;
+  font:800 11px inherit
+}
+.player{position:relative;aspect-ratio:16/9;background:#0c0806;min-height:460px}
+.player iframe{width:100%;height:100%;border:0;display:block}
+.loadscreen{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;
+  background:
+  linear-gradient(rgba(15,9,7,.68),rgba(15,9,7,.87)),
+  url("https://img.itch.zone/aW1nLzI4Njg1ODc4LnBuZw%3D%3D/original/l497XE.png") center/cover;
+}
+.loadscreen.hidden{display:none}
+.loadbox{max-width:560px}.loadbox h3{font-size:clamp(25px,4vw,42px);margin:0 0 10px}
+.loadbox p{color:#e4d0aa;margin:0 0 20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:linear-gradient(145deg,#302018,#21140f);border:1px solid var(--line);padding:22px;box-shadow:5px 5px 0 #070403}
+.card .num{color:var(--gold);font-weight:1000;font-size:13px}.card h3{margin:9px 0 8px;font-size:21px}.card p{color:#cbb796;margin:0;font-size:14px}
+.shots{display:grid;grid-template-columns:1.15fr .85fr .85fr;gap:12px}
+.shot{min-height:260px;border:2px solid #5f402d;background:#120b08;overflow:hidden;position:relative}
+.shot img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:pixelated}
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.loopitem{border-top:3px solid var(--cash);background:#22150f;padding:19px}
+.loopitem b{color:var(--gold)}
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{border:1px solid var(--line);background:#211510;padding:25px}
+.panel h3{margin-top:0;color:var(--gold)}
+.panel ul{padding-left:20px;color:#d2bd9a}.panel li+li{margin-top:8px}
+.faq{display:grid;gap:9px}
+details{background:#211510;border:1px solid var(--line);padding:16px 18px}
+summary{cursor:pointer;font-weight:1000;color:#f0d9ab}
+details p{color:#c9b391;margin:10px 0 0}
+.disclaimer{font-size:12px;color:#9d886b;border-left:3px solid var(--wine2);padding-left:12px}
+footer{padding:34px 0 46px;color:#8f7c64;font-size:12px;border-top:1px solid #3c291f}
+@media(max-width:850px){
+  .links a:not(.playpill){display:none}
+  .heroGrid,.guide{grid-template-columns:1fr}
+  .heroArt{order:-1;min-height:220px}.heroArt img{min-height:220px}
+  .stats,.loop{grid-template-columns:repeat(2,1fr)}
+  .grid3{grid-template-columns:1fr}
+  .shots{grid-template-columns:1fr 1fr}.shots .shot:first-child{grid-column:1/-1}
+  .player{aspect-ratio:auto;height:72vh;min-height:540px}
+}
+@media(max-width:520px){
+  .shell{width:min(100% - 20px,1180px)}
+  .hero{padding-top:32px}
+  .stats{grid-template-columns:1fr 1fr}
+  .shots{grid-template-columns:1fr}.shots .shot:first-child{grid-column:auto}
+  .gamebar{align-items:flex-start;flex-direction:column}
+  .player{height:72vh;min-height:500px}
+}
+</style>
+<script type="application/ld+json">
+{
+ "@context":"https://schema.org",
+ "@type":"VideoGame",
+ "name":"Scam Artist",
+ "gamePlatform":["Web browser","Windows","Linux"],
+ "genre":["Idle","Incremental","Building","Pixel Art"],
+ "author":{"@type":"Organization","name":"greenpixels"},
+ "url":"https://greenpixels.itch.io/scam-artist-prototype"
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context":"https://schema.org",
+ "@type":"FAQPage",
+ "mainEntity":[
+  {"@type":"Question","name":"Can you play Scam Artist in a browser?","acceptedAnswer":{"@type":"Answer","text":"Yes. The prototype has an HTML5 browser build on itch.io."}},
+  {"@type":"Question","name":"How do you buy and place items?","acceptedAnswer":{"@type":"Answer","text":"Drag items into valid room spaces. Hold a placed object to rearrange it."}},
+  {"@type":"Question","name":"Does Scam Artist support touch controls?","acceptedAnswer":{"@type":"Answer","text":"Yes. The prototype is designed around drag-and-drop controls and supports touch input."}}
+ ]
+}
+</script>
+</head>
+<body>
+<nav class="nav">
+  <div class="shell navin">
+    <a class="brand" href="#top"><span class="logo">💸</span><span>SCAM ARTIST</span></a>
+    <div class="links">
+      <a href="#play">Play</a><a href="#how">How It Works</a><a href="#tips">Tips</a><a href="#faq">FAQ</a>
+      <a class="playpill" href="#play">▶ PLAY NOW</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+<section class="hero">
+  <div class="shell">
+    <div class="heroGrid">
+      <div>
+        <div class="kicker">PIXEL IDLE BUILDING PROTOTYPE</div>
+        <h1>BUILD A<br><span class="gold">SHADY EMPIRE.</span></h1>
+        <p class="lede">Start in a moldy apartment, fill rooms with ridiculous money-making attractions, decorate for stronger boosts, and grow your operation one suspicious upgrade at a time.</p>
+        <div class="ctas">
+          <button class="btn" onclick="startGame()">▶ PLAY IN BROWSER</button>
+          <a class="btn alt" target="_blank" rel="noopener" href="https://store.steampowered.com/app/4979460/Scam_Artist/">STEAM PAGE ↗</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>HTML5</b><small>Browser build</small></div>
+          <div class="stat"><b>Idle</b><small>Incremental loop</small></div>
+          <div class="stat"><b>Touch</b><small>Drag & drop</small></div>
+          <div class="stat"><b>Pixel</b><small>Hand-made style</small></div>
+        </div>
+      </div>
+      <div class="heroArt">
+        <img src="https://img.itch.zone/aW1nLzI4Njg1ODc4LnBuZw%3D%3D/original/l497XE.png" alt="Scam Artist game artwork">
+        <div class="tape">PROTOTYPE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="play">
+  <div class="shell">
+    <div class="sechead">
+      <div><div class="eyebrow">INSTANT PLAY</div><h2>Play Scam Artist</h2></div>
+      <div class="note">The game loads from the current itch.io-hosted HTML5 build. Click Play once to start it inside this page.</div>
+    </div>
+    <div class="gameWrap" id="gameWrap">
+      <div class="gamebar">
+        <strong>SCAM ARTIST · BROWSER PROTOTYPE</strong>
+        <div class="gameActions">
+          <button class="tiny" onclick="reloadGame()">↻ RELOAD</button>
+          <button class="tiny" onclick="fullGame()">⛶ FULLSCREEN</button>
+        </div>
+      </div>
+      <div class="player">
+        <iframe id="game"
+          title="Scam Artist browser game"
+          data-src="https://html-classic.itch.zone/html/18628317/web/index.html?v=1785574627"
+          allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
+          allowfullscreen webkitallowfullscreen mozallowfullscreen
+          scrolling="no"></iframe>
+        <div class="loadscreen" id="load">
+          <div class="loadbox">
+            <h3>READY TO OPEN SHOP?</h3>
+            <p>Load the official browser build without leaving the page.</p>
+            <button class="btn" onclick="startGame()">LOAD GAME ▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="disclaimer">Unofficial discovery/guide page. Scam Artist is created by greenpixels. The playable build is hosted by itch.io; this page does not mirror the game files.</p>
+  </div>
+</section>
+
+<section class="section" id="how">
+ <div class="shell">
+  <div class="sechead"><div><div class="eyebrow">THE LOOP</div><h2>From Moldy Room to Money Machine</h2></div></div>
+  <div class="loop">
+   <div class="loopitem"><b>01 · PLACE</b><p>Drag structures into your rooms and squeeze value out of every usable tile.</p></div>
+   <div class="loopitem"><b>02 · EARN</b><p>Customers move through the apartment and interact with your money-making setups.</p></div>
+   <div class="loopitem"><b>03 · BOOST</b><p>Decorations and renovations improve the efficiency of your growing operation.</p></div>
+   <div class="loopitem"><b>04 · EXPAND</b><p>Add rooms, unlock new systems, automate collection, and push deeper into progression.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="section">
+ <div class="shell">
+  <div class="sechead"><div><div class="eyebrow">GAME FEEL</div><h2>Small Apartment. Big Schemes.</h2></div></div>
+  <div class="shots">
+    <div class="shot"><img src="https://img.itch.zone/aW1nLzI4Njg2MTY3LnBuZw%3D%3D/original/ZfAmk4.png" alt="Scam Artist pixel scene"></div>
+    <div class="shot"><img src="https://img.itch.zone/aW1nLzI4Njg2MTAxLnBuZw%3D%3D/original/TZ0yet.png" alt="Scam Artist slot machines"></div>
+    <div class="shot"><img src="https://img.itch.zone/aW1nLzI4Njg2MjE1LnBuZw%3D%3D/original/ZnWQSu.png" alt="Scam Society scene"></div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="tips">
+ <div class="shell">
+  <div class="sechead"><div><div class="eyebrow">QUICK START</div><h2>Beginner Playbook</h2></div></div>
+  <div class="grid3">
+    <article class="card"><span class="num">TIP 01</span><h3>Use space carefully</h3><p>Placement is part of the strategy. Leave yourself enough room to reorganize as stronger objects and decorations unlock.</p></article>
+    <article class="card"><span class="num">TIP 02</span><h3>Read decoration effects</h3><p>Decorations are not cosmetic only. Their effects can materially change your growth, so treat them like upgrades.</p></article>
+    <article class="card"><span class="num">TIP 03</span><h3>Push toward automation</h3><p>The current prototype includes automated money collection systems that reduce repetitive clicking later in the run.</p></article>
+  </div>
+ </div>
+</section>
+
+<section class="section">
+ <div class="shell guide">
+  <div class="panel">
+    <h3>Controls</h3>
+    <ul>
+      <li>Drag and drop objects to place them.</li>
+      <li>Hold a placed object to rearrange it.</li>
+      <li>Drag the view to move the camera.</li>
+      <li>On mobile, use two fingers to move the camera.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Progression to watch</h3>
+    <ul>
+      <li>Room expansion and renovations.</li>
+      <li>Structure and decoration synergies.</li>
+      <li>Money collection automation.</li>
+      <li>Scam Society research progression.</li>
+    </ul>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="faq">
+ <div class="shell">
+  <div class="sechead"><div><div class="eyebrow">FAQ</div><h2>Before You Play</h2></div></div>
+  <div class="faq">
+   <details><summary>Can I play Scam Artist directly in my browser?</summary><p>Yes. The current prototype includes an HTML5 browser build on itch.io, and the player above loads that hosted build.</p></details>
+   <details><summary>Do I need to download anything?</summary><p>No for the browser prototype. Windows and Linux builds also exist for players who prefer a desktop version.</p></details>
+   <details><summary>Does the game work on mobile?</summary><p>The developer describes the interaction system as touch-friendly. Drag-and-drop is the core input and camera movement uses two fingers on mobile.</p></details>
+   <details><summary>Is the full Steam game released?</summary><p>Not yet. The Steam listing currently shows the full game as coming soon.</p></details>
+   <details><summary>Who made Scam Artist?</summary><p>The game is developed and published by greenpixels.</p></details>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+ <div class="shell">
+  <div>SCAM ARTIST · UNOFFICIAL DISCOVERY & GUIDE DEMO</div>
+  <div style="margin-top:7px">Game and artwork belong to their respective creator. This demo is built to test a play-first trend-game landing-page workflow.</div>
+ </div>
+</footer>
+
+<script>
+const game = document.getElementById('game');
+const load = document.getElementById('load');
+function startGame(){
+  if(!game.src){
+    game.src = game.dataset.src;
+  }
+  load.classList.add('hidden');
+  document.getElementById('play').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function reloadGame(){
+  if(!game.src){ startGame(); return; }
+  const s = game.src; game.src='about:blank'; setTimeout(()=>game.src=s,120);
+}
+function fullGame(){
+  const box=document.getElementById('gameWrap');
+  const fn=box.requestFullscreen||box.webkitRequestFullscreen||box.mozRequestFullScreen;
+  if(fn) fn.call(box);
+}
+</script>
+</body>
+</html>
