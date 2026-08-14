@@ -98,6 +98,127 @@ npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
 
 See [`docs/project-config.md`](./docs/project-config.md).
 
+# v0.3.1 Quality and Multilingual Upgrade
+
+The project contract and QA pipeline are strict. Do not treat these rules as optional documentation.
+
+## Strict project schema
+
+`open-webgame.json` must validate with AJV against `schema/open-webgame.schema.json`. Unknown or misspelled keys are failures. Do not invent new config fields ad hoc; update the schema and tests when the contract genuinely changes.
+
+Run:
+
+```bash
+npm install
+npm run check:config -- --config path/to/open-webgame.json
+npm test
+```
+
+Regression fixtures must include both expected-pass and expected-fail cases for machine-enforced rules.
+
+## Real multilingual SEO
+
+Multilingual output is optional and is enabled only when requested or otherwise explicitly justified. It is not a client-side translation widget.
+
+When multiple languages are requested:
+
+1. Set `i18n.enabled = true`.
+2. Set `i18n.defaultLanguage`, `i18n.xDefaultLanguage` and `i18n.languages[]`.
+3. Create separate crawlable locale routes.
+4. Add `language` and a shared `translationKey` to every indexable translated page in `pages[]`.
+5. Localize search intent, title, meta description, H1, opening copy, headings, FAQ, alt text and navigation for the target language. Do not mechanically translate an English keyword page and call it finished.
+6. Every locale page must self-canonicalize.
+7. Every translation group must expose reciprocal `hreflang` links for all members, including itself, plus `x-default`.
+8. Provide a visible keyboard-accessible language switcher. Prefer the equivalent page with the same `translationKey`; do not force users back to the homepage when an equivalent locale page exists.
+9. Deployment-ready multilingual sites require sitemap alternate links with the XHTML namespace.
+10. Run `check:i18n`; any failure means `deployment-ready: NO`.
+
+Bootstrap example:
+
+```bash
+npm run init:game -- "Game Name" --languages en,ja,ko
+```
+
+The bootstrap only creates the contract. The agent must still research and generate every useful localized route.
+
+See [`docs/multilingual.md`](./docs/multilingual.md).
+
+## Image alt semantics
+
+For SEO and accessibility:
+
+- informative image → meaningful `alt="..."`
+- decorative image → `alt=""`
+- missing `alt` attribute → hard failure
+
+Do not convert intentional decorative empty alt text into keyword-filled alt text.
+
+## Live production resource QA
+
+Correct-looking HTML is not enough if production URLs are dead.
+
+Before first launch, run:
+
+```bash
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+The live gate checks production-facing canonical URLs, `og:image`, the sitemap declared by robots and sitemap `<loc>` URLs. A broken production URL blocks readiness.
+
+## Browser, accessibility and runtime QA
+
+Browser QA now verifies more than the iframe attribute:
+
+- desktop/tablet/mobile shell
+- horizontal overflow
+- lazy-load CTA
+- configured iframe URL assignment
+- a real child frame navigating to the runtime origin
+- Reload producing a real navigation cycle when Reload is offered
+- Fullscreen control presence when offered
+- console/page errors
+- axe WCAG 2 A/AA results for the host shell
+- real screenshots and machine-readable axe reports
+
+Run:
+
+```bash
+npx playwright install chromium
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+Serious or critical host-shell accessibility violations block deployment. Do not score a third-party game's internal iframe DOM as if Open WebGame controls it, but do make the surrounding player UI accessible.
+
+## Lighthouse gate
+
+Before first production launch, run:
+
+```bash
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+The shell is tested before the lazy game runtime starts. Hard failures include category scores below the configured thresholds and excessive CLS. Fix the underlying page rather than lowering thresholds to hide a regression.
+
+See [`docs/quality-gates.md`](./docs/quality-gates.md).
+
+## v0.3.1 machine gates
+
+```bash
+npm run check:config -- --config path/to/open-webgame.json
+npm run check:content -- --config path/to/open-webgame.json
+npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:i18n -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+npm run verify:embed -- --config path/to/open-webgame.json
+npm test
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+A relevant hard-gate failure always means `deployment-ready: NO`.
+
 # Inputs
 
 Minimum input:
