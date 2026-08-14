@@ -26,8 +26,11 @@ Stack: static HTML
 Research: automatic
 Site mode: auto → play-first only after embed verification, otherwise guide
 On-Page SEO: mandatory
+Content provenance: mandatory for material factual claims
+Iframe permissions: least privilege
 Responsive design: mandatory
 Performance review: mandatory
+Browser QA: mandatory before first production launch
 Output: complete website folder
 Clarifying questions: avoid unless genuinely blocked
 ```
@@ -36,16 +39,19 @@ Clarifying questions: avoid unless genuinely blocked
 
 1. Create or update `open-webgame.json`.
 2. Resolve the exact game entity and official sources.
-3. Fill `game` and set `status.research = "resolved"` only after verification.
-4. Determine whether a real browser runtime exists.
-5. If embedding is verified, set `site.mode = "play-first"`, `embed.status = "verified"`, and write the actual runtime URL.
-6. If embedding is unsupported, set `site.mode = "guide"` and never fake a player.
-7. Define search intent in `seo`.
-8. Derive visual DNA in `design`.
-9. Generate the site.
-10. Run automated config, SEO and embed gates.
-11. Run real browser/mobile QA.
-12. Set `status.deploymentReady = true` only after every hard gate passes.
+3. Add official/first-party research inputs to `sources[]`.
+4. Add material factual statements to `claims[]` and connect them to `sourceIds`.
+5. Set `status.research = "resolved"` only after the important facts are verified.
+6. Determine whether a real browser runtime exists.
+7. If embedding is verified, set `site.mode = "play-first"`, `embed.status = "verified"`, and write the actual runtime URL.
+8. If embedding is unsupported, set `site.mode = "guide"` and never fake a player.
+9. Define search intent in `seo` and intentional routes in `pages[]`.
+10. Derive visual DNA in `design`.
+11. Define the minimum iframe capabilities in `security.allowedIframePermissions`.
+12. Generate the site.
+13. Run automated config, content, site, SEO, security and embed gates.
+14. Run Playwright browser QA at desktop/tablet/mobile widths and inspect the screenshots.
+15. Set `status.deploymentReady = true` only after every hard gate passes.
 
 ## CLI bootstrap
 
@@ -70,6 +76,24 @@ output/goblincremental/
 ```
 
 The agent then researches the real game and progressively turns the pending config into a verified project config.
+
+## QA commands
+
+Non-browser hard gates:
+
+```bash
+npm run qa -- --config output/goblincremental/open-webgame.json --html output/goblincremental/index.html
+```
+
+First-launch browser QA:
+
+```bash
+npm install
+npx playwright install chromium
+npm run qa:browser -- --config output/goblincremental/open-webgame.json --site-dir output/goblincremental
+```
+
+The browser run is not optional evidence for a first play-first production launch. HTTP 200 and a valid iframe URL do not prove that the generated page works at real viewport sizes or that the lazy player wiring is correct.
 
 ## When a clarifying question is justified
 

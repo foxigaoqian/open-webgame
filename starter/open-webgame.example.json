@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.2",
+  "schemaVersion": "0.3",
   "game": {
     "name": "Example Game",
     "developer": "",
@@ -34,12 +34,30 @@
     "density": "derive",
     "notes": "Do not reuse another game's visual system."
   },
+  "sources": [],
+  "claims": [],
+  "pages": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "intent": "Resolve after search-intent research.",
+      "canonical": "",
+      "title": "",
+      "indexable": true
+    }
+  ],
+  "security": {
+    "allowedIframePermissions": ["autoplay", "fullscreen", "gamepad"],
+    "requireNoopenerForBlankTargets": true,
+    "allowInlineScripts": true
+  },
   "status": {
     "research": "pending",
     "onPageSeo": "pending",
     "deploymentReady": false,
     "blockingIssues": [
       "Game research has not been completed.",
+      "Content claims have not been sourced.",
       "Embed status has not been resolved.",
       "Production canonical has not been resolved."
     ]

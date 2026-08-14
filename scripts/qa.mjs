@@ -10,7 +10,10 @@ const siteDir = args['site-dir'] || path.dirname(html);
 
 const checks = [
   ['Config', ['scripts/check-config.mjs', '--config', config]],
+  ['Content Provenance', ['scripts/content-audit.mjs', '--config', config]],
+  ['Site Architecture', ['scripts/site-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
   ['On-Page SEO', ['scripts/seo-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
+  ['Security', ['scripts/security-audit.mjs', '--config', config, '--html', html]],
   ['Embed', ['scripts/verify-embed.mjs', '--config', config, ...(offline ? ['--offline'] : [])]],
 ];
 
@@ -31,4 +34,6 @@ if (failed) {
   process.exit(1);
 }
 console.log('Deployment-ready: YES');
-console.log(offline ? 'Automated offline gates passed. Run live embed/browser checks before first production launch.' : 'Automated gates passed.');
+console.log(offline
+  ? 'Automated offline gates passed. Run live embed and Playwright browser QA before first production launch.'
+  : 'Automated config/content/site/SEO/security/embed gates passed. Run Playwright browser QA before first production launch.');

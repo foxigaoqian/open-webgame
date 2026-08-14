@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.2",
+  "schemaVersion": "0.3",
   "game": {
     "name": "Scam Artist",
     "developer": "greenpixels",
@@ -37,6 +37,60 @@
     "palette": ["#17110f", "#f3bf46", "#91d447", "#6e171a", "#f7e8c4"],
     "density": "medium",
     "notes": "Hard-edged cards, pixel-game energy, strong gold/cash accents and minimal rounded UI."
+  },
+  "sources": [
+    {
+      "id": "itch-official",
+      "type": "itch",
+      "url": "https://greenpixels.itch.io/scam-artist-prototype",
+      "label": "Official Scam Artist prototype page",
+      "retrievedAt": "2026-08-14"
+    },
+    {
+      "id": "steam-official",
+      "type": "steam",
+      "url": "https://store.steampowered.com/app/4979460/Scam_Artist/",
+      "label": "Official Steam store listing",
+      "retrievedAt": "2026-08-14"
+    }
+  ],
+  "claims": [
+    {
+      "id": "browser-build",
+      "text": "The Scam Artist prototype has an HTML5 browser build.",
+      "sourceIds": ["itch-official"],
+      "status": "verified",
+      "usedIn": ["hero", "player", "faq"]
+    },
+    {
+      "id": "developer",
+      "text": "Scam Artist is developed by greenpixels.",
+      "sourceIds": ["itch-official", "steam-official"],
+      "status": "verified",
+      "usedIn": ["structured-data", "footer", "faq"]
+    },
+    {
+      "id": "controls",
+      "text": "The prototype uses drag-and-drop placement and supports touch-oriented interaction.",
+      "sourceIds": ["itch-official"],
+      "status": "verified",
+      "usedIn": ["controls", "faq"]
+    }
+  ],
+  "pages": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "intent": "play Scam Artist and learn the beginner loop",
+      "canonical": "https://foxigaoqian.github.io/open-webgame/",
+      "title": "Play Scam Artist Online | Idle Building Game Guide",
+      "indexable": true
+    }
+  ],
+  "security": {
+    "allowedIframePermissions": ["autoplay", "fullscreen", "gamepad", "cross-origin-isolated"],
+    "requireNoopenerForBlankTargets": true,
+    "allowInlineScripts": true
   },
   "status": {
     "research": "resolved",

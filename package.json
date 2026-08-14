@@ -1,6 +1,6 @@
 {
   "name": "open-webgame",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Agent skill and production QA workflow that turns a game keyword into a playable, game-native, search-ready website.",
@@ -17,9 +17,17 @@
     "init:game": "node scripts/init.mjs",
     "check:config": "node scripts/check-config.mjs",
     "check:seo": "node scripts/seo-audit.mjs",
+    "check:content": "node scripts/content-audit.mjs",
+    "check:site": "node scripts/site-audit.mjs",
+    "check:security": "node scripts/security-audit.mjs",
     "verify:embed": "node scripts/verify-embed.mjs",
     "verify:embed:config": "node scripts/verify-embed.mjs --offline",
     "qa": "node scripts/qa.mjs",
-    "qa:example": "node scripts/qa.mjs --config examples/scam-artist-site/open-webgame.json --html examples/scam-artist-site/index.html --offline"
+    "qa:example": "node scripts/qa.mjs --config examples/scam-artist-site/open-webgame.json --html examples/scam-artist-site/index.html --offline",
+    "qa:browser": "node scripts/browser-qa.mjs",
+    "qa:browser:example": "node scripts/browser-qa.mjs --config examples/scam-artist-site/open-webgame.json --site-dir examples/scam-artist-site"
+  },
+  "devDependencies": {
+    "playwright": "^1.54.2"
   }
 }
