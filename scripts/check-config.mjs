@@ -10,7 +10,7 @@ const requiredString = (value, label) => {
   if (typeof value !== 'string' || !value.trim()) errors.push(`${label} is required.`);
 };
 
-if (config.schemaVersion !== '0.2') errors.push('schemaVersion must be "0.2".');
+if (config.schemaVersion !== '0.3') errors.push('schemaVersion must be "0.3".');
 requiredString(config.game?.name, 'game.name');
 requiredString(config.site?.language, 'site.language');
 requiredString(config.site?.mode, 'site.mode');
@@ -18,6 +18,13 @@ requiredString(config.seo?.primaryIntent, 'seo.primaryIntent');
 requiredString(config.seo?.primaryKeyword, 'seo.primaryKeyword');
 requiredString(config.seo?.canonicalPagePurpose, 'seo.canonicalPagePurpose');
 requiredString(config.embed?.status, 'embed.status');
+
+for (const [key, value] of [['sources', config.sources], ['claims', config.claims], ['pages', config.pages]]) {
+  if (!Array.isArray(value)) errors.push(`${key} must be an array.`);
+}
+if (!config.security || !Array.isArray(config.security.allowedIframePermissions)) {
+  errors.push('security.allowedIframePermissions must be an array.');
+}
 
 const modes = new Set(['auto', 'play-first', 'guide']);
 if (config.site?.mode && !modes.has(config.site.mode)) {
@@ -34,12 +41,8 @@ if (config.game?.officialUrl && !isHttpUrl(config.game.officialUrl)) {
 }
 
 if (config.site?.mode === 'play-first') {
-  if (config.embed?.status !== 'verified') {
-    errors.push('play-first mode requires embed.status = "verified".');
-  }
-  if (!isHttpUrl(config.embed?.runtimeUrl || '')) {
-    errors.push('play-first mode requires embed.runtimeUrl.');
-  }
+  if (config.embed?.status !== 'verified') errors.push('play-first mode requires embed.status = "verified".');
+  if (!isHttpUrl(config.embed?.runtimeUrl || '')) errors.push('play-first mode requires embed.runtimeUrl.');
 }
 
 const runtime = String(config.embed?.runtimeUrl || '');
@@ -53,24 +56,15 @@ if (runtime) {
 if (config.status?.deploymentReady === true) {
   if (config.status?.research !== 'resolved') errors.push('deploymentReady requires status.research = "resolved".');
   if (config.status?.onPageSeo !== 'pass') errors.push('deploymentReady requires status.onPageSeo = "pass".');
-  if (!isProductionHttpsUrl(config.site?.canonical || '')) {
-    errors.push('deploymentReady requires a real HTTPS production canonical; placeholders/localhost are not allowed.');
-  }
-  if (Array.isArray(config.status?.blockingIssues) && config.status.blockingIssues.length > 0) {
-    errors.push('deploymentReady cannot be true while status.blockingIssues is non-empty.');
-  }
-  if (config.site?.mode === 'play-first' && config.embed?.status !== 'verified') {
-    errors.push('deploymentReady play-first sites require a verified embed.');
-  }
+  if (!isProductionHttpsUrl(config.site?.canonical || '')) errors.push('deploymentReady requires a real HTTPS production canonical; placeholders/localhost are not allowed.');
+  if (Array.isArray(config.status?.blockingIssues) && config.status.blockingIssues.length > 0) errors.push('deploymentReady cannot be true while status.blockingIssues is non-empty.');
+  if (config.site?.mode === 'play-first' && config.embed?.status !== 'verified') errors.push('deploymentReady play-first sites require a verified embed.');
+  if (!Array.isArray(config.sources) || config.sources.length === 0) errors.push('deploymentReady requires recorded research sources.');
+  if (!Array.isArray(config.pages) || config.pages.length === 0) errors.push('deploymentReady requires pages[].');
 }
 
-if (!Array.isArray(config.status?.blockingIssues)) {
-  errors.push('status.blockingIssues must be an array.');
-}
-
-if (config.site?.mode === 'auto' && config.status?.research === 'resolved') {
-  warnings.push('Research is resolved but site.mode is still "auto"; choose play-first or guide before production QA.');
-}
+if (!Array.isArray(config.status?.blockingIssues)) errors.push('status.blockingIssues must be an array.');
+if (config.site?.mode === 'auto' && config.status?.research === 'resolved') warnings.push('Research is resolved but site.mode is still "auto"; choose play-first or guide before production QA.');
 
 const ok = printResult(`Open WebGame config audit: ${configPath}`, errors, warnings);
 process.exit(ok ? 0 : 1);
