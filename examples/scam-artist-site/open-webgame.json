@@ -1,0 +1,47 @@
+{
+  "$schema": "../../schema/open-webgame.schema.json",
+  "schemaVersion": "0.2",
+  "game": {
+    "name": "Scam Artist",
+    "developer": "greenpixels",
+    "genre": "Idle / Incremental / Building",
+    "officialUrl": "https://greenpixels.itch.io/scam-artist-prototype",
+    "platforms": ["Web browser", "Windows", "Linux"]
+  },
+  "site": {
+    "language": "en",
+    "mode": "play-first",
+    "domain": "foxigaoqian.github.io/open-webgame",
+    "canonical": "https://foxigaoqian.github.io/open-webgame/",
+    "stack": "static-html",
+    "deploymentTarget": "github-pages"
+  },
+  "seo": {
+    "primaryIntent": "play + beginner guide",
+    "primaryKeyword": "Scam Artist",
+    "secondaryIntents": [
+      "Scam Artist controls",
+      "Scam Artist how to play",
+      "Scam Artist prototype"
+    ],
+    "canonicalPagePurpose": "Let users play the verified browser prototype and understand the core loop, controls and beginner progression."
+  },
+  "embed": {
+    "status": "verified",
+    "runtimeUrl": "https://html-classic.itch.zone/html/18628317/web/index.html?v=1785574627",
+    "officialPage": "https://greenpixels.itch.io/scam-artist-prototype",
+    "host": "itch.io"
+  },
+  "design": {
+    "direction": "Dark pixel-art idle-management interface with money, scam and apartment motifs.",
+    "palette": ["#17110f", "#f3bf46", "#91d447", "#6e171a", "#f7e8c4"],
+    "density": "medium",
+    "notes": "Hard-edged cards, pixel-game energy, strong gold/cash accents and minimal rounded UI."
+  },
+  "status": {
+    "research": "resolved",
+    "onPageSeo": "pass",
+    "deploymentReady": true,
+    "blockingIssues": []
+  }
+}
