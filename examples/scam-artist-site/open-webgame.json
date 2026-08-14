@@ -16,6 +16,18 @@
     "stack": "static-html",
     "deploymentTarget": "github-pages"
   },
+  "i18n": {
+    "enabled": false,
+    "defaultLanguage": "en",
+    "xDefaultLanguage": "en",
+    "languages": [
+      {
+        "code": "en",
+        "label": "English",
+        "prefix": ""
+      }
+    ]
+  },
   "seo": {
     "primaryIntent": "play + beginner guide",
     "primaryKeyword": "Scam Artist",
@@ -84,7 +96,9 @@
       "intent": "play Scam Artist and learn the beginner loop",
       "canonical": "https://foxigaoqian.github.io/open-webgame/",
       "title": "Play Scam Artist Online | Idle Building Game Guide",
-      "indexable": true
+      "indexable": true,
+      "language": "en",
+      "translationKey": "home"
     }
   ],
   "security": {
