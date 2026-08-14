@@ -1,0 +1,20 @@
+name: Embed Smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  scam-artist-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check current hosted runtime headers and reachability
+        run: npm run verify:embed -- --config examples/scam-artist-site/open-webgame.json
