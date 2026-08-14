@@ -116,7 +116,7 @@ try {
       errors.push(`Lighthouse CLS ${cls.toFixed(3)} exceeds the 0.15 hard limit.`);
     }
     if (typeof lcp === 'number') {
-      if (lcp > 4000) warnings.push(`Lighthouse LCP ${(lcp / 1000).toFixed(2)}s is slow; target <= 2.5s.`);
+      if (lcp > 4000) errors.push(`Lighthouse LCP ${(lcp / 1000).toFixed(2)}s exceeds the 4.0s hard limit; target <= 2.5s.`);
       else if (lcp > 2500) warnings.push(`Lighthouse LCP ${(lcp / 1000).toFixed(2)}s needs improvement; target <= 2.5s.`);
     }
     if (typeof tbt === 'number' && tbt > 600) warnings.push(`Lighthouse TBT ${Math.round(tbt)}ms is high; review main-thread work.`);
