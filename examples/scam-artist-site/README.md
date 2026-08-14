@@ -1,6 +1,8 @@
 # Scam Artist — Full Site Example
 
-This directory contains the actual single-file website generated while validating the Open WebGame workflow.
+This directory contains the real site used as Open WebGame's regression and live-demo case.
+
+**Live demo:** https://foxigaoqian.github.io/open-webgame/
 
 ## What this example demonstrates
 
@@ -14,58 +16,78 @@ This directory contains the actual single-file website generated while validatin
 - `VideoGame` and `FAQPage` structured data
 - responsive desktop/mobile layout
 - creator attribution and unofficial-site disclosure
+- production canonical / Open Graph URL
+- `robots.txt` and `sitemap.xml`
+- v0.2 single-source `open-webgame.json`
+- automated config, SEO and embed-config QA
 
-## SEO status
+## Single source of truth
 
-This file is a **repository demo**, not a production-domain deployment.
+Project state lives in:
 
-The original demo was useful for validating the player and design workflow, but it must not be labeled `deployment-ready` until it passes the current Open WebGame On-Page SEO Gate.
+[`open-webgame.json`](./open-webgame.json)
 
-In particular, a production version must ensure:
+It records the verified game identity, live canonical, runtime URL, search intent, visual direction and readiness state.
 
-- the real target-domain canonical replaces any demo/example canonical
-- the homepage H1 clearly identifies `Scam Artist` and the primary intent rather than using only a slogan
-- Open Graph URLs use the real production URL
-- production `robots.txt` exists
-- production `sitemap.xml` exists
-- image dimensions/lazy-loading strategy is finalized
-- the final domain has no staging/example SEO metadata
+Do not update the iframe, canonical, sitemap or readiness claims without keeping this config synchronized.
 
-See:
+## SEO / deployment status
 
-- [`../../references/on-page-seo.md`](../../references/on-page-seo.md)
-- [`../../references/qa-checklist.md`](../../references/qa-checklist.md)
-
-A future production build should report:
+The GitHub Pages case now has a real deployment URL:
 
 ```text
-Game Embed: PASS
-On-Page SEO: PASS
-Canonical: https://REAL-DOMAIN/
-Deployment-ready: YES
+https://foxigaoqian.github.io/open-webgame/
 ```
 
-Until a real production domain is supplied and validated, the canonical status is intentionally considered pending.
+The homepage H1 identifies `Scam Artist`, canonical and `og:url` point to the live URL, and the directory includes production robots/sitemap files.
+
+Current automated contract:
+
+```text
+Research: RESOLVED
+Embed config: VERIFIED
+On-Page SEO: PASS
+Canonical: https://foxigaoqian.github.io/open-webgame/
+Deployment-ready: YES
+Blocking issues: none
+```
+
+This status refers to the repository's own GitHub Pages example. A fork or newly generated production site must replace the canonical/domain with its own deployment and pass QA again.
+
+## Run QA
+
+From the repository root:
+
+```bash
+npm run qa:example
+```
+
+Run the live runtime HTTP/header check separately:
+
+```bash
+npm run verify:embed -- --config examples/scam-artist-site/open-webgame.json
+```
+
+The automated runtime check does not replace a real browser boot/input/fullscreen/mobile smoke test.
 
 ## Run locally
 
-Open `index.html` directly in a browser, or serve the directory with any static server.
-
-For example:
+Serve the directory with any static server, for example:
 
 ```bash
+cd examples/scam-artist-site
 python3 -m http.server 8080
 ```
 
 Then open:
 
 ```text
-http://localhost:8080/examples/scam-artist-site/
+http://localhost:8080/
 ```
 
 ## Runtime note
 
-The example references the itch.io-hosted browser build rather than mirroring game files. Runtime URLs can change when a developer uploads a new web build, so production projects should treat the runtime URL as configuration and re-verify it before deployment.
+The example references the itch.io-hosted browser build rather than mirroring game files. Runtime URLs can change when a developer uploads a new web build, so production projects should keep the runtime configurable and re-verify it.
 
 ## Rights / attribution
 
