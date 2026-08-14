@@ -3,9 +3,9 @@
   "$id": "https://github.com/foxigaoqian/open-webgame/schema/open-webgame.schema.json",
   "title": "Open WebGame Project Config",
   "type": "object",
-  "required": ["schemaVersion", "game", "site", "seo", "embed", "design", "status"],
+  "required": ["schemaVersion", "game", "site", "seo", "embed", "design", "sources", "claims", "pages", "security", "status"],
   "properties": {
-    "schemaVersion": { "const": "0.2" },
+    "schemaVersion": { "const": "0.3" },
     "game": {
       "type": "object",
       "required": ["name"],
@@ -60,6 +60,66 @@
         "palette": { "type": "array", "items": { "type": "string" } },
         "density": { "type": "string" },
         "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "url"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["official-site", "itch", "steam", "developer", "devlog", "verified-gameplay", "other"] },
+          "url": { "type": "string", "minLength": 1 },
+          "label": { "type": "string" },
+          "retrievedAt": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "sourceIds", "status"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "sourceIds": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "status": { "enum": ["verified", "pending", "rejected"] },
+          "usedIn": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "file", "intent", "canonical", "indexable"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "file": { "type": "string", "minLength": 1 },
+          "intent": { "type": "string", "minLength": 1 },
+          "canonical": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "indexable": { "type": "boolean" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "security": {
+      "type": "object",
+      "required": ["allowedIframePermissions"],
+      "properties": {
+        "allowedIframePermissions": {
+          "type": "array",
+          "items": { "enum": ["autoplay", "fullscreen", "gamepad", "clipboard-read", "clipboard-write", "cross-origin-isolated", "geolocation", "microphone", "camera", "midi", "gyroscope", "accelerometer", "xr-spatial-tracking", "web-share", "monetization"] }
+        },
+        "requireNoopenerForBlankTargets": { "type": "boolean" },
+        "allowInlineScripts": { "type": "boolean" }
       },
       "additionalProperties": true
     },
