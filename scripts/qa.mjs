@@ -12,6 +12,7 @@ const checks = [
   ['Config', ['scripts/check-config.mjs', '--config', config]],
   ['Content Provenance', ['scripts/content-audit.mjs', '--config', config]],
   ['Site Architecture', ['scripts/site-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
+  ['Multilingual SEO', ['scripts/i18n-audit.mjs', '--config', config, '--site-dir', siteDir]],
   ['On-Page SEO', ['scripts/seo-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
   ['Security', ['scripts/security-audit.mjs', '--config', config, '--html', html]],
   ...(!offline ? [['HTTP Resources', ['scripts/http-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]]] : []),
@@ -37,4 +38,4 @@ if (failed) {
 console.log('Deployment-ready: YES');
 console.log(offline
   ? 'Automated offline gates passed. Run live HTTP/embed and Playwright browser QA before first production launch.'
-  : 'Automated config/content/site/SEO/security/HTTP/embed gates passed. Run Playwright browser QA before first production launch.');
+  : 'Automated config/content/site/i18n/SEO/security/HTTP/embed gates passed. Run Playwright browser QA before first production launch.');
