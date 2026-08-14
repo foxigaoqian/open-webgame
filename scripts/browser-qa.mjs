@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
+import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 import { loadConfig, parseArgs, printResult } from './lib.mjs';
 
@@ -62,6 +63,21 @@ const address = server.address();
 const baseUrl = `http://127.0.0.1:${address.port}`;
 const routePath = home.path === '/' ? '/' : home.path;
 
+const waitForRuntimeFrame = async (page, runtimeUrl, timeoutMs = 10000) => {
+  let origin;
+  try {
+    origin = new URL(runtimeUrl).origin;
+  } catch {
+    return false;
+  }
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (page.frames().some((frame) => frame.url().startsWith(origin))) return true;
+    await page.waitForTimeout(250);
+  }
+  return false;
+};
+
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -89,6 +105,25 @@ try {
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
     if (overflow) errors.push(`${viewport.name}: horizontal overflow detected.`);
+
+    try {
+      const axeResults = await new AxeBuilder({ page })
+        .exclude('iframe')
+        .withTags(['wcag2a', 'wcag2aa'])
+        .analyze();
+      fs.writeFileSync(path.join(artifactsDir, `axe-${viewport.name}.json`), `${JSON.stringify(axeResults, null, 2)}\n`);
+      for (const violation of axeResults.violations) {
+        const impact = violation.impact || 'unknown';
+        const summary = `${violation.id}: ${violation.help} (${violation.nodes.length} node(s))`;
+        if (impact === 'critical' || impact === 'serious') {
+          errors.push(`${viewport.name}: accessibility ${impact}: ${summary}`);
+        } else {
+          warnings.push(`${viewport.name}: accessibility ${impact}: ${summary}`);
+        }
+      }
+    } catch (error) {
+      errors.push(`${viewport.name}: axe accessibility audit failed to run: ${error.message}`);
+    }
 
     if (config.site?.mode === 'play-first') {
       const iframe = page.locator('iframe').first();
@@ -118,6 +153,11 @@ try {
         src = (await iframe.getAttribute('src')) || '';
         if (runtimeUrl && !src.startsWith(runtimeUrl)) errors.push(`${viewport.name}: iframe src does not match embed.runtimeUrl after interaction.`);
 
+        if (runtimeUrl) {
+          const booted = await waitForRuntimeFrame(page, runtimeUrl);
+          if (!booted) errors.push(`${viewport.name}: browser never observed a child frame navigating to the configured runtime origin.`);
+        }
+
         if (viewport.name === 'desktop' && runtimeUrl) {
           try {
             await page.waitForFunction(
@@ -136,6 +176,7 @@ try {
             await page.waitForTimeout(500);
             const afterReload = (await iframe.getAttribute('src')) || '';
             if (!afterReload.startsWith(runtimeUrl)) errors.push('desktop: Reload did not restore the configured runtime URL.');
+            if (!(await waitForRuntimeFrame(page, runtimeUrl, 5000))) errors.push('desktop: runtime child frame did not boot after Reload.');
           } else {
             warnings.push('desktop: no Reload control found.');
           }
