@@ -113,6 +113,22 @@ npm run qa:example
 
 Automated HTTP/header embed checks do not replace a real browser boot/input/fullscreen/mobile smoke test.
 
+## v0.3 production requirements
+
+In addition to the existing game/content/design/SEO gates:
+
+- record official research inputs in `sources[]`
+- connect material factual statements to source-backed `claims[]`
+- reject deployment-ready status when a tracked claim is pending or rejected
+- define intentional routes in `pages[]` before adding multi-page output
+- keep indexable page intents distinct and avoid orphan pages
+- enforce least-privilege iframe capabilities from `security.allowedIframePermissions`
+- run `check:content`, `check:site` and `check:security` as hard gates
+- run Playwright browser QA before first production launch
+- preserve real desktop/tablet/mobile screenshots as QA evidence when CI is available
+
+Do not change `status.deploymentReady` merely to silence a failing gate. Fix the underlying source, page, security, SEO or embed issue.
+
 ## Working order
 
 Follow this sequence unless the task explicitly changes scope:

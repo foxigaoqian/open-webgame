@@ -52,6 +52,52 @@ When research resolves a field, update the config immediately. Do not let HTML, 
 
 See [`docs/zero-config.md`](./docs/zero-config.md) and [`docs/project-config.md`](./docs/project-config.md).
 
+# v0.3 Production Engine
+
+For production work, research and QA must be auditable rather than existing only in prose.
+
+## Source provenance
+
+Populate `sources[]` with the official/first-party research inputs used for the build. Track material factual statements in `claims[]` and connect each claim to one or more `sourceIds`. A deployment-ready build must not rely on tracked claims whose status is `pending` or `rejected`.
+
+Use claims for facts that materially affect the user: controls, platforms, browser/mobile support, release state, developer identity, gameplay systems, progression, compatibility and similar statements. Do not create a claim row for every stylistic sentence.
+
+## Page architecture
+
+Populate `pages[]` before generating deeper routes. Every page needs a distinct path, output file, intent, canonical and indexability decision. Create a route only when a distinct real user intent has enough useful content. Avoid duplicate intent pages and orphan routes.
+
+## Least-privilege embeds
+
+Populate `security.allowedIframePermissions`. Start with the minimum required set, normally `autoplay`, `fullscreen`, `gamepad` and only other capabilities the verified runtime actually needs. Do not copy camera, microphone, geolocation, MIDI, XR or sensor permissions merely because a host's default embed snippet includes them.
+
+## Real browser QA
+
+Before first production launch, run Playwright browser QA after the non-browser gates pass:
+
+```bash
+npm install
+npx playwright install chromium
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+Browser QA must check the generated shell at approximately 1440px, 768px and 390px, detect horizontal overflow, exercise lazy game loading, confirm the configured runtime is assigned to the iframe, preserve Reload behavior, require a Fullscreen control when offered, and capture real screenshots.
+
+A successful HTTP request is not a substitute for browser QA. A visually correct screenshot is not a substitute for embed verification. Both are required for a first production launch of a play-first build.
+
+## v0.3 machine gates
+
+```bash
+npm run check:config -- --config path/to/open-webgame.json
+npm run check:content -- --config path/to/open-webgame.json
+npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+npm run verify:embed -- --config path/to/open-webgame.json
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+```
+
+See [`docs/project-config.md`](./docs/project-config.md).
+
 # Inputs
 
 Minimum input:

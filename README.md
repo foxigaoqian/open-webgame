@@ -40,6 +40,30 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Responsive + performance QA** — desktop, tablet, mobile, iframe usability and page performance must be checked.
 - **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
 
+## v0.3 — Production Engine
+
+Open WebGame v0.3 moves another set of production rules out of prompt prose and into machine-checkable project state.
+
+New production contracts:
+
+- `sources[]` + `claims[]` — connect important factual content to recorded sources
+- `pages[]` — define distinct routes, intents, files, canonicals and indexability
+- `security` — declare the iframe capabilities the site is allowed to request
+- Playwright Browser QA — boot the real generated page at desktop/tablet/mobile widths and save real screenshots
+
+New gates:
+
+```bash
+npm run check:content -- --config path/to/open-webgame.json
+npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+The aggregate non-browser QA now checks config, provenance, page architecture, On-Page SEO, security and embed state. First production launch additionally requires the Playwright browser run.
+
+See [`docs/project-config.md`](./docs/project-config.md) and [`CHANGELOG.md`](./CHANGELOG.md).
+
 ## v0.2 — Zero-Config + Machine-Enforced QA
 
 Open WebGame now has an engineering layer in addition to the agent instructions. A generated project should keep one `open-webgame.json` as its single source of truth, and the repository can fail builds when core config, On-Page SEO or embed rules are broken.
