@@ -1,6 +1,10 @@
 name: Embed Smoke
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/embed-smoke.yml'
   workflow_dispatch:
   schedule:
     - cron: '17 4 * * 1'
