@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Open WebGame logo</title>
+  <desc id="desc">A code bracket gamepad symbol for Open WebGame.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#071a3b"/>
+      <stop offset="1" stop-color="#0b2d6f"/>
+    </linearGradient>
+    <linearGradient id="pad" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dce8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="88" cy="94" r="8" fill="#22d3ee" opacity=".9"/>
+  <circle cx="425" cy="105" r="6" fill="#c084fc" opacity=".9"/>
+  <circle cx="414" cy="409" r="7" fill="#22c55e" opacity=".9"/>
+  <path d="M154 186c-30 4-48 25-55 54l-24 96c-8 32 27 57 52 36l52-43h154l52 43c25 21 60-4 52-36l-24-96c-7-29-25-50-55-54-31-4-57 14-75 29h-54c-18-15-44-33-75-29Z" fill="#07101f" opacity=".75" transform="translate(0 12)"/>
+  <path d="M154 174c-30 4-48 25-55 54l-24 96c-8 32 27 57 52 36l52-43h154l52 43c25 21 60-4 52-36l-24-96c-7-29-25-50-55-54-31-4-57 14-75 29h-54c-18-15-44-33-75-29Z" fill="url(#pad)" stroke="#6ea8ff" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M186 231l-44 34 44 34" fill="none" stroke="#123f8d" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M326 231l44 34-44 34" fill="none" stroke="#123f8d" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M285 215l-58 101" fill="none" stroke="#123f8d" stroke-width="18" stroke-linecap="round"/>
+  <path d="M335 136l16-16 13 13 20-38 13 7-22 43 16 15-24 24-16-16Z" fill="#22d3ee" stroke="#6ea8ff" stroke-width="6" stroke-linejoin="round"/>
+</svg>
