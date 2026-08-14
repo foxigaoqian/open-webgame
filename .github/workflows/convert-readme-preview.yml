@@ -54,14 +54,22 @@ jobs:
               browser.close()
           PY
 
-      - name: Commit real screenshot
+      - name: Sync README and clean obsolete preview files
         run: |
-          if git diff --quiet -- assets/scam-artist-real-first-screen.jpg; then
-            echo 'Screenshot already up to date.'
+          sed -i 's#assets/scam-artist-real-first-screen\.webp#assets/scam-artist-real-first-screen.jpg#g' README.md
+          sed -i 's#scam-artist-real-first-screen\.webp#scam-artist-real-first-screen.jpg#g' README.md
+          rm -f assets/scam-artist-real-first-screen.webp
+          rm -f assets/README_IMAGE_FORMAT_NOTE.txt
+          rm -f assets/preview-source-note.md
+
+      - name: Commit real screenshot and README
+        run: |
+          if git diff --quiet; then
+            echo 'Preview and README already up to date.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/scam-artist-real-first-screen.jpg
-          git commit -m 'docs: capture real high-quality example screenshot'
+          git add -A
+          git commit -m 'docs: use real GitHub-compatible example screenshot'
           git push
