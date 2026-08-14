@@ -2,6 +2,28 @@
 
 All notable project changes are documented here.
 
+## 0.3.0 — 2026-08-14
+
+### Added
+
+- Content provenance model with `sources[]` and source-backed `claims[]`.
+- Multi-page project contract with `pages[]` and automated site-architecture checks.
+- Security configuration for iframe capabilities and blank-target link hardening.
+- `npm run check:content` provenance gate.
+- `npm run check:site` route/canonical/sitemap/orphan-risk gate.
+- `npm run check:security` iframe/link security gate.
+- Playwright browser QA that runs the real site at 1440px, 768px and 390px widths.
+- Browser QA screenshots as GitHub Actions artifacts.
+- Aggregate QA now includes config, provenance, site architecture, On-Page SEO, security and embed checks.
+
+### Changed
+
+- Project schema version is now `0.3`.
+- Zero-Config bootstrap now creates provenance, page and security sections by default.
+- Scam Artist example now records official sources and verified factual claims.
+- Scam Artist iframe permissions were reduced from the host's broad default set to the capabilities currently required by the demo workflow.
+- Deployment readiness now expects real browser QA before first production launch.
+
 ## 0.2.0 — 2026-08-14
 
 ### Added
