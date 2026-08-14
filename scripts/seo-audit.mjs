@@ -33,30 +33,34 @@ if (titleMatches.length !== 1) {
 
 const metaTags = [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]);
 const linkTags = [...html.matchAll(/<link\b[^>]*>/gi)].map((m) => m[0]);
-const findMetaName = (name) => metaTags.find((tag) => attr(tag, 'name').toLowerCase() === name.toLowerCase());
-const findMetaProperty = (name) => metaTags.find((tag) => attr(tag, 'property').toLowerCase() === name.toLowerCase());
+const metasByName = (name) => metaTags.filter((tag) => attr(tag, 'name').toLowerCase() === name.toLowerCase());
+const metasByProperty = (name) => metaTags.filter((tag) => attr(tag, 'property').toLowerCase() === name.toLowerCase());
+const findMetaName = (name) => metasByName(name)[0];
+const findMetaProperty = (name) => metasByProperty(name)[0];
 
-const descriptionTag = findMetaName('description');
-if (!descriptionTag) {
-  errors.push('Missing meta description.');
+const descriptionTags = metasByName('description');
+if (descriptionTags.length !== 1) {
+  errors.push(`Expected exactly one meta description; found ${descriptionTags.length}.`);
 } else {
-  const description = attr(descriptionTag, 'content').trim();
+  const description = attr(descriptionTags[0], 'content').trim();
   if (!description) errors.push('Meta description is empty.');
   if (description.length < 70 || description.length > 180) {
     warnings.push(`Meta description is ${description.length} characters; review snippet quality.`);
   }
 }
 
-const robotsTag = findMetaName('robots');
+const robotsTags = metasByName('robots');
+if (robotsTags.length > 1) warnings.push(`Found ${robotsTags.length} robots meta tags; consolidate indexing directives.`);
+const robotsTag = robotsTags[0];
 if (robotsTag && /\bnoindex\b/i.test(attr(robotsTag, 'content'))) {
   errors.push('Production page contains noindex.');
 }
 
-const canonicalTag = linkTags.find((tag) => attr(tag, 'rel').toLowerCase().split(/\s+/).includes('canonical'));
-if (!canonicalTag) {
-  errors.push('Missing canonical link.');
+const canonicalTags = linkTags.filter((tag) => attr(tag, 'rel').toLowerCase().split(/\s+/).includes('canonical'));
+if (canonicalTags.length !== 1) {
+  errors.push(`Expected exactly one canonical link; found ${canonicalTags.length}.`);
 } else {
-  const canonical = attr(canonicalTag, 'href').trim();
+  const canonical = attr(canonicalTags[0], 'href').trim();
   if (!isProductionHttpsUrl(canonical)) errors.push('Canonical must be a real HTTPS production URL, not example.com/localhost.');
   if (config.site?.canonical && normalizeUrl(canonical) !== normalizeUrl(config.site.canonical)) {
     errors.push(`Canonical does not match config.site.canonical (${config.site.canonical}).`);
@@ -64,8 +68,10 @@ if (!canonicalTag) {
 }
 
 for (const property of ['og:title', 'og:description', 'og:image', 'og:url']) {
-  const tag = findMetaProperty(property);
-  if (!tag || !attr(tag, 'content').trim()) errors.push(`Missing ${property}.`);
+  const tags = metasByProperty(property);
+  if (tags.length !== 1 || !attr(tags[0] || '', 'content').trim()) {
+    errors.push(`Expected exactly one non-empty ${property}; found ${tags.length}.`);
+  }
 }
 const ogImage = findMetaProperty('og:image');
 if (ogImage && !/^https:\/\//i.test(attr(ogImage, 'content'))) errors.push('og:image must be an absolute HTTPS URL.');
@@ -83,15 +89,26 @@ if (h1Matches.length !== 1) {
   if (lowerGame && !h1.toLowerCase().includes(lowerGame)) errors.push(`H1 must clearly identify ${gameName}.`);
 }
 
+const headingLevels = [...html.matchAll(/<h([1-6])\b[^>]*>/gi)].map((match) => Number(match[1]));
+for (let i = 1; i < headingLevels.length; i += 1) {
+  if (headingLevels[i] > headingLevels[i - 1] + 1) {
+    warnings.push(`Heading hierarchy jumps from H${headingLevels[i - 1]} to H${headingLevels[i]}; review document structure.`);
+    break;
+  }
+}
+
 const bodyText = stripTags(html);
 if (bodyText.length < 500) errors.push('Too little crawlable text outside scripts/styles/iframes.');
 if (lowerGame && !bodyText.toLowerCase().includes(lowerGame)) errors.push('Crawlable page text does not identify the game entity.');
 
 const imageTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);
 for (let i = 0; i < imageTags.length; i += 1) {
-  const alt = attr(imageTags[i], 'alt');
-  if (!alt.trim()) errors.push(`Image ${i + 1} is missing meaningful alt text.`);
-  if (!attr(imageTags[i], 'width') || !attr(imageTags[i], 'height')) {
+  const image = imageTags[i];
+  const hasAlt = /(?:^|\s)alt\s*=/i.test(image);
+  if (!hasAlt) {
+    errors.push(`Image ${i + 1} is missing an alt attribute. Use meaningful alt text for informative images or alt="" for decorative images.`);
+  }
+  if (!attr(image, 'width') || !attr(image, 'height')) {
     warnings.push(`Image ${i + 1} has no explicit width/height; review CLS risk.`);
   }
 }
