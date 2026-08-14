@@ -8,7 +8,8 @@
   <a href="https://foxigaoqian.github.io/open-webgame/"><strong>Live Demo</strong></a> ·
   <a href="./examples/scam-artist-site/index.html">Example Source</a> ·
   <a href="./SKILL.md">Skill Docs</a> ·
-  <a href="./references/on-page-seo.md">SEO Standard</a>
+  <a href="./references/on-page-seo.md">SEO Standard</a> ·
+  <a href="./docs/zero-config.md">Zero Config</a>
 </p>
 
 <p align="center">
@@ -38,6 +39,35 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Useful supporting content** — How to Play, controls, tips, progression, FAQ and additional pages only when they match real player intent.
 - **Responsive + performance QA** — desktop, tablet, mobile, iframe usability and page performance must be checked.
 - **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
+
+## v0.2 — Zero-Config + Machine-Enforced QA
+
+Open WebGame now has an engineering layer in addition to the agent instructions. A generated project should keep one `open-webgame.json` as its single source of truth, and the repository can fail builds when core config, On-Page SEO or embed rules are broken.
+
+If you only have a game name, that is enough to start:
+
+```text
+Scam Artist
+```
+
+Agent default: research the real game automatically, verify the real browser runtime, choose play-first or guide mode, derive the visual system, generate the site, then run hard QA.
+
+Optional local bootstrap:
+
+```bash
+npm run init:game -- "Scam Artist"
+```
+
+Automated gates:
+
+```bash
+npm run check:config -- --config path/to/open-webgame.json
+npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+npm run verify:embed -- --config path/to/open-webgame.json
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+```
+
+See [`docs/zero-config.md`](./docs/zero-config.md), [`docs/project-config.md`](./docs/project-config.md) and [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Live Case
 
@@ -203,15 +233,29 @@ open-webgame/
 ├── AGENTS.md
 ├── DESIGN.md
 ├── CONTRIBUTING.md
+├── CHANGELOG.md
+├── package.json
 ├── LICENSE
+├── schema/
+│   └── open-webgame.schema.json
+├── starter/
+│   └── open-webgame.example.json
+├── scripts/
+│   ├── init.mjs
+│   ├── check-config.mjs
+│   ├── seo-audit.mjs
+│   ├── verify-embed.mjs
+│   └── qa.mjs
+├── docs/
+│   ├── zero-config.md
+│   └── project-config.md
 ├── .github/
-│   ├── pull_request_template.md
+│   ├── ISSUE_TEMPLATE/
 │   └── workflows/
-│       └── pages.yml
-├── assets/
-│   ├── logo.svg
-│   ├── og.svg
-│   └── scam-artist-real-first-screen.jpg
+│       ├── ci.yml
+│       ├── embed-smoke.yml
+│       ├── pages.yml
+│       └── convert-readme-preview.yml
 ├── references/
 │   ├── iframe-verification.md
 │   ├── on-page-seo.md
@@ -221,6 +265,9 @@ open-webgame/
     ├── goblincremental.md
     ├── scam-artist.md
     └── scam-artist-site/
+        ├── open-webgame.json
+        ├── robots.txt
+        ├── sitemap.xml
         ├── README.md
         └── index.html
 ```

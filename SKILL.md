@@ -29,6 +29,29 @@ Read and follow:
 - [`references/site-blueprint.md`](./references/site-blueprint.md)
 - [`references/qa-checklist.md`](./references/qa-checklist.md)
 
+# Zero-Config Mode
+
+Zero-Config Mode is the default when the user provides only a game keyword. Do not ask for optional details that can be researched safely.
+
+Defaults:
+
+```text
+Language: English
+Stack: static HTML
+Research: automatic
+Site mode: auto → play-first only after runtime verification, otherwise guide
+On-Page SEO: mandatory
+Responsive QA: mandatory
+Output: complete website folder
+Clarifying questions: avoid unless genuinely blocked
+```
+
+Create or update `open-webgame.json` before the final build. It is the per-project single source of truth for game identity, canonical URL, search intent, runtime URL, visual direction and readiness state. Use `schema/open-webgame.schema.json` as the contract.
+
+When research resolves a field, update the config immediately. Do not let HTML, JSON-LD, sitemap, README or runtime configuration silently disagree with it.
+
+See [`docs/zero-config.md`](./docs/zero-config.md) and [`docs/project-config.md`](./docs/project-config.md).
+
 # Inputs
 
 Minimum input:
@@ -543,6 +566,22 @@ Check:
 
 If the browser game itself is poor on small screens, state `Desktop recommended` rather than claiming good mobile play.
 
+# Machine-Enforced Gates
+
+When the repository scripts are available, run them. Documentation-only self-review is not enough when a rule can be checked mechanically.
+
+```bash
+npm run check:config -- --config path/to/open-webgame.json
+npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+npm run verify:embed:config -- --config path/to/open-webgame.json
+npm run verify:embed -- --config path/to/open-webgame.json
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+```
+
+The offline embed gate validates configuration and rejects obvious project-page/runtime mistakes. The live embed command checks reachability and framing headers. Neither replaces a real browser boot/input/fullscreen/mobile smoke test.
+
+A command failure means the corresponding hard gate has not passed. Do not set `status.deploymentReady = true` to bypass it.
+
 # Final QA Gate
 
 A project is complete only when all applicable gates pass.
@@ -607,6 +646,7 @@ Any failed On-Page SEO Gate is a `FAIL` for a production/deployment-ready build.
 When invoked for a game keyword, deliver:
 
 ```text
+0. Project config (`open-webgame.json`)
 1. Resolved game identity
 2. Official sources
 3. Embed status
