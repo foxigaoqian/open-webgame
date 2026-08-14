@@ -67,6 +67,7 @@ try {
   browser = await chromium.launch({ headless: true });
   const viewports = [
     { name: 'desktop', width: 1440, height: 900 },
+    { name: 'tablet', width: 768, height: 1024 },
     { name: 'mobile', width: 390, height: 844 },
   ];
 
