@@ -1,0 +1,47 @@
+{
+  "$schema": "../schema/open-webgame.schema.json",
+  "schemaVersion": "0.2",
+  "game": {
+    "name": "Example Game",
+    "developer": "",
+    "genre": "",
+    "officialUrl": "",
+    "platforms": []
+  },
+  "site": {
+    "language": "en",
+    "mode": "auto",
+    "domain": "",
+    "canonical": "",
+    "stack": "static-html",
+    "deploymentTarget": "unspecified"
+  },
+  "seo": {
+    "primaryIntent": "mixed",
+    "primaryKeyword": "Example Game",
+    "secondaryIntents": [],
+    "canonicalPagePurpose": "Resolve after game research."
+  },
+  "embed": {
+    "status": "pending",
+    "runtimeUrl": "",
+    "officialPage": "",
+    "host": ""
+  },
+  "design": {
+    "direction": "Derive from official game visuals.",
+    "palette": [],
+    "density": "derive",
+    "notes": "Do not reuse another game's visual system."
+  },
+  "status": {
+    "research": "pending",
+    "onPageSeo": "pending",
+    "deploymentReady": false,
+    "blockingIssues": [
+      "Game research has not been completed.",
+      "Embed status has not been resolved.",
+      "Production canonical has not been resolved."
+    ]
+  }
+}
