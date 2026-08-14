@@ -5,7 +5,7 @@ import { parseArgs } from './lib.mjs';
 const args = parseArgs();
 const gameName = String(args._[0] || '').trim();
 if (!gameName) {
-  console.error('Usage: npm run init:game -- "Game Name" [--domain example.com] [--out output/game-name] [--force]');
+  console.error('Usage: npm run init:game -- "Game Name" [--domain example.com] [--languages en,ja,ko] [--out output/game-name] [--force]');
   process.exit(1);
 }
 
@@ -29,6 +29,24 @@ if (fs.existsSync(configPath) && !args.force) {
 const domain = String(args.domain || '').trim();
 const canonical = domain ? `https://${domain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/` : '';
 const schemaUrl = 'https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json';
+const requestedLanguages = String(args.languages || 'en')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const languages = [...new Set(requestedLanguages.length ? requestedLanguages : ['en'])];
+const defaultLanguage = languages[0];
+const languageLabels = {
+  en: 'English',
+  ja: '日本語',
+  zh: '中文',
+  'zh-CN': '简体中文',
+  'zh-TW': '繁體中文',
+  ko: '한국어',
+  es: 'Español',
+  fr: 'Français',
+  de: 'Deutsch',
+  pt: 'Português',
+};
 
 const config = {
   $schema: schemaUrl,
@@ -41,12 +59,22 @@ const config = {
     platforms: [],
   },
   site: {
-    language: 'en',
+    language: defaultLanguage,
     mode: 'auto',
     domain,
     canonical,
     stack: 'static-html',
     deploymentTarget: 'unspecified',
+  },
+  i18n: {
+    enabled: languages.length > 1,
+    defaultLanguage,
+    xDefaultLanguage: defaultLanguage,
+    languages: languages.map((code, index) => ({
+      code,
+      label: languageLabels[code] || code,
+      prefix: index === 0 ? '' : `/${code}`,
+    })),
   },
   seo: {
     primaryIntent: 'mixed',
@@ -76,6 +104,8 @@ const config = {
       canonical,
       title: '',
       indexable: true,
+      language: defaultLanguage,
+      translationKey: 'home',
     },
   ],
   security: {
@@ -91,13 +121,14 @@ const config = {
       'Resolve the real game entity and official sources.',
       'Record source-backed factual claims.',
       'Resolve browser/embed status.',
+      ...(languages.length > 1 ? ['Generate and QA every configured language route, hreflang set and multilingual sitemap.'] : []),
       ...(canonical ? [] : ['Resolve the production domain/canonical before deployment.']),
       'Run On-Page SEO, security, browser and final QA.',
     ],
   },
 };
 
-const brief = `# Open WebGame build brief\n\nGame keyword: **${gameName}**\n\nThis project was bootstrapped in Zero-Config Mode. The next agent must follow \`SKILL.md\` and treat \`open-webgame.json\` as the single source of truth.\n\n## Defaults\n\n- Language: English\n- Stack: static HTML\n- Research: automatic\n- Mode: play-first only when a real third-party runtime is verified; otherwise guide mode\n- On-Page SEO: mandatory\n- Content provenance: mandatory for factual claims\n- Iframe permissions: least privilege\n- Responsive browser QA: mandatory\n- Clarifying questions: avoid unless entity resolution or deployment is genuinely blocked\n\n## Required sequence\n\n1. Resolve the exact game and official sources.\n2. Add sources and source-backed claims to \`open-webgame.json\`.\n3. Verify browser playability and update \`embed\` + \`site.mode\`.\n4. Define search intent and update \`seo\` + \`pages\`.\n5. Derive visual DNA and update \`design\`.\n6. Generate the site with minimum iframe permissions.\n7. Run config, content, site, SEO, security and embed QA.\n8. Run Playwright browser QA at desktop/mobile widths.\n9. Set \`status.deploymentReady\` to true only after every hard gate passes.\n`;
+const brief = `# Open WebGame build brief\n\nGame keyword: **${gameName}**\n\nThis project was bootstrapped in Zero-Config Mode. The next agent must follow \`SKILL.md\` and treat \`open-webgame.json\` as the single source of truth.\n\n## Defaults\n\n- Languages: ${languages.join(', ')}\n- Default language: ${defaultLanguage}\n- Stack: static HTML\n- Research: automatic\n- Mode: play-first only when a real third-party runtime is verified; otherwise guide mode\n- On-Page SEO: mandatory\n- Multilingual SEO: ${languages.length > 1 ? 'enabled; localize intent/metadata/content and generate hreflang + x-default + sitemap alternates' : 'disabled'}\n- Content provenance: mandatory for factual claims\n- Iframe permissions: least privilege\n- Responsive browser QA: mandatory\n- Clarifying questions: avoid unless entity resolution or deployment is genuinely blocked\n\n## Required sequence\n\n1. Resolve the exact game and official sources.\n2. Add sources and source-backed claims to \`open-webgame.json\`.\n3. Verify browser playability and update \`embed\` + \`site.mode\`.\n4. Define search intent and update \`seo\` + \`pages\`.\n5. If multilingual, create language-specific page entries sharing translation keys, then localize metadata and content for each language's real search intent.\n6. Derive visual DNA and update \`design\`.\n7. Generate the site with minimum iframe permissions.\n8. Run config, content, site, i18n, SEO, security and embed QA.\n9. Run Playwright browser QA at desktop/tablet/mobile widths.\n10. Set \`status.deploymentReady\` to true only after every hard gate passes.\n`;
 
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
 fs.writeFileSync(briefPath, brief, 'utf8');

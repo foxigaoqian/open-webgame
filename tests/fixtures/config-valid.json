@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
+  "schemaVersion": "0.3",
+  "game": {
+    "name": "Fixture Game",
+    "developer": "Fixture Studio",
+    "genre": "Puzzle",
+    "officialUrl": "https://fixture.invalid/official",
+    "platforms": ["Web browser"]
+  },
+  "site": {
+    "language": "en",
+    "mode": "guide",
+    "domain": "fixture.invalid",
+    "canonical": "https://fixture.invalid/game/",
+    "stack": "static-html",
+    "deploymentTarget": "test"
+  },
+  "seo": {
+    "primaryIntent": "guide",
+    "primaryKeyword": "Fixture Game",
+    "secondaryIntents": ["Fixture Game guide"],
+    "canonicalPagePurpose": "Explain the verified Fixture Game basics."
+  },
+  "embed": {
+    "status": "unsupported",
+    "runtimeUrl": "",
+    "officialPage": "https://fixture.invalid/official",
+    "host": "fixture"
+  },
+  "design": {
+    "direction": "Fixture-only test visual system",
+    "palette": ["#111111", "#eeeeee"],
+    "density": "medium",
+    "notes": "Used only by regression tests."
+  },
+  "sources": [],
+  "claims": [],
+  "pages": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "intent": "Fixture Game guide",
+      "canonical": "https://fixture.invalid/game/",
+      "title": "Fixture Game Guide",
+      "indexable": true
+    }
+  ],
+  "security": {
+    "allowedIframePermissions": [],
+    "requireNoopenerForBlankTargets": true,
+    "allowInlineScripts": true
+  },
+  "status": {
+    "research": "pending",
+    "onPageSeo": "pending",
+    "deploymentReady": false,
+    "blockingIssues": []
+  }
+}

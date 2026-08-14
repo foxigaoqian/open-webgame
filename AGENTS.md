@@ -14,6 +14,8 @@ Read these in this order when relevant:
 - Zero-Config behavior: `docs/zero-config.md`
 - Per-project single-source contract: `open-webgame.json` + `schema/open-webgame.schema.json`
 - Project-config reference: `docs/project-config.md`
+- Multilingual SEO behavior: `docs/multilingual.md`
+- Machine/browser quality gates: `docs/quality-gates.md`
 - Browser runtime discovery and embed verification: `references/iframe-verification.md`
 - Mandatory On-Page SEO rules: `references/on-page-seo.md`
 - Reusable page architecture: `references/site-blueprint.md`
@@ -21,7 +23,7 @@ Read these in this order when relevant:
 - Design derivation rules: `DESIGN.md`
 - Real implementation examples: `examples/`
 
-For a generated site, `open-webgame.json` is the project-level source of truth for game identity, canonical URL, search intent, runtime URL, design direction and readiness state. Do not let HTML, schema, sitemap or documentation silently disagree with it.
+For a generated site, `open-webgame.json` is the project-level source of truth for game identity, canonical URL, languages, search intent, runtime URL, design direction and readiness state. Do not let HTML, schema, sitemap or documentation silently disagree with it.
 
 ## Zero-Config default
 
@@ -31,11 +33,16 @@ Use these defaults unless the user overrides them:
 
 ```text
 Language: English
+Multilingual: off unless requested
 Stack: static HTML
 Research: automatic
 Mode: auto → play-first only after runtime verification, otherwise guide
 On-Page SEO: mandatory
+Content provenance: mandatory
+Least-privilege iframe permissions: mandatory
 Responsive QA: mandatory
+Accessibility QA: mandatory
+Performance QA: mandatory before first production launch
 Output: complete website folder
 Clarifying questions: only when genuinely blocked
 ```
@@ -57,6 +64,7 @@ A generated site is not deployment-ready unless all relevant gates pass.
 ### Content gate
 
 - ground game facts in official sources or verified gameplay
+- record material factual claims in `claims[]` and connect them to `sources[]`
 - do not invent controls, codes, upgrades, characters, modes, release dates or mobile support
 - only create sections/pages that answer a real player need
 
@@ -65,6 +73,7 @@ A generated site is not deployment-ready unless all relevant gates pass.
 - derive the visual system again for every game
 - do not ship a recolored generic gaming template
 - preserve readability, accessibility and mobile usability
+- use real generated-site screenshots for showcase/QA evidence; do not present fake promotional UI as product output
 
 ### On-Page SEO gate
 
@@ -74,15 +83,49 @@ A generated site is not deployment-ready unless all relevant gates pass.
 - use a correct self-referencing production canonical
 - avoid keyword stuffing and doorway pages
 - generate production robots and sitemap when a target domain is known
+- informative images need meaningful alt text
+- decorative images should use `alt=""`; omitting the `alt` attribute entirely is a failure
 - do not mark `On-Page SEO: PASS` while placeholder/staging URLs remain
+
+### Multilingual SEO gate
+
+Only enable multilingual output when requested or explicitly justified.
+
+When `i18n.enabled = true`:
+
+- research/localize search intent per language; do not mechanically translate English keyword copy
+- create real crawlable locale routes
+- every indexable locale page must declare `language` and `translationKey` in `pages[]`
+- every translation cluster needs reciprocal hreflang entries including itself
+- include a correct `x-default`
+- every locale page self-canonicalizes; never canonicalize all locales to English
+- provide a visible keyboard-accessible language switcher
+- prefer switching to the corresponding page in the same `translationKey`
+- generate multilingual sitemap alternates
+- run `check:i18n` as a hard gate
 
 ### Config/readiness gate
 
+- config must pass strict AJV schema validation; unknown/misspelled properties are errors
 - `status.research = "resolved"` before production readiness
 - `site.mode = "play-first"` only with `embed.status = "verified"`
 - `status.onPageSeo = "pass"` before production readiness
 - `status.blockingIssues` must be empty before production readiness
 - a real HTTPS production canonical is required for `status.deploymentReady = true`
+- do not change readiness flags merely to silence a failing gate
+
+### Browser/accessibility/performance gate
+
+Before first production launch:
+
+- Browser QA must run at approximately 1440 / 768 / 390 widths
+- lazy game loading must assign the configured runtime
+- a real child frame must navigate to the runtime origin
+- Reload must prove a fresh child-frame navigation cycle when the site offers Reload
+- serious/critical axe WCAG 2 A/AA violations in the host shell are hard failures
+- screenshots and axe reports should be preserved as CI artifacts
+- Lighthouse must pass configured shell thresholds, including CLS
+- third-party game iframe DOM is not scored as if Open WebGame owns it; the host shell still must be accessible
 
 ## Commands
 
@@ -92,11 +135,32 @@ The repository includes machine-enforced QA. Use it instead of relying on visual
 # Bootstrap a one-keyword project
 npm run init:game -- "Game Name"
 
-# Validate the single-source config
+# Bootstrap a multilingual project
+npm run init:game -- "Game Name" --languages en,ja,ko
+
+# Install QA dependencies
+npm install
+
+# Validate strict schema + semantic config rules
 npm run check:config -- --config path/to/open-webgame.json
+
+# Verify source-backed claims
+npm run check:content -- --config path/to/open-webgame.json
+
+# Verify page architecture
+npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
+
+# Verify hreflang/x-default/multilingual page relationships
+npm run check:i18n -- --config path/to/open-webgame.json --site-dir path/to/site
 
 # Audit On-Page SEO
 npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+
+# Check iframe/link security
+npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+
+# Check canonical/OG/sitemap URLs live
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
 
 # Check runtime config only (no network)
 npm run verify:embed:config -- --config path/to/open-webgame.json
@@ -104,8 +168,21 @@ npm run verify:embed:config -- --config path/to/open-webgame.json
 # Check runtime reachability + framing headers
 npm run verify:embed -- --config path/to/open-webgame.json
 
-# Run all automated gates
+# Deterministic regression tests
+npm test
+
+# Run non-browser gates offline
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html --offline
+
+# Run live non-browser gates
 npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+
+# Real browser + axe QA
+npx playwright install chromium
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+
+# Lighthouse shell QA
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
 
 # Repository regression case
 npm run qa:example
@@ -127,7 +204,15 @@ In addition to the existing game/content/design/SEO gates:
 - run Playwright browser QA before first production launch
 - preserve real desktop/tablet/mobile screenshots as QA evidence when CI is available
 
-Do not change `status.deploymentReady` merely to silence a failing gate. Fix the underlying source, page, security, SEO or embed issue.
+## v0.3.1 quality requirements
+
+- strict AJV Schema is authoritative for config shape; do not rely on permissive unknown fields
+- keep pass/fail regression fixtures for machine-enforced rules
+- use `check:http` before launch so correct-looking canonical/OG/sitemap markup cannot hide dead URLs
+- when multilingual, run `check:i18n` and keep translation groups complete
+- run axe as part of Browser QA and fix serious/critical host-shell violations
+- prove the actual runtime child frame boots, not just that an iframe `src` string exists
+- run Lighthouse before first production launch and fix hard-threshold failures rather than lowering the threshold to hide regressions
 
 ## Working order
 
@@ -135,15 +220,18 @@ Follow this sequence unless the task explicitly changes scope:
 
 ```text
 create/update open-webgame.json
-→ resolve game
+→ strict-schema validation
+→ resolve game + sources + claims
 → verify runtime
-→ define search intent
+→ define search intent + page architecture
+→ define locales when requested
 → research mechanics + controls + visual DNA
 → derive design direction
 → build play-first or guide site
-→ implement On-Page SEO
-→ run automated QA
-→ browser/mobile/performance checks
+→ implement On-Page + multilingual SEO
+→ run regression + static/live gates
+→ browser + axe QA
+→ Lighthouse QA
 → final readiness decision
 ```
 
@@ -151,11 +239,13 @@ Do not start the full visual build with an unverified player when the site is su
 
 ## CI expectations
 
-`.github/workflows/ci.yml` must remain green. It syntax-checks the QA scripts and runs the real Scam Artist example through the config, SEO and offline embed gates.
+`.github/workflows/ci.yml` must remain green. It installs QA dependencies, syntax-checks scripts, runs regression tests and sends the real Scam Artist example through deterministic hard gates.
+
+`.github/workflows/browser-qa.yml` must remain green. It runs Playwright + axe against the real example, verifies runtime child-frame behavior, runs Lighthouse and uploads quality artifacts.
 
 `.github/workflows/embed-smoke.yml` performs a live runtime reachability/header check on a schedule and can also be run manually.
 
-Do not weaken a hard gate just to make CI green. Fix the example or the underlying implementation.
+Do not weaken a hard gate just to make CI green. Fix the example, the test, or the underlying implementation.
 
 ## Contribution discipline
 
@@ -165,9 +255,10 @@ When changing behavior or standards:
 2. update `README.md` if public-facing behavior changed
 3. update config/schema when the project contract changed
 4. update automated QA when a rule can be enforced mechanically
-5. update examples only when they remain truthful
-6. keep demo/staging status explicit
-7. never weaken a hard gate merely to make an example appear complete
+5. add or update pass/fail regression coverage
+6. update examples only when they remain truthful
+7. keep demo/staging status explicit
+8. never weaken a hard gate merely to make an example appear complete
 
 ## Safety and rights
 

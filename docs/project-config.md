@@ -2,7 +2,7 @@
 
 Every generated Open WebGame project should have one `open-webgame.json` file.
 
-This file is the single source of truth for game identity, deployment URL, search intent, embed state, visual direction, source provenance, page architecture, iframe permissions and QA status.
+This file is the single source of truth for game identity, deployment URL, search intent, embed state, visual direction, source provenance, page architecture, multilingual relationships, iframe permissions and QA status.
 
 Schema:
 
@@ -31,10 +31,13 @@ Without a single source of truth, generated sites drift easily:
 - iframe uses an old runtime while documentation points to a new one
 - canonical points to staging while sitemap points to production
 - a deeper page exists without being linked or included in the sitemap
+- language pages have broken hreflang relationships
 - iframe permissions stay much broader than the game actually needs
 - README claims `deployment-ready` while a hard gate still fails
 
-Open WebGame v0.3 treats these forms of drift as QA failures where they can be checked mechanically.
+Open WebGame v0.3.1 treats these forms of drift as QA failures where they can be checked mechanically.
+
+The config is now validated by AJV against a strict JSON Schema. Unknown keys are rejected instead of silently ignored.
 
 ## Core sections
 
@@ -74,6 +77,26 @@ Deployment and rendering decisions.
 - `auto` — research not finished
 - `play-first` — real third-party runtime verified
 - `guide` — no reliable embedded runtime; use official Play links instead
+
+### `i18n`
+
+Optional multilingual project contract.
+
+```json
+{
+  "enabled": true,
+  "defaultLanguage": "en",
+  "xDefaultLanguage": "en",
+  "languages": [
+    { "code": "en", "label": "English", "prefix": "" },
+    { "code": "ja", "label": "日本語", "prefix": "/ja" }
+  ]
+}
+```
+
+When enabled, `site.language` must match `i18n.defaultLanguage`, and every indexable page must record `language` and `translationKey`.
+
+See [`multilingual.md`](./multilingual.md).
 
 ### `seo`
 
@@ -116,7 +139,7 @@ A compact description of the visual system derived for this game. It is not a fi
 }
 ```
 
-## v0.3 production sections
+## Production sections
 
 ### `sources`
 
@@ -154,7 +177,7 @@ Track important factual claims and connect them to sources.
 
 A deployment-ready build cannot rely on pending or rejected tracked claims.
 
-This does not require every sentence to become a database row. Track claims that materially affect gameplay instructions, platform support, release status, developer identity, controls, compatibility, progression systems and other facts users may act on.
+Track claims that materially affect gameplay instructions, platform support, release status, developer identity, controls, compatibility, progression systems and other facts users may act on.
 
 ### `pages`
 
@@ -163,25 +186,19 @@ Describe the intended indexable site architecture.
 ```json
 [
   {
-    "path": "/",
-    "file": "index.html",
-    "intent": "play the game and learn the beginner loop",
-    "canonical": "https://example.com/",
-    "title": "Play Example Game Online",
-    "indexable": true
-  },
-  {
-    "path": "/how-to-play/",
-    "file": "how-to-play/index.html",
-    "intent": "learn controls and first-session mechanics",
-    "canonical": "https://example.com/how-to-play/",
-    "title": "How to Play Example Game",
-    "indexable": true
+    "path": "/ja/how-to-play/",
+    "file": "ja/how-to-play/index.html",
+    "intent": "localized Japanese controls and first-session mechanics",
+    "canonical": "https://example.com/ja/how-to-play/",
+    "title": "Example Game 遊び方ガイド",
+    "indexable": true,
+    "language": "ja",
+    "translationKey": "how-to-play"
   }
 ]
 ```
 
-Create a new page only when it serves a distinct real intent with enough useful content. The site gate checks duplicate routes/canonicals, missing files, sitemap coverage and basic orphan risk.
+Create a new page only when it serves a distinct real intent with enough useful content. Pages sharing `translationKey` are alternate-language versions of the same page purpose.
 
 ### `security`
 
@@ -214,7 +231,13 @@ The final project state.
 
 ## Commands
 
-Validate config:
+Install QA dependencies:
+
+```bash
+npm install
+```
+
+Validate the strict config schema and semantic relationships:
 
 ```bash
 npm run check:config -- --config path/to/open-webgame.json
@@ -232,6 +255,12 @@ Check page architecture and sitemap coverage:
 npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
+Check multilingual SEO relationships:
+
+```bash
+npm run check:i18n -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
 Audit On-Page SEO:
 
 ```bash
@@ -242,6 +271,12 @@ Check iframe/link security:
 
 ```bash
 npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+```
+
+Check production canonical/OG/sitemap URLs over HTTP:
+
+```bash
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
 ```
 
 Check embed config only:
@@ -256,20 +291,31 @@ Run a live HTTP/header runtime check:
 npm run verify:embed -- --config path/to/open-webgame.json
 ```
 
+Run deterministic regression tests:
+
+```bash
+npm test
+```
+
 Run all non-browser gates:
 
 ```bash
 npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
 ```
 
-Run real browser QA after installing Playwright Chromium:
+Run real browser + axe QA after installing Playwright Chromium:
 
 ```bash
-npm install
 npx playwright install chromium
 npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
-Browser QA starts the generated site locally, checks desktop/tablet/mobile layouts, detects horizontal overflow, exercises lazy player loading, verifies that the configured runtime is assigned to the iframe, checks Reload/Fullscreen presence and saves real screenshots.
+Run Lighthouse shell QA:
 
-HTTP/header checks and Playwright checks complement each other. Neither should be replaced by a fake `deployment-ready` flag.
+```bash
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+Browser QA starts the generated site locally, checks desktop/tablet/mobile layouts, detects horizontal overflow, exercises lazy player loading, confirms a real child frame reaches the configured runtime origin, tests Reload, runs axe and saves real screenshots/reports.
+
+See [`quality-gates.md`](./quality-gates.md) for the complete quality model.
