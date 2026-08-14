@@ -16,6 +16,18 @@
     "stack": "static-html",
     "deploymentTarget": "unspecified"
   },
+  "i18n": {
+    "enabled": false,
+    "defaultLanguage": "en",
+    "xDefaultLanguage": "en",
+    "languages": [
+      {
+        "code": "en",
+        "label": "English",
+        "prefix": ""
+      }
+    ]
+  },
   "seo": {
     "primaryIntent": "mixed",
     "primaryKeyword": "Example Game",
@@ -43,7 +55,9 @@
       "intent": "Resolve after search-intent research.",
       "canonical": "",
       "title": "",
-      "indexable": true
+      "indexable": true,
+      "language": "en",
+      "translationKey": "home"
     }
   ],
   "security": {
