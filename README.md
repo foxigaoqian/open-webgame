@@ -1,7 +1,14 @@
 <h1 align="center">Open WebGame</h1>
 
 <p align="center">
-  Turn a game keyword into a playable, game-native, search-ready website.
+  Turn a game keyword into a <strong>playable, game-native, search-ready website</strong>.
+</p>
+
+<p align="center">
+  <a href="https://foxigaoqian.github.io/open-webgame/"><strong>Live Demo</strong></a> ·
+  <a href="./examples/scam-artist-site/index.html">Example Source</a> ·
+  <a href="./SKILL.md">Skill Docs</a> ·
+  <a href="./references/on-page-seo.md">SEO Standard</a>
 </p>
 
 <p align="center">
@@ -11,38 +18,56 @@
   <a href="./references/iframe-verification.md"><img src="https://img.shields.io/badge/player-HTML5%20embed-f59e0b.svg" alt="HTML5 Embed" /></a>
 </p>
 
-<p align="center">
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#how-it-works">How It Works</a> ·
-  <a href="#example">Example</a> ·
-  <a href="#on-page-seo-gate">SEO Gate</a> ·
-  <a href="#contributing">Contributing</a>
-</p>
+[![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.webp)](https://foxigaoqian.github.io/open-webgame/)
 
-[![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.jpg)](./examples/scam-artist-site/index.html)
-
-> Real first-screen output from the Scam Artist example. Open WebGame should showcase actual generated sites, not illustrated mockups of imaginary interfaces.
+<p align="center"><em>Real 2048px first-screen capture from the Scam Artist example — not a generated product mockup.</em></p>
 
 Open WebGame is an open-source **agent skill and production workflow** for building play-first game websites from a game keyword or official game URL.
 
-It does not start by choosing a generic landing-page template. It first resolves the real game, finds and validates the real browser runtime when one exists, studies the game's mechanics and visual language, defines search intent, and only then generates the site.
+It resolves the real game first, verifies a real browser runtime when one exists, studies the game's mechanics and visual language, defines search intent, and then generates a site designed specifically for that game.
 
-A build is not complete just because it looks polished. **A broken game player or a failed On-Page SEO Gate means the project is not deployment-ready.**
+> A polished UI is not enough. A broken player or a failed On-Page SEO Gate means the project is **not deployment-ready**.
 
 ## Features
 
-- **Real game resolution** — identify the canonical game, developer, current status, platforms, mechanics, controls and official sources before writing copy.
-- **Playable HTML5 verification** — distinguish an itch.io project page from the actual browser runtime and test third-party iframe behavior before building the full site.
-- **Game-native design** — derive palette, typography mood, density, borders, shadows, texture, cards and interaction style from the current game's visual DNA.
-- **Play-first architecture** — keep the playable experience near the top when embedding is verified, with reload, fullscreen and official fallback behavior.
-- **Mandatory On-Page SEO** — search intent, title, H1, opening copy, canonical, crawlable content, internal links, metadata, structured data, images, robots and sitemap are part of the acceptance gate.
-- **Useful supporting content** — How to Play, controls, tips, progression, FAQ and additional routes only when they match real game systems and real user intent.
-- **Production QA** — game, design, content, SEO, responsive behavior, performance and attribution must all be reviewed before `deployment-ready: YES`.
-- **No fake features** — do not invent controls, codes, upgrades, release dates, mobile support, leaderboards or hidden systems to fill SEO copy.
+- **Real game research** — resolve the canonical game, developer, current status, mechanics, controls and official sources before writing content.
+- **Real HTML5 embed verification** — find and test the actual browser runtime instead of putting an itch.io project detail page in an iframe.
+- **Game-native visual design** — derive palette, typography mood, cards, borders, shadows, texture and interaction style from the current game.
+- **Play-first architecture** — put the game near the top when embedding is verified, with reload, fullscreen and official fallback behavior.
+- **Mandatory On-Page SEO** — search intent, title, H1, opening copy, canonical, metadata, internal links, structured data, images, robots and sitemap are part of the hard QA gate.
+- **Useful supporting content** — How to Play, controls, tips, progression, FAQ and additional pages only when they match real player intent.
+- **Responsive + performance QA** — desktop, tablet, mobile, iframe usability and page performance must be checked.
+- **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
+
+## Live Case
+
+### Scam Artist
+
+The repository includes a real site produced while validating the workflow.
+
+**Live demo:** https://foxigaoqian.github.io/open-webgame/
+
+**Source:** [`examples/scam-artist-site/index.html`](./examples/scam-artist-site/index.html)
+
+**Case study:** [`examples/scam-artist.md`](./examples/scam-artist.md)
+
+The case demonstrates:
+
+- real itch.io-hosted HTML5 runtime
+- lazy-loaded game player
+- reload + fullscreen controls
+- custom visual treatment based on the game
+- crawlable How to Play / Tips / FAQ content outside the iframe
+- responsive layout
+- structured data and SEO foundations
+
+The repository demo is a showcase deployment. A production project should still replace demo/staging configuration with the real target domain and pass the full production SEO gate.
+
+> GitHub Pages deployment is included in `.github/workflows/pages.yml`. If the Live Demo URL is still 404, enable **Settings → Pages → Source: GitHub Actions** once; subsequent pushes deploy automatically.
 
 ## Quick Start
 
-Clone the repository and give your agent the project instructions in [`SKILL.md`](./SKILL.md):
+Clone the repository and use [`SKILL.md`](./SKILL.md) as the agent instruction file:
 
 ```bash
 git clone https://github.com/foxigaoqian/open-webgame.git
@@ -66,8 +91,6 @@ Language: English
 Deployment target: Cloudflare | Vercel | GitHub Pages
 ```
 
-A production domain is strongly recommended for final QA because a site cannot pass the production SEO gate while its canonical origin is unresolved.
-
 ## How It Works
 
 ```text
@@ -77,15 +100,15 @@ Resolve the real game entity
         ↓
 Confirm HTML5 / browser availability
         ↓
-Find the actual game runtime iframe
+Find the actual runtime iframe
         ↓
-Test the runtime in a minimal third-party page
+Test third-party embedding
         ↓
-Define primary search intent + supporting intents
+Define primary + secondary search intent
         ↓
 Research mechanics, controls, screenshots and terminology
         ↓
-Extract the game's visual DNA
+Extract visual DNA
         ↓
 Design a game-native play-first website
         ↓
@@ -115,13 +138,13 @@ https://html-classic.itch.zone/html/<build-id>/index.html?v=...
 https://html-classic.itch.zone/html/<build-id>/web/index.html?v=...
 ```
 
-If the official page clearly shows `Run game` + `HTML5` but a text parser does not expose the iframe `src`, continue inspecting the rendered player, page source or network requests. Missing parsed text is not proof that the runtime does not exist.
+If an official page shows `Run game` + `HTML5` but a text parser does not expose the iframe URL, keep investigating the rendered player, page source or browser network requests.
 
 See [`references/iframe-verification.md`](./references/iframe-verification.md).
 
 ## On-Page SEO Gate
 
-On-Page SEO is a **hard deployment requirement**, not an optional polish step.
+On-Page SEO is a **hard deployment requirement**, not optional polish.
 
 Every production build should define:
 
@@ -133,28 +156,28 @@ Secondary intents: <real supporting queries>
 Canonical page purpose: <one sentence>
 ```
 
-The production page must then pass checks for:
+A production page must then pass checks for:
 
-- unique, descriptive title and meta description
+- unique descriptive title + meta description
 - one clear H1 that identifies the game/topic
-- useful opening copy outside the iframe
+- useful opening content outside the iframe
 - logical H2/H3 hierarchy
-- correct self-referencing production canonical
-- natural entity/topic coverage without keyword stuffing
-- meaningful image alt text and stable dimensions
-- crawlable internal links and no orphan pages
+- self-referencing production canonical
+- natural topic/entity coverage without keyword stuffing
+- meaningful image alt text + stable dimensions
+- crawlable internal links with no orphan pages
 - accurate Open Graph metadata
 - accurate structured data only where justified
 - no accidental `noindex`
 - production `robots.txt`
 - production `sitemap.xml`
-- mobile usability and performance readiness
+- mobile usability + performance readiness
 
 See [`references/on-page-seo.md`](./references/on-page-seo.md) and [`references/qa-checklist.md`](./references/qa-checklist.md).
 
 ## Output Contract
 
-A completed run should report something like:
+A completed run should report:
 
 ```text
 Game: Example Game
@@ -169,41 +192,31 @@ Deployment-ready: YES
 Blocking issues: none
 ```
 
-If the embed is broken or On-Page SEO fails, `Deployment-ready` must be `NO`.
-
-## Example
-
-The repository includes the actual generated **Scam Artist** demo used while validating the workflow:
-
-- [`examples/scam-artist-site/index.html`](./examples/scam-artist-site/index.html) — full single-file site
-- [`examples/scam-artist-site/README.md`](./examples/scam-artist-site/README.md) — implementation notes
-- [`examples/scam-artist.md`](./examples/scam-artist.md) — end-to-end case study
-
-It demonstrates a real itch.io-hosted HTML5 runtime, lazy loading, reload/fullscreen controls, game-specific visual treatment and supporting content.
-
-The example is intentionally labeled as a **repository demo**, not a production SEO deployment: its placeholder canonical/domain must be replaced before it can pass the production On-Page SEO Gate.
-
-[`examples/goblincremental.md`](./examples/goblincremental.md) documents the earlier failure mode where the itch.io detail page was mistakenly used instead of the real runtime. That broken build is intentionally not published as a successful example.
+If the embed fails or On-Page SEO fails, `Deployment-ready` must be `NO`.
 
 ## Repository Structure
 
 ```text
 open-webgame/
-├── README.md                    # public project overview
-├── SKILL.md                     # full agent workflow and hard rules
-├── AGENTS.md                    # concise repository guide for coding agents
-├── DESIGN.md                    # design derivation principles
-├── CONTRIBUTING.md              # contribution workflow
+├── README.md
+├── SKILL.md
+├── AGENTS.md
+├── DESIGN.md
+├── CONTRIBUTING.md
 ├── LICENSE
+├── .github/
+│   ├── pull_request_template.md
+│   └── workflows/
+│       └── pages.yml
 ├── assets/
 │   ├── logo.svg
 │   ├── og.svg
-│   └── scam-artist-real-first-screen.jpg
+│   └── scam-artist-real-first-screen.webp
 ├── references/
-│   ├── iframe-verification.md   # runtime discovery + embed validation
-│   ├── on-page-seo.md           # mandatory On-Page SEO standard
-│   ├── site-blueprint.md        # reusable information architecture
-│   └── qa-checklist.md          # final acceptance criteria
+│   ├── iframe-verification.md
+│   ├── on-page-seo.md
+│   ├── site-blueprint.md
+│   └── qa-checklist.md
 └── examples/
     ├── goblincremental.md
     ├── scam-artist.md
@@ -218,22 +231,6 @@ open-webgame/
 
 A cute pet game, a perspective challenge, a goblin incremental game and a dark pixel-art idle game should not look like recolored copies of the same template.
 
-Before coding, derive a visual brief from current official artwork/screenshots:
-
-```text
-Dominant palette:
-Accent palette:
-Art style:
-UI density:
-Corners:
-Borders:
-Shadows:
-Texture:
-Typography mood:
-Icon style:
-Motion style:
-```
-
 See [`DESIGN.md`](./DESIGN.md).
 
 ## Responsible Use
@@ -244,15 +241,15 @@ Before production use:
 
 - check creator/host terms and asset usage expectations
 - credit the creator and link the official game page
-- make unofficial status clear when applicable
+- make unofficial status clear when appropriate
 - do not mirror or redistribute game binaries without authorization
 - do not imply endorsement, ownership or official affiliation
 
 ## Contributing
 
-Contributions are welcome. Keep changes focused and preserve the project's hard gates: real game facts, real embed verification, game-native design, On-Page SEO and final QA.
+Contributions are welcome. Keep changes focused and preserve the hard gates: real game facts, real embed verification, game-native design, On-Page SEO and final QA.
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) before opening a pull request.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## License
 
