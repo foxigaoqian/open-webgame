@@ -18,7 +18,7 @@
   <a href="./references/iframe-verification.md"><img src="https://img.shields.io/badge/player-HTML5%20embed-f59e0b.svg" alt="HTML5 Embed" /></a>
 </p>
 
-[![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.webp)](https://foxigaoqian.github.io/open-webgame/)
+[![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.jpg)](https://foxigaoqian.github.io/open-webgame/)
 
 <p align="center"><em>Real 2048px first-screen capture from the Scam Artist example — not a generated product mockup.</em></p>
 
@@ -211,7 +211,7 @@ open-webgame/
 ├── assets/
 │   ├── logo.svg
 │   ├── og.svg
-│   └── scam-artist-real-first-screen.webp
+│   └── scam-artist-real-first-screen.jpg
 ├── references/
 │   ├── iframe-verification.md
 │   ├── on-page-seo.md
