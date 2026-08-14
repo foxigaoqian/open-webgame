@@ -2,6 +2,30 @@
 
 All notable project changes are documented here.
 
+## 0.3.1 — 2026-08-14
+
+### Added
+
+- Strict AJV validation for `open-webgame.json`; unknown and misspelled project fields now fail config QA.
+- Pass/fail regression fixtures and Node test coverage for schema, SEO image-alt behavior and multilingual hreflang relationships.
+- Optional multilingual `i18n` project contract with default language, x-default language and locale prefixes.
+- `pages[].language` and `pages[].translationKey` for alternate-language page relationships.
+- `npm run check:i18n` for html language, self-canonical, reciprocal hreflang, x-default and multilingual sitemap checks.
+- `--languages en,ja,ko` support in Zero-Config bootstrap.
+- `npm run check:http` for live canonical, Open Graph image, robots sitemap and sitemap URL validation.
+- axe WCAG 2 A/AA checks in Playwright Browser QA.
+- Real runtime child-frame boot checks and explicit Reload navigation-cycle verification.
+- Lighthouse mobile-shell QA with category thresholds and a CLS hard limit.
+- `docs/multilingual.md` and `docs/quality-gates.md`.
+
+### Changed
+
+- On-Page SEO audit now correctly accepts `alt=""` for decorative images and fails only when the `alt` attribute is omitted entirely.
+- SEO audit now enforces singular canonical/meta description/Open Graph fields and reports heading-hierarchy jumps.
+- CI installs QA dependencies and runs regression tests before the real example gates.
+- Browser QA artifacts now include axe reports, real screenshots and Lighthouse output when the run completes.
+- Scam Artist project config explicitly records its current single-language English state; the live example itself is not presented as multilingual.
+
 ## 0.3.0 — 2026-08-14
 
 ### Added
