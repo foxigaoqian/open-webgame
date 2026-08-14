@@ -1,0 +1,1 @@
+The README preview must use a standard GitHub-supported image format (JPEG/PNG/SVG/GIF). The previous WebP asset was corrupted and must not be referenced.
