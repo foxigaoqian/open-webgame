@@ -1,0 +1,56 @@
+{
+  "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
+  "schemaVersion": "0.3",
+  "game": { "name": "Fixture Game" },
+  "site": {
+    "language": "en",
+    "mode": "guide",
+    "domain": "fixture.invalid",
+    "canonical": "https://fixture.invalid/game/"
+  },
+  "i18n": {
+    "enabled": true,
+    "defaultLanguage": "en",
+    "xDefaultLanguage": "en",
+    "languages": [
+      { "code": "en", "label": "English", "prefix": "" },
+      { "code": "ja", "label": "日本語", "prefix": "/ja" }
+    ]
+  },
+  "seo": {
+    "primaryIntent": "guide",
+    "primaryKeyword": "Fixture Game",
+    "canonicalPagePurpose": "Test multilingual SEO relationships."
+  },
+  "embed": { "status": "unsupported" },
+  "design": {},
+  "sources": [],
+  "claims": [],
+  "pages": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "intent": "Fixture Game guide",
+      "canonical": "https://fixture.invalid/game/",
+      "indexable": true,
+      "language": "en",
+      "translationKey": "home"
+    },
+    {
+      "path": "/ja/",
+      "file": "ja/index.html",
+      "intent": "Fixture Game 日本語ガイド",
+      "canonical": "https://fixture.invalid/game/ja/",
+      "indexable": true,
+      "language": "ja",
+      "translationKey": "home"
+    }
+  ],
+  "security": { "allowedIframePermissions": [] },
+  "status": {
+    "research": "pending",
+    "onPageSeo": "pending",
+    "deploymentReady": false,
+    "blockingIssues": []
+  }
+}
