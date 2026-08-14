@@ -78,6 +78,38 @@ const waitForRuntimeFrame = async (page, runtimeUrl, timeoutMs = 10000) => {
   return false;
 };
 
+const waitForReloadCycle = (page, targetFrame, runtimeUrl, timeoutMs = 12000) => {
+  let origin;
+  try {
+    origin = new URL(runtimeUrl).origin;
+  } catch {
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    let sawBlank = false;
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      page.off('framenavigated', onNavigate);
+      resolve(value);
+    };
+    const onNavigate = (frame) => {
+      if (frame !== targetFrame) return;
+      const url = frame.url();
+      if (url === 'about:blank') {
+        sawBlank = true;
+        return;
+      }
+      if (sawBlank && url.startsWith(origin)) finish(true);
+    };
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    page.on('framenavigated', onNavigate);
+  });
+};
+
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -172,11 +204,25 @@ try {
 
           const reload = page.getByRole('button', { name: /reload/i }).first();
           if (await reload.count()) {
-            await reload.click();
-            await page.waitForTimeout(500);
-            const afterReload = (await iframe.getAttribute('src')) || '';
-            if (!afterReload.startsWith(runtimeUrl)) errors.push('desktop: Reload did not restore the configured runtime URL.');
-            if (!(await waitForRuntimeFrame(page, runtimeUrl, 5000))) errors.push('desktop: runtime child frame did not boot after Reload.');
+            const contentFrame = await iframe.contentFrame();
+            if (!contentFrame) {
+              errors.push('desktop: cannot identify the game child frame before Reload.');
+            } else {
+              const reloadCycle = waitForReloadCycle(page, contentFrame, runtimeUrl);
+              await reload.click();
+              try {
+                await page.waitForFunction(
+                  (expected) => document.querySelector('iframe')?.getAttribute('src')?.startsWith(expected),
+                  runtimeUrl,
+                  { timeout: 10000 },
+                );
+              } catch {
+                errors.push('desktop: Reload did not restore the configured runtime URL.');
+              }
+              if (!(await reloadCycle)) {
+                errors.push('desktop: Reload did not produce an about:blank → runtime child-frame navigation cycle.');
+              }
+            }
           } else {
             warnings.push('desktop: no Reload control found.');
           }
