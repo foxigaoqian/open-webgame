@@ -9,7 +9,9 @@
   <a href="./examples/scam-artist-site/index.html">Example Source</a> ·
   <a href="./SKILL.md">Skill Docs</a> ·
   <a href="./references/on-page-seo.md">SEO Standard</a> ·
-  <a href="./docs/zero-config.md">Zero Config</a>
+  <a href="./docs/zero-config.md">Zero Config</a> ·
+  <a href="./docs/multilingual.md">Multilingual</a> ·
+  <a href="./docs/quality-gates.md">Quality Gates</a>
 </p>
 
 <p align="center">
@@ -21,37 +23,92 @@
 
 [![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.jpg)](https://foxigaoqian.github.io/open-webgame/)
 
-<p align="center"><em>Real 2048px first-screen capture from the Scam Artist example — not a generated product mockup.</em></p>
+<p align="center"><em>Real first-screen capture from the Scam Artist example — not a generated product mockup.</em></p>
 
 Open WebGame is an open-source **agent skill and production workflow** for building play-first game websites from a game keyword or official game URL.
 
-It resolves the real game first, verifies a real browser runtime when one exists, studies the game's mechanics and visual language, defines search intent, and then generates a site designed specifically for that game.
+It resolves the real game first, verifies a real browser runtime when one exists, records source-backed facts, studies the game's mechanics and visual language, defines search intent, and then generates a site designed specifically for that game.
 
-> A polished UI is not enough. A broken player or a failed On-Page SEO Gate means the project is **not deployment-ready**.
+> A polished UI is not enough. Broken gameplay, unsourced facts, failed SEO, failed accessibility or failed browser QA means the project is **not deployment-ready**.
 
 ## Features
 
+- **One-keyword start** — the agent can begin from only a game name and research the rest.
 - **Real game research** — resolve the canonical game, developer, current status, mechanics, controls and official sources before writing content.
+- **Source-backed claims** — material factual content is connected to `sources[]` and `claims[]` instead of living only in prompt prose.
 - **Real HTML5 embed verification** — find and test the actual browser runtime instead of putting an itch.io project detail page in an iframe.
 - **Game-native visual design** — derive palette, typography mood, cards, borders, shadows, texture and interaction style from the current game.
-- **Play-first architecture** — put the game near the top when embedding is verified, with reload, fullscreen and official fallback behavior.
-- **Mandatory On-Page SEO** — search intent, title, H1, opening copy, canonical, metadata, internal links, structured data, images, robots and sitemap are part of the hard QA gate.
-- **Useful supporting content** — How to Play, controls, tips, progression, FAQ and additional pages only when they match real player intent.
-- **Responsive + performance QA** — desktop, tablet, mobile, iframe usability and page performance must be checked.
+- **Play-first architecture** — put the game near the top when embedding is verified, with lazy load, reload, fullscreen and official fallback behavior.
+- **Mandatory On-Page SEO** — search intent, title, H1, canonical, metadata, internal links, structured data, images, robots and sitemap are hard QA requirements.
+- **Real multilingual SEO** — optional localized routes, reciprocal hreflang, x-default, locale canonicals and multilingual sitemap validation.
+- **Strict project schema** — AJV rejects unknown or misspelled configuration fields.
+- **Browser + accessibility QA** — Playwright runs desktop/tablet/mobile, verifies the real runtime child frame, runs axe and saves real screenshots/reports.
+- **Performance QA** — Lighthouse evaluates the lazy-loaded site shell and enforces minimum quality thresholds.
 - **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
+
+## v0.3.1 — Quality Gates + Multilingual SEO
+
+v0.3.1 turns more production expectations into executable tests.
+
+New quality enforcement:
+
+```text
+Strict AJV Schema
+Regression fixtures
+Live canonical / OG / sitemap HTTP checks
+Decorative alt="" regression coverage
+axe WCAG 2 A/AA host-shell checks
+Real child-frame runtime boot verification
+Reload navigation verification
+Lighthouse mobile-shell QA
+```
+
+New multilingual contract:
+
+```text
+i18n.enabled
+defaultLanguage
+xDefaultLanguage
+languages[]
+pages[].language
+pages[].translationKey
+hreflang
+x-default
+multilingual sitemap alternates
+```
+
+Bootstrap a multilingual project directly:
+
+```bash
+npm run init:game -- "Game Name" --languages en,ja,ko
+```
+
+The CLI only creates the project contract. The agent must still research and generate useful localized content and every configured route before `check:i18n` can pass.
+
+New commands:
+
+```bash
+npm test
+npm run check:i18n -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+See [`docs/multilingual.md`](./docs/multilingual.md), [`docs/quality-gates.md`](./docs/quality-gates.md) and [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## v0.3 — Production Engine
 
-Open WebGame v0.3 moves another set of production rules out of prompt prose and into machine-checkable project state.
+Open WebGame v0.3 moved production rules out of prompt prose and into machine-checkable project state.
 
-New production contracts:
+Production contracts:
 
 - `sources[]` + `claims[]` — connect important factual content to recorded sources
 - `pages[]` — define distinct routes, intents, files, canonicals and indexability
 - `security` — declare the iframe capabilities the site is allowed to request
 - Playwright Browser QA — boot the real generated page at desktop/tablet/mobile widths and save real screenshots
 
-New gates:
+Core gates:
 
 ```bash
 npm run check:content -- --config path/to/open-webgame.json
@@ -60,13 +117,9 @@ npm run check:security -- --config path/to/open-webgame.json --html path/to/inde
 npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
-The aggregate non-browser QA now checks config, provenance, page architecture, On-Page SEO, security and embed state. First production launch additionally requires the Playwright browser run.
-
-See [`docs/project-config.md`](./docs/project-config.md) and [`CHANGELOG.md`](./CHANGELOG.md).
-
 ## v0.2 — Zero-Config + Machine-Enforced QA
 
-Open WebGame now has an engineering layer in addition to the agent instructions. A generated project should keep one `open-webgame.json` as its single source of truth, and the repository can fail builds when core config, On-Page SEO or embed rules are broken.
+Open WebGame added an engineering layer in addition to the agent instructions. A generated project keeps one `open-webgame.json` as its single source of truth, and the repository can fail builds when core config, On-Page SEO or embed rules are broken.
 
 If you only have a game name, that is enough to start:
 
@@ -74,24 +127,11 @@ If you only have a game name, that is enough to start:
 Scam Artist
 ```
 
-Agent default: research the real game automatically, verify the real browser runtime, choose play-first or guide mode, derive the visual system, generate the site, then run hard QA.
-
 Optional local bootstrap:
 
 ```bash
 npm run init:game -- "Scam Artist"
 ```
-
-Automated gates:
-
-```bash
-npm run check:config -- --config path/to/open-webgame.json
-npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
-npm run verify:embed -- --config path/to/open-webgame.json
-npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
-```
-
-See [`docs/zero-config.md`](./docs/zero-config.md), [`docs/project-config.md`](./docs/project-config.md) and [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Live Case
 
@@ -112,12 +152,13 @@ The case demonstrates:
 - reload + fullscreen controls
 - custom visual treatment based on the game
 - crawlable How to Play / Tips / FAQ content outside the iframe
+- source-backed project facts
+- least-privilege iframe permissions
 - responsive layout
 - structured data and SEO foundations
+- real Browser QA evidence
 
-The repository demo is a showcase deployment. A production project should still replace demo/staging configuration with the real target domain and pass the full production SEO gate.
-
-> GitHub Pages deployment is included in `.github/workflows/pages.yml`. If the Live Demo URL is still 404, enable **Settings → Pages → Source: GitHub Actions** once; subsequent pushes deploy automatically.
+The live Scam Artist case currently remains a **single-language English example**. Multilingual capability is covered by the project contract and regression fixtures; do not confuse that with a translated Scam Artist deployment.
 
 ## Quick Start
 
@@ -126,22 +167,35 @@ Clone the repository and use [`SKILL.md`](./SKILL.md) as the agent instruction f
 ```bash
 git clone https://github.com/foxigaoqian/open-webgame.git
 cd open-webgame
+npm install
 ```
 
-Minimum input:
+Minimum user input:
 
 ```text
-Game keyword: Goblincremental
+Goblincremental
 ```
 
-Recommended input:
+Or bootstrap a local project contract:
+
+```bash
+npm run init:game -- "Goblincremental"
+```
+
+Multilingual bootstrap:
+
+```bash
+npm run init:game -- "Goblincremental" --languages en,ja,ko
+```
+
+Recommended richer input when known:
 
 ```text
 Game keyword: Goblincremental
 Official URL: https://dogwater-games.itch.io/goblincremental
 Target domain: example.com
 Preferred stack: static HTML | Next.js | Astro
-Language: English
+Languages: en, ja, ko
 Deployment target: Cloudflare | Vercel | GitHub Pages
 ```
 
@@ -150,29 +204,35 @@ Deployment target: Cloudflare | Vercel | GitHub Pages
 ```text
 Game keyword / official URL
         ↓
-Resolve the real game entity
+Create strict project config
+        ↓
+Resolve the real game entity + official sources
+        ↓
+Record source-backed factual claims
         ↓
 Confirm HTML5 / browser availability
         ↓
-Find the actual runtime iframe
+Find and test the actual runtime iframe
         ↓
-Test third-party embedding
+Define search intent + page architecture
         ↓
-Define primary + secondary search intent
+Define locale architecture when requested
         ↓
 Research mechanics, controls, screenshots and terminology
         ↓
 Extract visual DNA
         ↓
-Design a game-native play-first website
+Design a game-native play-first or guide site
         ↓
-Add useful crawlable content outside the iframe
+Implement On-Page + multilingual SEO
         ↓
-Implement On-Page SEO + robots + sitemap
+Static + live HTTP gates
         ↓
-Game + Design + Content + SEO + Mobile + Performance QA
+Playwright + axe + real runtime-frame QA
         ↓
-Deploy
+Lighthouse QA
+        ↓
+Deployment-ready decision
 ```
 
 ### Critical iframe rule
@@ -215,10 +275,11 @@ A production page must then pass checks for:
 - unique descriptive title + meta description
 - one clear H1 that identifies the game/topic
 - useful opening content outside the iframe
-- logical H2/H3 hierarchy
+- logical heading hierarchy
 - self-referencing production canonical
 - natural topic/entity coverage without keyword stuffing
-- meaningful image alt text + stable dimensions
+- meaningful alt text for informative images
+- `alt=""` for decorative images; never omit the alt attribute entirely
 - crawlable internal links with no orphan pages
 - accurate Open Graph metadata
 - accurate structured data only where justified
@@ -229,6 +290,47 @@ A production page must then pass checks for:
 
 See [`references/on-page-seo.md`](./references/on-page-seo.md) and [`references/qa-checklist.md`](./references/qa-checklist.md).
 
+## Multilingual SEO
+
+When multiple languages are requested, Open WebGame creates separate crawlable routes instead of adding a client-side translation button.
+
+Each translation group should have:
+
+- localized search intent and copy
+- localized title/meta/H1
+- self canonical for every locale
+- reciprocal hreflang including itself
+- `x-default`
+- equivalent-page language switching
+- multilingual sitemap alternates
+
+See [`docs/multilingual.md`](./docs/multilingual.md).
+
+## Quality Gates
+
+Deterministic checks:
+
+```bash
+npm test
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html --offline
+```
+
+Live production URL/embed checks:
+
+```bash
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+```
+
+First-launch browser/accessibility/performance checks:
+
+```bash
+npx playwright install chromium
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
+```
+
+See [`docs/quality-gates.md`](./docs/quality-gates.md).
+
 ## Output Contract
 
 A completed run should report:
@@ -236,17 +338,22 @@ A completed run should report:
 ```text
 Game: Example Game
 Embed: VERIFIED
+Languages: en, ja, ko
 Primary intent: play + beginner guide
 Primary keyword/entity: Example Game
 On-Page SEO: PASS
+Multilingual SEO: PASS
+Browser QA: PASS
+Accessibility: PASS
+Lighthouse: PASS
 Canonical: https://examplegame.com/
 Design direction: pixel-art management / dark resource UI
-Pages: /, /how-to-play/, /tips/
+Pages: /, /ja/, /ko/
 Deployment-ready: YES
 Blocking issues: none
 ```
 
-If the embed fails or On-Page SEO fails, `Deployment-ready` must be `NO`.
+If any relevant hard gate fails, `Deployment-ready` must be `NO`.
 
 ## Repository Structure
 
@@ -266,20 +373,26 @@ open-webgame/
 │   └── open-webgame.example.json
 ├── scripts/
 │   ├── init.mjs
+│   ├── schema-validator.mjs
 │   ├── check-config.mjs
+│   ├── content-audit.mjs
+│   ├── site-audit.mjs
+│   ├── i18n-audit.mjs
 │   ├── seo-audit.mjs
+│   ├── security-audit.mjs
+│   ├── http-audit.mjs
 │   ├── verify-embed.mjs
+│   ├── browser-qa.mjs
+│   ├── lighthouse-qa.mjs
 │   └── qa.mjs
+├── tests/
+│   ├── fixtures/
+│   └── quality-gates.test.mjs
 ├── docs/
 │   ├── zero-config.md
-│   └── project-config.md
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-│       ├── ci.yml
-│       ├── embed-smoke.yml
-│       ├── pages.yml
-│       └── convert-readme-preview.yml
+│   ├── project-config.md
+│   ├── multilingual.md
+│   └── quality-gates.md
 ├── references/
 │   ├── iframe-verification.md
 │   ├── on-page-seo.md
@@ -318,7 +431,7 @@ Before production use:
 
 ## Contributing
 
-Contributions are welcome. Keep changes focused and preserve the hard gates: real game facts, real embed verification, game-native design, On-Page SEO and final QA.
+Contributions are welcome. Keep changes focused and preserve the hard gates: real game facts, real embed verification, game-native design, On-Page SEO, accessibility, performance and final QA.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
