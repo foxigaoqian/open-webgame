@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="./assets/logo.svg" width="104" alt="Open WebGame logo" />
-</p>
-
 <h1 align="center">Open WebGame</h1>
 
 <p align="center">
@@ -23,7 +19,9 @@
   <a href="#contributing">Contributing</a>
 </p>
 
-[![Open WebGame preview](./assets/og.svg)](https://github.com/foxigaoqian/open-webgame)
+[![Real Open WebGame generated first screen](./assets/scam-artist-real-first-screen.jpg)](./examples/scam-artist-site/index.html)
+
+> Real first-screen output from the Scam Artist example. Open WebGame should showcase actual generated sites, not illustrated mockups of imaginary interfaces.
 
 Open WebGame is an open-source **agent skill and production workflow** for building play-first game websites from a game keyword or official game URL.
 
@@ -198,8 +196,9 @@ open-webgame/
 ├── CONTRIBUTING.md              # contribution workflow
 ├── LICENSE
 ├── assets/
-│   ├── logo.svg                 # project logo
-│   └── og.svg                   # README / social cover artwork
+│   ├── logo.svg
+│   ├── og.svg
+│   └── scam-artist-real-first-screen.jpg
 ├── references/
 │   ├── iframe-verification.md   # runtime discovery + embed validation
 │   ├── on-page-seo.md           # mandatory On-Page SEO standard
