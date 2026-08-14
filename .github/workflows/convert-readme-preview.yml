@@ -1,0 +1,54 @@
+name: Convert README preview to JPEG
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/scam-artist-real-first-screen.webp'
+      - '.github/workflows/convert-readme-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Convert real screenshot to high-quality JPEG
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          src = 'assets/scam-artist-real-first-screen.webp'
+          dst = 'assets/scam-artist-real-first-screen.jpg'
+          image = Image.open(src).convert('RGB')
+          print('source size:', image.size)
+          image.save(dst, 'JPEG', quality=92, subsampling=0, optimize=True, progressive=True)
+          check = Image.open(dst)
+          print('jpeg size:', check.size)
+          PY
+
+      - name: Commit converted JPEG
+        run: |
+          if git diff --quiet -- assets/scam-artist-real-first-screen.jpg; then
+            echo 'JPEG already up to date.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/scam-artist-real-first-screen.jpg
+          git commit -m 'docs: generate GitHub-compatible high-quality preview'
+          git push
