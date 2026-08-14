@@ -1,0 +1,54 @@
+name: Browser QA
+
+on:
+  push:
+    branches: [main, feat/v0.3-production-engine]
+    paths:
+      - 'scripts/**'
+      - 'schema/**'
+      - 'examples/scam-artist-site/**'
+      - 'package.json'
+      - '.github/workflows/browser-qa.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'schema/**'
+      - 'examples/scam-artist-site/**'
+      - 'package.json'
+      - '.github/workflows/browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright browser QA
+        run: npm run qa:browser:example
+
+      - name: Upload browser QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-qa-screenshots
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
