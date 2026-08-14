@@ -1,0 +1,58 @@
+name: Optimize example image loading
+
+on:
+  push:
+    branches:
+      - feat/v0.3-phase2-quality
+    paths:
+      - .github/workflows/migrate-example-image-performance.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: feat/v0.3-phase2-quality
+          fetch-depth: 0
+
+      - name: Optimize external image loading
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('examples/scam-artist-site/index.html')
+          s = p.read_text()
+          giant = 'https://img.itch.zone/aW1nLzI4Njg1ODc4LnBuZw%3D%3D/original/l497XE.png'
+          lighter = 'https://img.itch.zone/aW1nLzI4Njg2MTY3LnBuZw%3D%3D/original/ZfAmk4.png'
+          s = s.replace(giant, lighter)
+          old_hero = f'<img src="{lighter}" alt="Scam Artist game artwork">'
+          new_hero = f'<img src="{lighter}" alt="Scam Artist in-game apartment scene" width="395" height="286" fetchpriority="high" decoding="async">'
+          if old_hero not in s and new_hero not in s:
+              raise SystemExit('Hero image marker not found')
+          s = s.replace(old_hero, new_hero, 1)
+          old_shot1 = f'<img src="{lighter}" alt="Scam Artist pixel scene">'
+          new_shot1 = f'<img src="{lighter}" alt="Scam Artist pixel scene" width="395" height="286" loading="lazy" decoding="async">'
+          s = s.replace(old_shot1, new_shot1)
+          s = s.replace('<img src="https://img.itch.zone/aW1nLzI4Njg2MTAxLnBuZw%3D%3D/original/TZ0yet.png" alt="Scam Artist slot machines">', '<img src="https://img.itch.zone/aW1nLzI4Njg2MTAxLnBuZw%3D%3D/original/TZ0yet.png" alt="Scam Artist slot machines" loading="lazy" decoding="async">')
+          s = s.replace('<img src="https://img.itch.zone/aW1nLzI4Njg2MjE1LnBuZw%3D%3D/original/ZnWQSu.png" alt="Scam Society scene">', '<img src="https://img.itch.zone/aW1nLzI4Njg2MjE1LnBuZw%3D%3D/original/ZnWQSu.png" alt="Scam Society scene" width="493" height="345" loading="lazy" decoding="async">')
+          p.write_text(s)
+          PY
+
+      - name: Commit optimized example
+        shell: bash
+        run: |
+          if git diff --quiet -- examples/scam-artist-site/index.html; then
+            echo "Example already optimized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add examples/scam-artist-site/index.html
+          git commit -m "perf: reduce example LCP image cost"
+          git push origin HEAD:feat/v0.3-phase2-quality
