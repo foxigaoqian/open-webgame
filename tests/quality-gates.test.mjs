@@ -10,6 +10,8 @@ const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 
 const validConfigPath = path.resolve('tests/fixtures/config-valid.json');
 const invalidTypoPath = path.resolve('tests/fixtures/config-invalid-typo.json');
+const i18nConfigPath = path.resolve('tests/fixtures/i18n-config-valid.json');
+const i18nSitePath = path.resolve('tests/fixtures/i18n-site');
 
 const seoHtml = (imageMarkup) => `<!doctype html>
 <html lang="en">
@@ -49,6 +51,15 @@ const runSeoAudit = (html) => {
   });
 };
 
+const runI18nAudit = (siteDir) => spawnSync(process.execPath, [
+  'scripts/i18n-audit.mjs',
+  '--config', i18nConfigPath,
+  '--site-dir', siteDir,
+], {
+  cwd: process.cwd(),
+  encoding: 'utf8',
+});
+
 test('strict schema accepts the valid fixture', () => {
   const errors = validateConfigSchema(readJson(validConfigPath));
   assert.deepEqual(errors, []);
@@ -69,4 +80,20 @@ test('SEO audit rejects an image with no alt attribute', () => {
   const result = runSeoAudit('<img src="informative.jpg" width="640" height="360">');
   assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
   assert.match(`${result.stdout}\n${result.stderr}`, /missing an alt attribute/i);
+});
+
+test('multilingual SEO audit accepts a complete en/ja hreflang cluster', () => {
+  const result = runI18nAudit(i18nSitePath);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
+
+test('multilingual SEO audit rejects a page missing x-default', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'open-webgame-i18n-'));
+  fs.cpSync(i18nSitePath, dir, { recursive: true });
+  const jaPath = path.join(dir, 'ja/index.html');
+  const html = fs.readFileSync(jaPath, 'utf8').replace(/\s*<link rel="alternate" hreflang="x-default"[^>]*>\s*/i, '\n');
+  fs.writeFileSync(jaPath, html);
+  const result = runI18nAudit(dir);
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /missing hreflang=x-default/i);
 });
