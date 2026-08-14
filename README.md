@@ -70,6 +70,17 @@ Deployment-ready: YES
 Blocking issues: none
 ```
 
+## Full generated example
+
+A complete generated site is included here:
+
+- [`examples/scam-artist-site/index.html`](./examples/scam-artist-site/index.html) — full single-file website
+- [`examples/scam-artist-site/README.md`](./examples/scam-artist-site/README.md) — how the example works
+
+This is the actual Scam Artist build produced while testing the workflow. It includes the real itch.io-hosted HTML5 runtime, lazy loading, fullscreen/reload controls, game-specific visual design, guide content, FAQ and structured data.
+
+Goblincremental remains a process case study rather than a full-site example because the first generated version used the itch.io project detail page instead of the real runtime iframe. The repository intentionally does not publish that broken build as a successful example.
+
 ## Critical iframe rule
 
 An itch.io project page is **not** the game runtime.
@@ -104,7 +115,10 @@ open-webgame/
 │   └── qa-checklist.md
 └── examples/
     ├── goblincremental.md
-    └── scam-artist.md
+    ├── scam-artist.md
+    └── scam-artist-site/
+        ├── README.md
+        └── index.html
 ```
 
 ## Files
@@ -115,6 +129,7 @@ open-webgame/
 - [`references/qa-checklist.md`](./references/qa-checklist.md) — acceptance criteria
 - [`examples/goblincremental.md`](./examples/goblincremental.md) — failure-mode lesson
 - [`examples/scam-artist.md`](./examples/scam-artist.md) — corrected end-to-end pattern
+- [`examples/scam-artist-site/index.html`](./examples/scam-artist-site/index.html) — complete generated site source
 
 ## Design principle
 
