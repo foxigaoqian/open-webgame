@@ -1,0 +1,25 @@
+{
+  "name": "open-webgame",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent skill and production QA workflow that turns a game keyword into a playable, game-native, search-ready website.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/foxigaoqian/open-webgame.git"
+  },
+  "homepage": "https://foxigaoqian.github.io/open-webgame/",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "init:game": "node scripts/init.mjs",
+    "check:config": "node scripts/check-config.mjs",
+    "check:seo": "node scripts/seo-audit.mjs",
+    "verify:embed": "node scripts/verify-embed.mjs",
+    "verify:embed:config": "node scripts/verify-embed.mjs --offline",
+    "qa": "node scripts/qa.mjs",
+    "qa:example": "node scripts/qa.mjs --config examples/scam-artist-site/open-webgame.json --html examples/scam-artist-site/index.html --offline"
+  }
+}
