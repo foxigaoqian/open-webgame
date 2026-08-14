@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/logo.svg" width="104" alt="Open WebGame logo" />
+</p>
+
 <h1 align="center">Open WebGame</h1>
 
 <p align="center">
@@ -18,6 +22,8 @@
   <a href="#on-page-seo-gate">SEO Gate</a> ·
   <a href="#contributing">Contributing</a>
 </p>
+
+[![Open WebGame preview](./assets/og.svg)](https://github.com/foxigaoqian/open-webgame)
 
 Open WebGame is an open-source **agent skill and production workflow** for building play-first game websites from a game keyword or official game URL.
 
@@ -191,6 +197,9 @@ open-webgame/
 ├── DESIGN.md                    # design derivation principles
 ├── CONTRIBUTING.md              # contribution workflow
 ├── LICENSE
+├── assets/
+│   ├── logo.svg                 # project logo
+│   └── og.svg                   # README / social cover artwork
 ├── references/
 │   ├── iframe-verification.md   # runtime discovery + embed validation
 │   ├── on-page-seo.md           # mandatory On-Page SEO standard
