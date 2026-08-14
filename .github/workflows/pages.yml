@@ -1,0 +1,47 @@
+name: Deploy Scam Artist demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/scam-artist-site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare demo artifact
+        shell: bash
+        run: |
+          mkdir -p _site
+          cp -R examples/scam-artist-site/. _site/
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
