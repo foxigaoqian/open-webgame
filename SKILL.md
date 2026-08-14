@@ -1,46 +1,33 @@
 ---
 name: open-webgame
-description: Build a deployable, game-native, play-first website from a game keyword or official game URL. Resolve the real game first, verify a working third-party browser embed when possible, then generate a visual system, page architecture, copy, SEO metadata, structured data, responsive UI, and QA plan tailored to that specific game.
+description: Build a deployable, game-native, play-first website from a game keyword or official game URL. Resolve the real game, verify browser embedding, derive the visual system from the game, generate useful game content, and require a strict On-Page SEO gate before the site can be marked deployment-ready.
 ---
 
 # Open WebGame
 
-Build a real website from a game keyword, not a generic SEO page with the game name swapped in.
+Turn a game keyword into a real, deployable, game-native website.
 
-The target pattern is a **play-first discovery/guide site**:
+This is not a generic landing-page skin and it is not a keyword-discovery skill.
 
-1. User provides a game keyword, and optionally an itch.io/Steam/official URL.
-2. Find the canonical game and current official sources.
-3. Verify whether the game can actually run inside a third-party website.
-4. Study the game's art direction, mechanics, controls, terminology, and player intent.
-5. Design a site that visually belongs to that game.
-6. Put the playable game near the top when embedding is verified.
-7. Surround the playable experience with useful, indexable game-specific content.
-8. Produce deployable code, SEO metadata, structured data, attribution, and QA checks.
+The reusable part is the production workflow and information architecture. The visual design, content, terminology and page depth must be derived again for every game.
 
-This skill is for building the site. It is **not** a keyword discovery or trend-scoring skill.
+## Non-negotiable rules
 
-## Core Principle
+1. **Resolve the real game before generating content.**
+2. **Verify the real browser runtime before claiming the game is playable.**
+3. **Do not use an itch.io project detail page as the game iframe.**
+4. **Do not fabricate mechanics, controls, release information, features or strategies.**
+5. **The website must visually match the specific game, not a recolored previous site.**
+6. **Important indexable content must exist outside the iframe.**
+7. **Every production build must pass the On-Page SEO Gate.**
+8. **A broken player or failed On-Page SEO Gate means `deployment-ready: NO`.**
 
-**The information architecture may repeat. The visual design must not.**
+Read and follow:
 
-Do not make every site look like the same template.
-
-A cute pet-washing game, a perspective drawing challenge, a goblin incremental game, and a dark pixel-art idle game should have visibly different:
-
-- color systems
-- typography
-- border radius
-- spacing density
-- illustration treatment
-- button shapes
-- background texture
-- card design
-- iconography
-- motion
-- voice and microcopy
-
-The generated website should feel like an extension of the game rather than an unrelated SEO shell.
+- [`references/iframe-verification.md`](./references/iframe-verification.md)
+- [`references/on-page-seo.md`](./references/on-page-seo.md)
+- [`references/site-blueprint.md`](./references/site-blueprint.md)
+- [`references/qa-checklist.md`](./references/qa-checklist.md)
 
 # Inputs
 
@@ -61,90 +48,86 @@ Language: English by default
 Deployment target: Cloudflare | Vercel | GitHub Pages | other
 ```
 
-If only a keyword is provided, research the current official game before generating the site.
+If the user only provides the game name, research the current official game first.
 
 # Mandatory Workflow
 
-Do not skip or reorder the first three phases.
+Do not start the final UI before Phases 1–4 are complete.
 
-## Phase 1 — Resolve the Game Entity
+## Phase 1 — Resolve the game entity
 
-Find the current canonical source.
+Find the correct current game.
 
 Preferred source order:
 
 1. official website
-2. itch.io developer page
+2. itch.io project/developer page
 3. Steam store page
 4. developer/publisher page
-5. official social account
+5. official social account or devlog
 
 Confirm:
 
 - exact game name
 - developer/publisher
 - release/prototype/demo status
-- platforms
+- supported platforms
 - browser availability
-- current game description
+- official description
 - real mechanics
 - real controls when documented
 - official screenshots/artwork
 
-Do not infer mechanics from the title alone.
+If multiple games share the same name, resolve the entity before continuing.
 
-If multiple games share the same name, stop and resolve the correct entity before building.
+Never infer the game from the title alone.
 
-## Phase 2 — Verify Browser Playability
+## Phase 2 — Verify browser playability
 
-This is a hard gate for a play-first site.
+This is a hard gate for a play-first build.
 
-### 2.1 Check whether the official page says the game is HTML5/browser playable
-
-Signals include:
+Look for official signals such as:
 
 - `Run game`
 - `Play in browser`
-- platform `HTML5`
-- an embedded game canvas/iframe
+- `HTML5`
+- visible embedded browser player
 
-### 2.2 Find the actual runtime URL
+### Find the actual runtime
 
-**Never put the itch.io project detail page into the game iframe.**
-
-Incorrect:
+Wrong:
 
 ```html
 <iframe src="https://developer.itch.io/game-name"></iframe>
 ```
 
-Look for the actual runtime iframe, commonly resembling:
+That is a project page, not the runtime.
+
+A real itch-hosted runtime often resembles:
 
 ```text
 https://html-classic.itch.zone/html/<build-id>/index.html?...
 https://html-classic.itch.zone/html/<build-id>/web/index.html?...
 ```
 
-Possible extraction methods:
+Possible discovery methods:
 
-- inspect rendered DOM
-- inspect page source
-- inspect browser network requests
-- inspect the game iframe element
-- inspect public developer comments/devlogs if the runtime URL is surfaced there
+- rendered DOM inspection
+- page source inspection
+- browser network inspection
+- iframe element inspection
+- official developer comments/devlogs when they expose the runtime URL
 
-The parsed text version of a webpage may omit iframe `src` attributes. If the page clearly shows `Run game + HTML5`, do not conclude that no runtime exists merely because text extraction did not expose it.
+Important: a text parser may omit iframe `src` attributes. If the official page clearly shows `Run game + HTML5`, continue investigating instead of concluding that no runtime exists.
 
-### 2.3 Test the runtime in a minimal third-party page
+### Minimal third-party test
 
-Use a minimal test before designing the full website:
+Before building the full website, test the runtime in the smallest possible page:
 
 ```html
 <!doctype html>
 <meta charset="utf-8">
-<style>
-html,body,iframe{margin:0;width:100%;height:100%;border:0}
-</style>
+<style>html,body,iframe{margin:0;width:100%;height:100%;border:0}</style>
 <iframe
   src="REAL_RUNTIME_URL"
   allow="autoplay; fullscreen *; gamepad; gyroscope; accelerometer; web-share"
@@ -154,362 +137,355 @@ html,body,iframe{margin:0;width:100%;height:100%;border:0}
 
 Verify:
 
-- the game loads
-- keyboard input works
-- mouse/touch works
-- audio starts when permitted
-- fullscreen works when supported
+- game boots
+- mouse works
+- keyboard works when relevant
+- touch works if mobile play is claimed
+- fullscreen works when offered
+- reload works
+- no CSP / `frame-ancestors` / `X-Frame-Options` blocker
 - the game does not immediately navigate away
-- no `X-Frame-Options` or CSP `frame-ancestors` block occurs
 
-### 2.4 If embedding fails
+If the runtime fails, do not fake a player. Either build a guide/discovery site with a real official Play link or reject it for the play-first template.
 
-Do not fake a playable player.
-
-Choose one:
-
-- build a guide/discovery site with a prominent official `Play on itch.io` button
-- reject the game for the play-first template
-
-Label the result clearly as `embed unsupported`.
-
-## Phase 3 — Check Attribution and Usage Boundaries
+## Phase 3 — Check attribution and usage boundaries
 
 Technical embeddability is not the same as permission.
 
-Before production deployment, check available developer/host terms and asset usage expectations.
+Before production deployment:
 
-Rules:
-
-- do not claim to be the official website unless it is actually official
-- do not remove creator attribution
-- do not mirror or redistribute game binaries unless authorized
-- prefer loading the current host-provided runtime instead of copying game files
-- link to the official game/developer page
-- use an `Unofficial discovery/guide` disclosure when appropriate
+- check available developer/host terms
+- credit the developer
+- link to the official game page
+- do not claim official status unless true
+- do not mirror game binaries without authorization
+- prefer the current host-provided runtime
+- disclose unofficial discovery/guide status when appropriate
 - do not fabricate endorsement or affiliation
 
-If permission is unclear, state that production use should be confirmed with the creator.
+## Phase 4 — Build the search-intent brief
 
-# Game Research Brief
+Before UI generation, define:
 
-Before UI generation, create a compact internal brief.
+```text
+Primary entity: <exact game name>
+Primary query intent: play | guide | controls | wiki | mixed
+Primary keyword: <natural main query>
+Secondary intents: <real supporting queries>
+Canonical page purpose: <one sentence>
+```
 
-## Identity
+Do not force modifiers such as `free`, `online`, `unblocked`, `codes`, `download` or `wiki` unless they are accurate and useful.
+
+The page structure must be driven by actual player intent, not by a generic SEO checklist.
+
+## Phase 5 — Build the game research brief
+
+### Identity
 
 Collect:
 
 - game name
 - developer
-- tagline/official description
+- official description/tagline
 - genre
 - platform
 - release status
 
-## Mechanics
+### Mechanics
 
 Collect only real systems:
 
-- primary loop
-- win/score/progression condition
+- primary gameplay loop
+- score/win/progression condition
 - resources
 - upgrades
 - characters
 - enemies
-- levels/rooms/areas
-- prestige/reset mechanics
+- rooms/levels/areas
+- prestige/reset systems
 - daily challenges
 - leaderboard
 - collections
-- codes/secrets if real
+- codes/secrets only if real
 
-## Controls
+### Controls
 
-Only document controls supported by official sources or verified play.
+Only document controls supported by official sources or verified gameplay.
 
-## Visual DNA
+### Visual DNA
 
-Extract from official screenshots and artwork:
+Derive from official screenshots/artwork:
 
 - dominant colors
 - accent colors
-- pixel art / vector / hand-drawn / 3D / minimalist
+- pixel/vector/hand-drawn/3D/minimalist style
 - UI density
-- shapes
+- shape language
 - border style
+- corner radius
 - shadows
-- texture
+- textures
 - typography mood
 - icon style
-- animation style
+- motion style
 
-## Search/User Intent
+### Player intent
 
-Identify what a new player actually wants:
+Identify what users genuinely need:
 
 - play now
 - how to play
 - controls
-- tips
-- score explanation
-- upgrades
-- builds
+- beginner tips
+- scoring/progression explanation
+- upgrades/builds
 - wiki/reference
-- codes
-- secrets
-- mobile compatibility
-- save progress
-- release date
+- codes/secrets only when real
+- mobile/browser support
+- save behavior
+- release information
 
-Do not create sections for systems that do not exist in the game.
+Do not create sections for systems that do not exist.
 
-# Visual Direction Rules
+# Visual Direction
 
-Translate the Visual DNA into a site design system.
-
-### Cute / cozy / pet / casual
-
-Prefer:
-
-- soft pastel palette
-- larger radius
-- illustrated buttons
-- bubbly spacing
-- friendly microcopy
-- sticker/card motifs
-
-### Drawing / precision / challenge
-
-Prefer:
-
-- cleaner geometry
-- score/challenge emphasis
-- high whitespace or grid-paper motifs
-- visible challenge feedback
-- sharper interactive states
-
-### Incremental / management / strategy
-
-Prefer:
-
-- resource counters
-- compact stats
-- upgrade/progression panels
-- stronger information hierarchy
-- dashboards only when consistent with the game
-
-### Pixel / dark / roguelike / idle
-
-Prefer:
-
-- pixel-compatible typography treatment
-- hard edges
-- low-radius cards
-- game-like status bars
-- limited neon/highlight accents
-- stronger texture/shadow contrast
-
-These are starting heuristics, not fixed themes.
-
-# Required Page Architecture
-
-The default site should work well as a single high-quality landing page first.
-
-## 1. Navigation
-
-Keep it small.
-
-Typical links:
-
-- Play
-- How to Play
-- Tips / Guide
-- FAQ
-- Official Game
-
-## 2. Hero
-
-Must answer within seconds:
-
-- What game is this?
-- Why should I play it?
-- Can I play now?
-
-Required:
-
-- one H1
-- concise game-specific description
-- primary Play action
-- official artwork/screenshot where permitted
-
-Avoid generic filler such as `The ultimate gaming experience`.
-
-## 3. Game Player
-
-Place high on the page when embed verification succeeded.
-
-Recommended behavior:
-
-- lazy load on user interaction
-- clear `Load Game` button
-- responsive container
-- Reload button
-- Fullscreen button
-- official host attribution
-- fallback link to official game page
-
-Do not force autoplaying audio before interaction.
-
-## 4. How to Play
-
-Explain the real loop in 3–6 steps using the game's own terminology.
-
-## 5. Features / Systems
-
-Only include systems that were verified.
+**Repeat the information architecture. Do not repeat the visual design.**
 
 Examples:
 
-- score
-- daily challenge
-- prestige
-- upgrades
-- rooms
-- spells
-- collection
-- leaderboard
+### Cute / cozy / pet / casual
 
-## 6. Tips / Beginner Guide
+Prefer soft palettes, illustrated controls, larger radius, sticker/card motifs and friendly spacing.
 
-Give practical advice based on verified mechanics.
+### Drawing / precision / challenge
 
-Do not invent advanced strategies merely to fill SEO copy.
+Prefer clean geometry, challenge/score emphasis, sharper states, paper/grid motifs where appropriate.
 
-## 7. Screenshots / Game Feel
+### Incremental / management / strategy
 
-Use official screenshots or creator-approved media.
+Prefer resource counters, compact information hierarchy, progression panels and management-oriented UI only when consistent with the game.
 
-Keep images meaningful rather than decorative duplication.
+### Pixel / dark / roguelike / idle
 
-## 8. FAQ
+Prefer harder edges, pixel-compatible typography treatment, status bars, stronger shadows and limited highlight accents.
 
-Good topics:
+These are heuristics, not fixed templates.
 
-- What is the game?
-- Is it free?
-- Can I play in browser?
-- Does it work on mobile?
-- How do controls work?
-- Does progress save?
-- Who made it?
-- Where is the official page?
+# Default Site Architecture
 
-Only answer what can be verified.
+Start with one strong page unless real search intent justifies more routes.
 
-## 9. Footer
+Recommended order:
 
-Include:
+```text
+Navigation
+Hero
+Playable Game
+How to Play / Core Loop
+Verified Features / Systems
+Screenshots / Game Feel
+Beginner Tips
+Controls / Progression
+FAQ
+Official Links / Attribution
+Footer
+```
 
-- creator attribution
-- official game link
-- unofficial-site disclosure when appropriate
-- copyright/trademark neutrality language if relevant
+## Hero requirements
+
+The hero must immediately answer:
+
+- what game this is
+- what the player does
+- why the game is interesting
+- whether the player can play now
+
+Required:
+
+- exactly one normal H1
+- H1 clearly identifies the game/topic
+- concise game-specific introduction
+- primary Play action when verified
+- meaningful official artwork/screenshot where permitted
+
+A pure slogan such as `BUILD A SHADY EMPIRE` is not sufficient as the homepage H1 by itself. Prefer a search-clear H1 such as:
+
+```html
+<h1>Play Scam Artist Online <span>Build a Shady Empire</span></h1>
+```
+
+## Player requirements
+
+When embedding is verified:
+
+- place the player high on the page
+- lazy-load the heavy runtime after user interaction when practical
+- keep the runtime URL configurable
+- provide Reload
+- provide Fullscreen when supported
+- provide an official fallback link
+- do not force autoplay audio before user interaction
+
+Important SEO copy must remain outside the iframe.
+
+## How to Play / Tips / FAQ
+
+Use the game's terminology and verified mechanics.
+
+Do not write generic filler such as:
+
+```text
+Practice makes perfect.
+Have fun.
+Try different strategies.
+```
+
+FAQ should answer real first-session questions. FAQ structured data is optional and must be accurate; the visible FAQ itself is the main value.
+
+# Mandatory On-Page SEO Gate
+
+Every generated production site must follow [`references/on-page-seo.md`](./references/on-page-seo.md).
+
+This is a **hard acceptance gate**, not an optional optimization pass.
+
+## Required page-level SEO
+
+Every important indexable page must have:
+
+- unique descriptive `<title>`
+- useful meta description
+- exact game entity/topic made clear in the H1
+- one normal H1
+- logical H2/H3 hierarchy
+- search intent matched by visible content
+- self-referencing production canonical
+- no staging/example canonical left in production
+- accurate Open Graph metadata
+- accurate structured data only when justified
+- meaningful indexable text outside the iframe
+- crawlable internal links
+- no accidental `noindex`
+
+## Required content signals
+
+Use the game name naturally where it helps identify the entity:
+
+- title
+- H1
+- opening copy
+- relevant H2s
+- meaningful image alt text
+- internal anchors where natural
+- structured data
+
+Never use a keyword-density target.
+
+Do not use:
+
+- keyword stuffing
+- hidden text
+- giant keyword footers
+- autogenerated synonym blocks
+- irrelevant modifiers
+- doorway pages
+- multiple near-identical pages targeting the same intent
+
+## Images
+
+For production output:
+
+- use meaningful alt text
+- use empty alt for decorative images
+- reserve image dimensions / aspect ratio
+- avoid lazy-loading the likely LCP hero image
+- lazy-load below-the-fold screenshots when appropriate
+- compress site-owned assets
+- do not stretch artwork
+
+## Site-level technical SEO
+
+Production deliverables must include:
+
+```text
+robots.txt
+sitemap.xml
+```
+
+The sitemap must contain canonical indexable production URLs only.
+
+Multi-page sites must not contain orphan pages.
+
+## Performance
+
+The website shell should load before the game runtime.
+
+Optimize for usable Core Web Vitals:
+
+- avoid unnecessary render-blocking assets
+- keep non-game JavaScript small
+- avoid layout shift from images/media
+- lazy-load the heavy runtime when practical
+
+## Search Console readiness
+
+A production result should be ready for:
+
+- Google Search Console verification
+- sitemap submission
+- canonical URL inspection
+- indexing request where appropriate
+- query/impression/CTR monitoring
+
+Do not pretend Search Console is connected unless it actually is.
 
 # Optional Multi-page Expansion
 
-Only create pages that match real player intent.
+Create a separate route only for a distinct real user intent with enough meaningful content.
 
 Possible routes:
 
 ```text
 /
-/how-to-play
-/tips
-/guide
-/wiki
-/upgrades
-/builds
-/codes
-/leaderboard
-/daily
-/secrets
-/calculator
-/release-date
+/how-to-play/
+/tips/
+/guide/
+/wiki/
+/upgrades/
+/builds/
+/codes/
+/leaderboard/
+/daily/
+/secrets/
+/calculator/
+/release-date/
 ```
 
-Do not publish empty SEO doorway pages. A page should exist only if it can answer a distinct user need with meaningful content.
-
-# SEO Requirements
-
-## Metadata
-
-Generate game-specific:
-
-- `<title>`
-- meta description
-- canonical URL
-- Open Graph title/description/image
-- Twitter card metadata when useful
-
-Avoid forced keyword stuffing.
-
-Example pattern, not a fixed title:
-
-```text
-Play <Game Name> Online — Guide, Controls & Tips
-```
-
-Use `Free` only if the current browser version is actually free.
-
-## Headings
-
-- one H1
-- logical H2/H3 hierarchy
-- headings should describe real sections, not repeated keyword variants
-
-## Structured Data
-
-Use structured data only when accurate.
-
-Potential types:
-
-- `VideoGame`
-- `FAQPage`
-- `BreadcrumbList` for multi-page sites
-
-Do not mark unrelated content as `SoftwareApplication` simply for SEO coverage.
-
-## Crawlability
-
-Production output should include:
-
-- robots.txt
-- sitemap.xml
-- canonical URLs
-- clean internal links
-- no accidental `noindex`
+Do not create thin pages simply to capture keyword variants.
 
 # Implementation Requirements
 
-Default output should be deployable, not a mockup.
+Default output should be deployable, not a screenshot/mockup.
 
 For static HTML:
 
 - semantic HTML5
+- `<html lang="...">`
 - CSS variables for design tokens
 - minimal JavaScript
-- responsive desktop/tablet/mobile behavior
-- no broken placeholder links
-- no fake player
+- responsive desktop/tablet/mobile layout
+- no broken placeholder links in production
+- no fake game player
+- important content present in HTML source
 
 For frameworks:
 
-- isolate game embed as a component
-- keep the runtime URL configurable
-- avoid hardcoding the same URL in multiple files
-- preserve metadata and JSON-LD server-side where applicable
+- isolate the game player as a component
+- keep runtime URL configurable
+- avoid duplicating runtime URLs across files
+- render SEO metadata and core content server-side/static where practical
 
-Recommended configuration concept:
+Recommended configuration:
 
 ```js
 const GAME = {
@@ -520,38 +496,11 @@ const GAME = {
 };
 ```
 
-Runtime URLs may change after developers upload a new Web build. Keep them easy to update.
-
-# Player Component Requirements
-
-A valid player implementation should support:
-
-```html
-<iframe
-  src="REAL_RUNTIME_URL"
-  title="<Game Name> browser game"
-  allow="autoplay; fullscreen *; gamepad; gyroscope; accelerometer; web-share"
-  allowfullscreen
-  scrolling="no">
-</iframe>
-```
-
-Do not copy irrelevant permissions blindly. Preserve host-required permissions when the official iframe uses them.
-
-Recommended UX:
-
-1. render poster/cover first
-2. user clicks `Load Game`
-3. assign iframe `src`
-4. hide poster
-5. offer reload/fullscreen
-6. keep official fallback link visible
+Runtime URLs may change after a developer uploads a new browser build. Keep them easy to update.
 
 # Content Quality Rules
 
-Never generate content from the game name alone.
-
-Every factual statement about the game must be supported by one of:
+Every factual game claim must be supported by:
 
 - official game page
 - official developer page
@@ -561,7 +510,6 @@ Every factual statement about the game must be supported by one of:
 
 Do not invent:
 
-- scores
 - controls
 - release dates
 - mobile support
@@ -571,87 +519,88 @@ Do not invent:
 - characters
 - hidden content
 - codes
+- ratings/review counts
 
-If a fact cannot be confirmed, omit it or label it unknown.
+If a fact cannot be verified, omit it or label it unknown.
 
 # Responsive Requirements
 
-Verify at minimum:
+Verify approximately:
 
-- ~1440px desktop
-- ~768px tablet
-- ~390px mobile
+- 1440px desktop
+- 768px tablet
+- 390px mobile
 
 Check:
 
-- hero does not overwhelm mobile
-- iframe remains usable
-- player height is sufficient
-- fullscreen remains available
-- touch target size is reasonable
+- game title/H1 remains readable
 - navigation does not overflow
-- screenshots do not cause layout shifts
-- body text remains readable
+- iframe/player remains usable
+- touch targets are usable
+- screenshots do not break layout
+- no horizontal scrolling
+- body copy remains readable
 
-Some browser games are technically embeddable but unusable on small screens. If so, state `desktop recommended` instead of pretending mobile play is good.
-
-# Performance Rules
-
-- lazy-load game runtime after a click where possible
-- compress site-owned images
-- do not preload every screenshot
-- avoid heavy UI libraries for a single-page static site
-- keep external fonts minimal
-- preserve the game runtime independently from site assets
-
-The website should load before the game payload.
+If the browser game itself is poor on small screens, state `Desktop recommended` rather than claiming good mobile play.
 
 # Final QA Gate
 
-A project is not complete until all relevant checks pass.
+A project is complete only when all applicable gates pass.
 
 ## Game
 
-- [ ] Actual runtime URL is used, not the itch.io detail page
-- [ ] Game loads inside the site
-- [ ] Mouse/keyboard input works
-- [ ] Touch is checked if mobile is claimed
-- [ ] Fullscreen is checked
+- [ ] Correct runtime URL is used
+- [ ] Project detail page is not used as the runtime
+- [ ] Game loads inside the page
+- [ ] Relevant controls work
+- [ ] Fullscreen works when offered
 - [ ] Reload works
-- [ ] Official fallback link works
+- [ ] Official fallback works
 
 ## Design
 
-- [ ] Visual system clearly matches this specific game
+- [ ] Visual system belongs to this game
 - [ ] It is not a recolored generic template
-- [ ] Official screenshots are displayed correctly
-- [ ] No stretched artwork
-- [ ] Mobile layout is intentional
+- [ ] Artwork is displayed correctly
+- [ ] Mobile design is intentional
 
 ## Content
 
 - [ ] Mechanics are verified
 - [ ] Controls are verified
-- [ ] No fabricated features
-- [ ] Copy is useful to an actual player
+- [ ] No fabricated systems
+- [ ] Copy helps a real player
 
-## SEO
+## On-Page SEO
 
-- [ ] Unique title/meta
-- [ ] Single H1
-- [ ] canonical
-- [ ] Open Graph
-- [ ] valid JSON-LD where used
-- [ ] sitemap/robots for production
+- [ ] Primary entity and intent are defined
+- [ ] Unique title and meta description
+- [ ] Homepage H1 clearly identifies the game/topic
+- [ ] Exactly one normal H1 per page
+- [ ] Search-clear opening copy exists outside iframe
+- [ ] Logical H2/H3 structure
+- [ ] Correct production canonical
+- [ ] No placeholder/staging canonical in production
+- [ ] Accurate OG metadata
+- [ ] Accurate structured data when used
+- [ ] Meaningful alt text and image dimensions
+- [ ] Important internal links are crawlable
+- [ ] No orphan/duplicate-intent pages
+- [ ] robots.txt exists
+- [ ] sitemap.xml exists
+- [ ] No accidental noindex
+- [ ] No keyword stuffing, hidden text or doorway patterns
 
 ## Attribution
 
 - [ ] Developer is credited
-- [ ] Official link exists
+- [ ] Official page is linked
 - [ ] Unofficial status is clear when applicable
-- [ ] No claim of ownership of the game
+- [ ] No false ownership/affiliation claim
 
-If the iframe is broken, the play-first site **fails QA**, even if the UI looks finished.
+Any broken iframe is a `FAIL` for a play-first build.
+
+Any failed On-Page SEO Gate is a `FAIL` for a production/deployment-ready build.
 
 # Output Contract
 
@@ -659,23 +608,29 @@ When invoked for a game keyword, deliver:
 
 ```text
 1. Resolved game identity
-2. Official source URLs
-3. Embed status: verified / unsupported / needs manual verification
+2. Official sources
+3. Embed status
 4. Runtime URL when verified
-5. Game research brief
-6. Visual direction
-7. Site architecture
-8. Deployable site code
-9. SEO metadata + JSON-LD
-10. Attribution/disclosure
-11. QA result
+5. Search-intent brief
+6. Game research brief
+7. Visual direction
+8. Site architecture
+9. Deployable site code
+10. On-page SEO implementation
+11. robots.txt + sitemap.xml for production
+12. Attribution/disclosure
+13. QA result
 ```
 
-For a completed build, summarize status in this format:
+Completion summary:
 
 ```text
 Game: <name>
 Embed: VERIFIED | UNSUPPORTED | MANUAL CHECK REQUIRED
+Primary intent: <intent>
+Primary keyword/entity: <query/game>
+On-Page SEO: PASS | FAIL
+Canonical: <production URL or pending>
 Design direction: <short description>
 Pages: <list>
 Deployment-ready: YES | NO
@@ -684,13 +639,17 @@ Blocking issues: <none or list>
 
 # Failure Conditions
 
-Stop and report a blocker instead of pretending the site is complete when:
+Stop and report a blocker instead of pretending the project is complete when:
 
-- the game entity cannot be resolved
-- browser gameplay cannot be verified
-- a third-party iframe is blocked
+- game identity cannot be resolved
+- browser runtime cannot be verified for a claimed playable build
+- third-party embedding is blocked
 - required artwork cannot be used responsibly
-- the game page is removed/offline
-- key content would have to be fabricated
+- key game facts would have to be fabricated
+- production canonical is unresolved
+- primary content would live only inside the iframe
+- On-Page SEO Gate fails
 
-A polished fake player is worse than an honest `Play on official site` fallback.
+A polished fake player is worse than an honest official Play link.
+
+A beautiful page with weak On-Page SEO is not deployment-ready.
