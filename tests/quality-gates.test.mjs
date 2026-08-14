@@ -37,10 +37,10 @@ const seoHtml = (imageMarkup) => `<!doctype html>
 </body>
 </html>`;
 
-const runSeoAudit = (html) => {
+const runSeoAudit = (imageMarkup) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'open-webgame-seo-'));
   const htmlPath = path.join(dir, 'index.html');
-  fs.writeFileSync(htmlPath, html);
+  fs.writeFileSync(htmlPath, seoHtml(imageMarkup));
   return spawnSync(process.execPath, [
     'scripts/seo-audit.mjs',
     '--config', validConfigPath,
