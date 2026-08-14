@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
+  "schemaVersion": "0.3",
+  "game": {
+    "name": "Fixture Game"
+  },
+  "site": {
+    "language": "en",
+    "mode": "guide"
+  },
+  "seo": {
+    "primaryIntent": "guide",
+    "primayKeyword": "Fixture Game",
+    "canonicalPagePurpose": "This fixture must fail because primaryKeyword is misspelled."
+  },
+  "embed": {
+    "status": "unsupported"
+  },
+  "design": {},
+  "sources": [],
+  "claims": [],
+  "pages": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "intent": "guide",
+      "canonical": "",
+      "indexable": true
+    }
+  ],
+  "security": {
+    "allowedIframePermissions": []
+  },
+  "status": {
+    "research": "pending",
+    "onPageSeo": "pending",
+    "deploymentReady": false,
+    "blockingIssues": []
+  }
+}
