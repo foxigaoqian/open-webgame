@@ -20,6 +20,7 @@
     "check:content": "node scripts/content-audit.mjs",
     "check:site": "node scripts/site-audit.mjs",
     "check:security": "node scripts/security-audit.mjs",
+    "check:i18n": "node scripts/i18n-audit.mjs",
     "check:http": "node scripts/http-audit.mjs",
     "verify:embed": "node scripts/verify-embed.mjs",
     "verify:embed:config": "node scripts/verify-embed.mjs --offline",
