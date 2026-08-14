@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check QA scripts
+        shell: bash
+        run: |
+          for file in scripts/*.mjs; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
+      - name: Run Open WebGame hard gates against the live example
+        run: npm run qa:example
