@@ -125,11 +125,14 @@ Accessibility    85
 Best Practices   80
 SEO              90
 CLS              <= 0.15
+LCP              <= 4.0s hard limit
 ```
 
-LCP above 2.5s and high Total Blocking Time are surfaced as warnings for optimization work.
+LCP between 2.5s and 4.0s is surfaced as a warning and should still be optimized toward <= 2.5s. LCP above 4.0s is a hard failure. High Total Blocking Time is also surfaced for optimization work.
 
 The browser game is normally lazy-loaded, so Lighthouse evaluates the website shell before the heavy game runtime is intentionally started.
+
+The Scam Artist regression case demonstrates why this gate exists: replacing an oversized first-screen image and lazy-loading below-fold screenshots reduced measured mobile-shell LCP from about 7.0s to about 1.9s in CI while keeping the source artwork on the creator's existing itch-hosted image infrastructure.
 
 ## Aggregate QA
 
