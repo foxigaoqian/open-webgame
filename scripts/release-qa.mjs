@@ -21,22 +21,24 @@ if (config.status?.research !== 'resolved') releaseErrors.push('status.research 
 if (config.status?.onPageSeo !== 'pass') releaseErrors.push('status.onPageSeo must be pass before release QA.');
 if (blockingIssues.length > 0) releaseErrors.push(`status.blockingIssues must be empty before release QA (${blockingIssues.length} remaining).`);
 
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const checks = [
-  ['Live non-browser gates', ['scripts/qa.mjs', '--config', configPath, '--html', html, '--site-dir', siteDir]],
-  ['Browser + accessibility', ['scripts/browser-qa.mjs', '--config', configPath, '--site-dir', siteDir]],
-  ['Lighthouse', ['scripts/lighthouse-qa.mjs', '--config', configPath, '--site-dir', siteDir]],
+  { name: 'Dependency security', executable: npmCommand, args: ['run', 'check:deps'] },
+  { name: 'Live non-browser gates', executable: process.execPath, args: ['scripts/qa.mjs', '--config', configPath, '--html', html, '--site-dir', siteDir] },
+  { name: 'Browser + accessibility', executable: process.execPath, args: ['scripts/browser-qa.mjs', '--config', configPath, '--site-dir', siteDir] },
+  { name: 'Lighthouse', executable: process.execPath, args: ['scripts/lighthouse-qa.mjs', '--config', configPath, '--site-dir', siteDir] },
 ];
 
 let failed = releaseErrors.length > 0;
 const results = [];
-for (const [name, commandArgs] of checks) {
-  console.log(`\n=== ${name} ===`);
-  const result = spawnSync(process.execPath, commandArgs, {
+for (const check of checks) {
+  console.log(`\n=== ${check.name} ===`);
+  const result = spawnSync(check.executable, check.args, {
     cwd: process.cwd(),
     stdio: 'inherit',
   });
   const pass = result.status === 0;
-  results.push({ name, pass, exitCode: result.status });
+  results.push({ name: check.name, pass, exitCode: result.status });
   if (!pass) failed = true;
 }
 
@@ -67,4 +69,4 @@ if (failed) {
 
 console.log('Deployment-ready: YES');
 console.log(`Release evidence is bound to commit ${commit}.`);
-console.log('Live config/content/site/i18n/SEO/security/HTTP/embed, Browser/axe and Lighthouse gates all passed.');
+console.log('Dependency audit, live config/content/freshness/site/i18n/SEO/security/HTTP/embed, Browser/axe and Lighthouse gates all passed.');
