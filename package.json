@@ -1,6 +1,6 @@
 {
   "name": "open-webgame",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "type": "module",
   "description": "Agent skill and production QA workflow that turns a game keyword into a playable, game-native, search-ready website.",
@@ -22,6 +22,7 @@
     "check:security": "node scripts/security-audit.mjs",
     "check:i18n": "node scripts/i18n-audit.mjs",
     "check:http": "node scripts/http-audit.mjs",
+    "check:deps": "npm audit --audit-level=high",
     "verify:embed": "node scripts/verify-embed.mjs",
     "verify:embed:config": "node scripts/verify-embed.mjs --offline",
     "qa": "node scripts/qa.mjs",
