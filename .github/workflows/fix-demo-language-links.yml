@@ -1,0 +1,63 @@
+name: Fix multilingual demo links
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-demo-language-links.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fix project-site language URLs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [
+              Path('examples/scam-artist-site/index.html'),
+              Path('examples/scam-artist-site/ja/index.html'),
+              Path('examples/scam-artist-site/ko/index.html'),
+          ]
+          replacements = {
+              'href="/" hreflang="en"': 'href="https://foxigaoqian.github.io/open-webgame/" hreflang="en"',
+              'href="/ja/" hreflang="ja"': 'href="https://foxigaoqian.github.io/open-webgame/ja/" hreflang="ja"',
+              'href="/ko/" hreflang="ko"': 'href="https://foxigaoqian.github.io/open-webgame/ko/" hreflang="ko"',
+          }
+
+          changed = False
+          for p in files:
+              s = p.read_text()
+              original = s
+              for old, new in replacements.items():
+                  s = s.replace(old, new)
+              if s != original:
+                  p.write_text(s)
+                  changed = True
+          if not changed:
+              print('Language links already correct.')
+          PY
+
+      - name: Commit fixed language links
+        shell: bash
+        run: |
+          if git diff --quiet -- examples/scam-artist-site; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add examples/scam-artist-site/index.html examples/scam-artist-site/ja/index.html examples/scam-artist-site/ko/index.html
+          git commit -m "fix: use project-site language switcher URLs"
+          git push origin HEAD:main
