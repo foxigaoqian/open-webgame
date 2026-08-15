@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://foxigaoqian.github.io/open-webgame/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://foxigaoqian.github.io/open-webgame/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://foxigaoqian.github.io/open-webgame/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://foxigaoqian.github.io/open-webgame/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://foxigaoqian.github.io/open-webgame/"/>
+  </url>
+  <url>
+    <loc>https://foxigaoqian.github.io/open-webgame/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://foxigaoqian.github.io/open-webgame/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://foxigaoqian.github.io/open-webgame/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://foxigaoqian.github.io/open-webgame/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://foxigaoqian.github.io/open-webgame/"/>
+  </url>
+  <url>
+    <loc>https://foxigaoqian.github.io/open-webgame/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://foxigaoqian.github.io/open-webgame/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://foxigaoqian.github.io/open-webgame/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://foxigaoqian.github.io/open-webgame/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://foxigaoqian.github.io/open-webgame/"/>
   </url>
 </urlset>

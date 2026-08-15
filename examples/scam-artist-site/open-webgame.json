@@ -17,15 +17,13 @@
     "deploymentTarget": "github-pages"
   },
   "i18n": {
-    "enabled": false,
+    "enabled": true,
     "defaultLanguage": "en",
     "xDefaultLanguage": "en",
     "languages": [
-      {
-        "code": "en",
-        "label": "English",
-        "prefix": ""
-      }
+      {"code": "en", "label": "English", "prefix": ""},
+      {"code": "ja", "label": "日本語", "prefix": "ja"},
+      {"code": "ko", "label": "한국어", "prefix": "ko"}
     ]
   },
   "seo": {
@@ -93,11 +91,31 @@
     {
       "path": "/",
       "file": "index.html",
-      "intent": "play Scam Artist and learn the beginner loop",
+      "intent": "play Scam Artist and learn the beginner loop in English",
       "canonical": "https://foxigaoqian.github.io/open-webgame/",
       "title": "Play Scam Artist Online | Idle Building Game Guide",
       "indexable": true,
       "language": "en",
+      "translationKey": "home"
+    },
+    {
+      "path": "/ja/",
+      "file": "ja/index.html",
+      "intent": "play Scam Artist and learn the beginner loop in Japanese",
+      "canonical": "https://foxigaoqian.github.io/open-webgame/ja/",
+      "title": "Scam Artistをブラウザでプレイ | 放置系ビルドゲーム攻略ガイド",
+      "indexable": true,
+      "language": "ja",
+      "translationKey": "home"
+    },
+    {
+      "path": "/ko/",
+      "file": "ko/index.html",
+      "intent": "play Scam Artist and learn the beginner loop in Korean",
+      "canonical": "https://foxigaoqian.github.io/open-webgame/ko/",
+      "title": "Scam Artist 온라인 플레이 | 방치형 빌딩 게임 가이드",
+      "indexable": true,
+      "language": "ko",
       "translationKey": "home"
     }
   ],
