@@ -40,7 +40,7 @@
     "@axe-core/playwright": "^4.10.2",
     "ajv": "^8.17.1",
     "chrome-launcher": "^1.0.0",
-    "lighthouse": "^12.8.2",
+    "lighthouse": "^13.4.1",
     "playwright": "^1.54.2"
   }
 }
