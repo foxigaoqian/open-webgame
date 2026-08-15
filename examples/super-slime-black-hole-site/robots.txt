@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/sitemap.xml
