@@ -14,7 +14,10 @@ const artifactsDir = path.resolve(process.cwd(), args.artifacts || 'qa-artifacts
 const errors = [];
 const warnings = [];
 const pages = Array.isArray(config.pages) ? config.pages : [];
-const home = pages.find((page) => page.path === '/') || { file: 'index.html', path: '/' };
+const home = pages.find((page) => page.path === '/') || { file: 'index.html', path: '/', language: config.site?.language || 'en', translationKey: 'home' };
+const targets = config.i18n?.enabled
+  ? pages.filter((page) => page.indexable !== false && page.translationKey === (home.translationKey || 'home'))
+  : [home];
 const homeFile = path.resolve(siteDir, home.file || 'index.html');
 
 if (!fs.existsSync(homeFile)) {
@@ -61,7 +64,7 @@ const server = http.createServer((req, res) => {
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const address = server.address();
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const routePath = home.path === '/' ? '/' : home.path;
+const slug = (value) => String(value || 'page').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'page';
 
 let chrome;
 try {
@@ -70,40 +73,45 @@ try {
     chromeFlags: ['--headless', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
   });
 
-  const result = await lighthouse(`${baseUrl}${routePath}`, {
-    port: chrome.port,
-    output: 'json',
-    logLevel: 'error',
-    onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
-    formFactor: 'mobile',
-    screenEmulation: {
-      mobile: true,
-      width: 390,
-      height: 844,
-      deviceScaleFactor: 1,
-      disabled: false,
-    },
-  });
+  const thresholds = {
+    performance: 0.60,
+    accessibility: 0.85,
+    'best-practices': 0.80,
+    seo: 0.90,
+  };
 
-  if (!result?.lhr) {
-    errors.push('Lighthouse did not return an LHR report.');
-  } else {
-    const reportPath = path.join(artifactsDir, 'lighthouse.json');
+  for (const target of targets) {
+    const locale = target.language || config.site?.language || 'page';
+    const result = await lighthouse(`${baseUrl}${target.path || '/'}`, {
+      port: chrome.port,
+      output: 'json',
+      logLevel: 'error',
+      onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
+      formFactor: 'mobile',
+      screenEmulation: {
+        mobile: true,
+        width: 390,
+        height: 844,
+        deviceScaleFactor: 1,
+        disabled: false,
+      },
+    });
+
+    if (!result?.lhr) {
+      errors.push(`${locale}: Lighthouse did not return an LHR report.`);
+      continue;
+    }
+
+    const reportPath = path.join(artifactsDir, `lighthouse-${slug(locale)}.json`);
     fs.writeFileSync(reportPath, `${JSON.stringify(result.lhr, null, 2)}\n`);
 
     const categories = result.lhr.categories || {};
-    const thresholds = {
-      performance: 0.60,
-      accessibility: 0.85,
-      'best-practices': 0.80,
-      seo: 0.90,
-    };
     for (const [key, minimum] of Object.entries(thresholds)) {
       const score = categories[key]?.score;
       if (typeof score !== 'number') {
-        errors.push(`Lighthouse category ${key} has no numeric score.`);
+        errors.push(`${locale}: Lighthouse category ${key} has no numeric score.`);
       } else if (score < minimum) {
-        errors.push(`Lighthouse ${key} score ${(score * 100).toFixed(0)} is below ${(minimum * 100).toFixed(0)}.`);
+        errors.push(`${locale}: Lighthouse ${key} score ${(score * 100).toFixed(0)} is below ${(minimum * 100).toFixed(0)}.`);
       }
     }
 
@@ -113,13 +121,13 @@ try {
     const tbt = audits['total-blocking-time']?.numericValue;
 
     if (typeof cls === 'number' && cls > 0.15) {
-      errors.push(`Lighthouse CLS ${cls.toFixed(3)} exceeds the 0.15 hard limit.`);
+      errors.push(`${locale}: Lighthouse CLS ${cls.toFixed(3)} exceeds the 0.15 hard limit.`);
     }
     if (typeof lcp === 'number') {
-      if (lcp > 4000) errors.push(`Lighthouse LCP ${(lcp / 1000).toFixed(2)}s exceeds the 4.0s hard limit; target <= 2.5s.`);
-      else if (lcp > 2500) warnings.push(`Lighthouse LCP ${(lcp / 1000).toFixed(2)}s needs improvement; target <= 2.5s.`);
+      if (lcp > 4000) errors.push(`${locale}: Lighthouse LCP ${(lcp / 1000).toFixed(2)}s exceeds the 4.0s hard limit; target <= 2.5s.`);
+      else if (lcp > 2500) warnings.push(`${locale}: Lighthouse LCP ${(lcp / 1000).toFixed(2)}s needs improvement; target <= 2.5s.`);
     }
-    if (typeof tbt === 'number' && tbt > 600) warnings.push(`Lighthouse TBT ${Math.round(tbt)}ms is high; review main-thread work.`);
+    if (typeof tbt === 'number' && tbt > 600) warnings.push(`${locale}: Lighthouse TBT ${Math.round(tbt)}ms is high; review main-thread work.`);
   }
 } catch (error) {
   errors.push(`Lighthouse QA failed to run: ${error.message}`);
