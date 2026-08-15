@@ -9,6 +9,7 @@ on:
       - 'tests/**'
       - 'examples/scam-artist-site/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/browser-qa.yml'
   pull_request:
     branches: [main]
@@ -18,6 +19,7 @@ on:
       - 'tests/**'
       - 'examples/scam-artist-site/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/browser-qa.yml'
   workflow_dispatch:
 
@@ -36,9 +38,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Run live HTTP + embed gates
         run: npm run qa:live:example
