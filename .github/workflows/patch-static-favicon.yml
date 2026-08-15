@@ -1,0 +1,49 @@
+name: Patch static favicon links
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-static-favicon.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Add static favicon links to all locales
+        shell: python
+        run: |
+          from pathlib import Path
+
+          pages = [
+              (Path('examples/scam-artist-site/index.html'), './favicon.ico'),
+              (Path('examples/scam-artist-site/ja/index.html'), '../favicon.ico'),
+              (Path('examples/scam-artist-site/ko/index.html'), '../favicon.ico'),
+          ]
+          marker = '<meta name="theme-color" content="#17110f">'
+          for path, href in pages:
+              text = path.read_text(encoding='utf-8')
+              if 'rel="icon"' in text:
+                  continue
+              replacement = marker + f'\n<link rel="icon" href="{href}" sizes="any">\n<link rel="shortcut icon" href="{href}">'
+              if marker not in text:
+                  raise SystemExit(f'Missing theme-color marker in {path}')
+              path.write_text(text.replace(marker, replacement, 1), encoding='utf-8')
+
+      - name: Remove one-time workflow and commit
+        shell: bash
+        run: |
+          rm .github/workflows/patch-static-favicon.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: declare favicon statically in all locale heads"
+          git push
