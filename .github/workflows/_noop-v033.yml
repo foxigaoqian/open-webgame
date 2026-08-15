@@ -1,8 +1,0 @@
-name: noop-v033
-on:
-  workflow_dispatch:
-jobs:
-  noop:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo noop
