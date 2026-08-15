@@ -10,7 +10,7 @@ This directory contains the real site used as Open WebGame's regression and live
 - 日本語: https://foxigaoqian.github.io/open-webgame/ja/
 - 한국어: https://foxigaoqian.github.io/open-webgame/ko/
 
-The header includes a visible `EN / 日本語 / 한국어` language switcher. Each locale is a separate static, indexable page rather than client-side text replacement.
+The header uses a compact dropdown language switcher. Each locale is a separate static, indexable page rather than client-side text replacement.
 
 ## What this example demonstrates
 
@@ -24,7 +24,7 @@ The header includes a visible `EN / 日本語 / 한국어` language switcher. Ea
 - per-language `<html lang>`, canonical, Open Graph URL and structured data language
 - reciprocal `hreflang` for `en`, `ja`, `ko` and `x-default`
 - multilingual sitemap alternate entries
-- visible language navigation between all locale pages
+- accessible dropdown language navigation between all locale pages
 - game-specific How to Play / Tips / FAQ content
 - `VideoGame` and `FAQPage` structured data
 - responsive desktop/mobile layout
@@ -84,7 +84,7 @@ Run the live runtime HTTP/header check separately:
 npm run verify:embed -- --config examples/scam-artist-site/open-webgame.json
 ```
 
-First-production verification also uses the Browser QA workflow for real iframe boot/reload, accessibility and Lighthouse checks.
+First-production verification also uses the Browser QA workflow for real iframe boot/reload, accessibility and Lighthouse checks across every configured locale.
 
 ## Run locally
 
