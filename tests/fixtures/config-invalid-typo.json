@@ -1,12 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.3.3",
   "game": {
     "name": "Fixture Game"
   },
   "site": {
     "language": "en",
-    "mode": "guide"
+    "mode": "guide",
+    "origin": "",
+    "basePath": "",
+    "canonical": ""
   },
   "seo": {
     "primaryIntent": "guide",
@@ -34,7 +37,6 @@
   "status": {
     "research": "pending",
     "onPageSeo": "pending",
-    "deploymentReady": false,
     "blockingIssues": []
   }
 }
