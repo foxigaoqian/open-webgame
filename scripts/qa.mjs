@@ -10,7 +10,7 @@ const siteDir = args['site-dir'] || path.dirname(html);
 
 const checks = [
   ['Config', ['scripts/check-config.mjs', '--config', config]],
-  ['Content Provenance', ['scripts/content-audit.mjs', '--config', config]],
+  ['Content Provenance + Freshness', ['scripts/content-audit.mjs', '--config', config]],
   ['Site Architecture', ['scripts/site-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
   ['Multilingual SEO', ['scripts/i18n-audit.mjs', '--config', config, '--site-dir', siteDir]],
   ['On-Page SEO', ['scripts/seo-audit.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
