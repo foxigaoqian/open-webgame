@@ -158,7 +158,7 @@ The case demonstrates:
 - structured data and SEO foundations
 - real Browser QA evidence
 
-The live Scam Artist case currently remains a **single-language English example**. Multilingual capability is covered by the project contract and regression fixtures; do not confuse that with a translated Scam Artist deployment.
+The live Scam Artist case is deployed in **English, Japanese and Korean**, with separate indexable locale routes and a visible dropdown language switcher.
 
 ## Quick Start
 
