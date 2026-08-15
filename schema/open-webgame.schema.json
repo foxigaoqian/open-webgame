@@ -121,7 +121,10 @@
         "allOf": [
           {
             "if": { "properties": { "volatility": { "const": "volatile" } }, "required": ["volatility"] },
-            "then": { "required": ["maxAgeDays"] }
+            "then": {
+              "properties": { "maxAgeDays": { "type": "integer", "minimum": 1, "maximum": 3650 } },
+              "required": ["maxAgeDays"]
+            }
           }
         ],
         "additionalProperties": false
