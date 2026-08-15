@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.3.3",
   "game": {
     "name": "Scam Artist",
     "developer": "greenpixels",
@@ -11,7 +11,8 @@
   "site": {
     "language": "en",
     "mode": "play-first",
-    "domain": "foxigaoqian.github.io/open-webgame",
+    "origin": "https://foxigaoqian.github.io",
+    "basePath": "/open-webgame",
     "canonical": "https://foxigaoqian.github.io/open-webgame/",
     "stack": "static-html",
     "deploymentTarget": "github-pages"
@@ -70,6 +71,8 @@
       "text": "The Scam Artist prototype has an HTML5 browser build.",
       "sourceIds": ["itch-official"],
       "status": "verified",
+      "volatility": "volatile",
+      "maxAgeDays": 14,
       "usedIn": ["hero", "player", "faq"]
     },
     {
@@ -77,6 +80,7 @@
       "text": "Scam Artist is developed by greenpixels.",
       "sourceIds": ["itch-official", "steam-official"],
       "status": "verified",
+      "volatility": "stable",
       "usedIn": ["structured-data", "footer", "faq"]
     },
     {
@@ -84,6 +88,7 @@
       "text": "The prototype uses drag-and-drop placement and supports touch-oriented interaction.",
       "sourceIds": ["itch-official"],
       "status": "verified",
+      "volatility": "stable",
       "usedIn": ["controls", "faq"]
     }
   ],
@@ -127,7 +132,6 @@
   "status": {
     "research": "resolved",
     "onPageSeo": "pass",
-    "deploymentReady": true,
     "blockingIssues": []
   }
 }
