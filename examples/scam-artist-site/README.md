@@ -4,6 +4,14 @@ This directory contains the real site used as Open WebGame's regression and live
 
 **Live demo:** https://foxigaoqian.github.io/open-webgame/
 
+**Visible languages:**
+
+- English: https://foxigaoqian.github.io/open-webgame/
+- 日本語: https://foxigaoqian.github.io/open-webgame/ja/
+- 한국어: https://foxigaoqian.github.io/open-webgame/ko/
+
+The header includes a visible `EN / 日本語 / 한국어` language switcher. Each locale is a separate static, indexable page rather than client-side text replacement.
+
 ## What this example demonstrates
 
 - game-specific visual direction rather than a generic reskin
@@ -12,14 +20,19 @@ This directory contains the real site used as Open WebGame's regression and live
 - lazy loading behind a `Load Game` action
 - reload and fullscreen controls
 - official artwork/screenshots loaded from itch.io
+- localized English, Japanese and Korean visible page content
+- per-language `<html lang>`, canonical, Open Graph URL and structured data language
+- reciprocal `hreflang` for `en`, `ja`, `ko` and `x-default`
+- multilingual sitemap alternate entries
+- visible language navigation between all locale pages
 - game-specific How to Play / Tips / FAQ content
 - `VideoGame` and `FAQPage` structured data
 - responsive desktop/mobile layout
 - creator attribution and unofficial-site disclosure
 - production canonical / Open Graph URL
 - `robots.txt` and `sitemap.xml`
-- v0.2 single-source `open-webgame.json`
-- automated config, SEO and embed-config QA
+- strict `open-webgame.json` project contract
+- automated config, multilingual SEO, SEO, HTTP, embed, browser, axe and Lighthouse QA
 
 ## Single source of truth
 
@@ -27,27 +40,30 @@ Project state lives in:
 
 [`open-webgame.json`](./open-webgame.json)
 
-It records the verified game identity, live canonical, runtime URL, search intent, visual direction and readiness state.
+It records the verified game identity, live canonicals, locale routes, runtime URL, search intent, visual direction and readiness state.
 
-Do not update the iframe, canonical, sitemap or readiness claims without keeping this config synchronized.
+Do not update the iframe, locale routes, canonical, sitemap or readiness claims without keeping this config synchronized.
 
 ## SEO / deployment status
 
-The GitHub Pages case now has a real deployment URL:
+The GitHub Pages case has real production URLs for all three locale pages:
 
 ```text
 https://foxigaoqian.github.io/open-webgame/
+https://foxigaoqian.github.io/open-webgame/ja/
+https://foxigaoqian.github.io/open-webgame/ko/
 ```
 
-The homepage H1 identifies `Scam Artist`, canonical and `og:url` point to the live URL, and the directory includes production robots/sitemap files.
+The locale pages identify `Scam Artist`, use self-referencing canonicals, expose reciprocal hreflang alternates, and are represented in the multilingual sitemap.
 
 Current automated contract:
 
 ```text
 Research: RESOLVED
 Embed config: VERIFIED
+Multilingual SEO: PASS
 On-Page SEO: PASS
-Canonical: https://foxigaoqian.github.io/open-webgame/
+Default canonical: https://foxigaoqian.github.io/open-webgame/
 Deployment-ready: YES
 Blocking issues: none
 ```
@@ -68,7 +84,7 @@ Run the live runtime HTTP/header check separately:
 npm run verify:embed -- --config examples/scam-artist-site/open-webgame.json
 ```
 
-The automated runtime check does not replace a real browser boot/input/fullscreen/mobile smoke test.
+First-production verification also uses the Browser QA workflow for real iframe boot/reload, accessibility and Lighthouse checks.
 
 ## Run locally
 
@@ -83,6 +99,8 @@ Then open:
 
 ```text
 http://localhost:8080/
+http://localhost:8080/ja/
+http://localhost:8080/ko/
 ```
 
 ## Runtime note
