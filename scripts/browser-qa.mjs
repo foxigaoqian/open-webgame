@@ -14,7 +14,10 @@ const errors = [];
 const warnings = [];
 
 const pages = Array.isArray(config.pages) ? config.pages : [];
-const home = pages.find((page) => page.path === '/') || { file: 'index.html' };
+const home = pages.find((page) => page.path === '/') || { file: 'index.html', path: '/', language: config.site?.language || 'en' };
+const pageTargets = config.i18n?.enabled
+  ? pages.filter((page) => page.indexable !== false)
+  : [home];
 const homeFile = path.resolve(siteDir, home.file || 'index.html');
 if (!fs.existsSync(homeFile)) {
   console.error(`Homepage file not found: ${homeFile}`);
@@ -61,7 +64,6 @@ const server = http.createServer((req, res) => {
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const address = server.address();
 const baseUrl = `http://127.0.0.1:${address.port}`;
-const routePath = home.path === '/' ? '/' : home.path;
 
 const runtimeOrigin = (runtimeUrl) => {
   try {
@@ -95,6 +97,8 @@ const waitForRuntimeNavigation = async (frame, runtimeUrl, timeout = 15000) => {
   }
 };
 
+const slug = (value) => String(value || 'page').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'page';
+
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -104,125 +108,158 @@ try {
     { name: 'mobile', width: 390, height: 844 },
   ];
 
-  for (const viewport of viewports) {
-    const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
-    const page = await context.newPage();
-    const pageErrors = [];
-    const consoleErrors = [];
-    const requestFailures = [];
-    page.on('pageerror', (error) => pageErrors.push(error.message));
-    page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text());
-    });
-    page.on('requestfailed', (request) => {
-      requestFailures.push(`${request.failure()?.errorText || 'request failed'} ${request.url()}`);
-    });
+  for (const target of pageTargets) {
+    const locale = target.language || config.site?.language || 'page';
+    const routePath = target.path || '/';
 
-    const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    if (!response?.ok()) errors.push(`${viewport.name}: homepage returned HTTP ${response?.status() || 'unknown'}.`);
+    for (const viewport of viewports) {
+      const label = `${locale}/${viewport.name}`;
+      const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
+      const page = await context.newPage();
+      const pageErrors = [];
+      const consoleErrors = [];
+      const requestFailures = [];
+      page.on('pageerror', (error) => pageErrors.push(error.message));
+      page.on('console', (message) => {
+        if (message.type() === 'error') consoleErrors.push(message.text());
+      });
+      page.on('requestfailed', (request) => {
+        requestFailures.push(`${request.failure()?.errorText || 'request failed'} ${request.url()}`);
+      });
 
-    const h1 = page.locator('h1').first();
-    if (!(await h1.count()) || !(await h1.isVisible())) errors.push(`${viewport.name}: H1 is not visible.`);
+      const response = await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      if (!response?.ok()) errors.push(`${label}: page returned HTTP ${response?.status() || 'unknown'}.`);
 
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
-    if (overflow) errors.push(`${viewport.name}: horizontal overflow detected.`);
+      const h1 = page.locator('h1').first();
+      if (!(await h1.count()) || !(await h1.isVisible())) errors.push(`${label}: H1 is not visible.`);
 
-    try {
-      const axeResults = await new AxeBuilder({ page })
-        .exclude('iframe')
-        .withTags(['wcag2a', 'wcag2aa'])
-        .analyze();
-      fs.writeFileSync(path.join(artifactsDir, `axe-${viewport.name}.json`), `${JSON.stringify(axeResults, null, 2)}\n`);
-      for (const violation of axeResults.violations) {
-        const impact = violation.impact || 'unknown';
-        const summary = `${violation.id}: ${violation.help} (${violation.nodes.length} node(s))`;
-        if (impact === 'critical' || impact === 'serious') {
-          errors.push(`${viewport.name}: accessibility ${impact}: ${summary}`);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
+      if (overflow) errors.push(`${label}: horizontal overflow detected.`);
+
+      if (config.i18n?.enabled) {
+        const toggle = page.locator('.langToggle').first();
+        if (!(await toggle.count()) || !(await toggle.isVisible())) {
+          errors.push(`${label}: visible language dropdown toggle was not rendered.`);
         } else {
-          warnings.push(`${viewport.name}: accessibility ${impact}: ${summary}`);
+          await toggle.click();
+          const menu = page.locator('.langMenu').first();
+          if (!(await menu.isVisible())) errors.push(`${label}: language dropdown did not open.`);
+          const languageLinks = page.locator('.langMenu a');
+          const expectedLanguages = config.i18n.languages?.length || 0;
+          if ((await languageLinks.count()) !== expectedLanguages) {
+            errors.push(`${label}: language dropdown has ${await languageLinks.count()} links; expected ${expectedLanguages}.`);
+          }
+          await page.keyboard.press('Escape');
+          if (await menu.isVisible()) errors.push(`${label}: language dropdown did not close on Escape.`);
         }
       }
-    } catch (error) {
-      errors.push(`${viewport.name}: axe accessibility audit failed to run: ${error.message}`);
-    }
 
-    if (config.site?.mode === 'play-first') {
-      const iframe = page.locator('iframe').first();
-      if (!(await iframe.count())) {
-        errors.push(`${viewport.name}: play-first page has no iframe.`);
-      } else {
-        const runtimeUrl = String(config.embed?.runtimeUrl || '');
-        let src = (await iframe.getAttribute('src')) || '';
-        if (!src || !src.startsWith(runtimeUrl)) {
-          const loadButton = page.getByRole('button', { name: /load game|play in browser|play now/i }).first();
-          if (await loadButton.count()) {
-            await loadButton.click();
-            try {
-              await page.waitForFunction(
-                (expected) => document.querySelector('iframe')?.getAttribute('src')?.startsWith(expected),
-                runtimeUrl,
-                { timeout: 10000 },
-              );
-            } catch {
-              errors.push(`${viewport.name}: clicking the player CTA did not assign embed.runtimeUrl to the iframe.`);
-            }
+      try {
+        const axeResults = await new AxeBuilder({ page })
+          .exclude('iframe')
+          .withTags(['wcag2a', 'wcag2aa'])
+          .analyze();
+        fs.writeFileSync(path.join(artifactsDir, `axe-${slug(locale)}-${viewport.name}.json`), `${JSON.stringify(axeResults, null, 2)}\n`);
+        for (const violation of axeResults.violations) {
+          const impact = violation.impact || 'unknown';
+          const summary = `${violation.id}: ${violation.help} (${violation.nodes.length} node(s))`;
+          if (impact === 'critical' || impact === 'serious') {
+            errors.push(`${label}: accessibility ${impact}: ${summary}`);
           } else {
-            errors.push(`${viewport.name}: iframe is lazy but no playable load button was found.`);
+            warnings.push(`${label}: accessibility ${impact}: ${summary}`);
           }
         }
+      } catch (error) {
+        errors.push(`${label}: axe accessibility audit failed to run: ${error.message}`);
+      }
 
-        src = (await iframe.getAttribute('src')) || '';
-        if (runtimeUrl && !src.startsWith(runtimeUrl)) errors.push(`${viewport.name}: iframe src does not match embed.runtimeUrl after interaction.`);
-
-        const contentFrame = await getContentFrame(iframe);
-        if (!contentFrame) {
-          errors.push(`${viewport.name}: browser could not resolve the iframe content frame.`);
-        } else if (runtimeUrl) {
-          const booted = await waitForRuntimeNavigation(contentFrame, runtimeUrl);
-          if (!booted) {
-            const failedAtRuntimeOrigin = requestFailures.filter((item) => item.includes(runtimeOrigin(runtimeUrl))).slice(-3);
-            errors.push(`${viewport.name}: game child frame did not reach the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
-            for (const failure of failedAtRuntimeOrigin) warnings.push(`${viewport.name}: runtime request failure: ${failure}`);
+      if (config.site?.mode === 'play-first') {
+        const iframe = page.locator('iframe').first();
+        if (!(await iframe.count())) {
+          errors.push(`${label}: play-first page has no iframe.`);
+        } else {
+          const runtimeUrl = String(config.embed?.runtimeUrl || '');
+          const configuredRuntime = (await iframe.getAttribute('data-src')) || (await iframe.getAttribute('src')) || '';
+          if (runtimeUrl && !configuredRuntime.startsWith(runtimeUrl)) {
+            errors.push(`${label}: iframe data-src/src does not match embed.runtimeUrl.`);
           }
-        }
 
-        if (viewport.name === 'desktop' && runtimeUrl && contentFrame) {
-          const reload = page.getByRole('button', { name: /reload/i }).first();
-          if (await reload.count()) {
-            const blankNavigation = contentFrame.waitForURL('about:blank', {
-              timeout: 5000,
-              waitUntil: 'commit',
-            }).then(() => true).catch(() => false);
-
-            await reload.click();
-            const sawBlank = await blankNavigation;
-            if (!sawBlank) {
-              errors.push(`desktop: Reload did not navigate the game child frame to about:blank; current frame URL is ${contentFrame.url() || 'empty'}.`);
-            } else {
-              const rebooted = await waitForRuntimeNavigation(contentFrame, runtimeUrl, 15000);
-              if (!rebooted) {
-                errors.push(`desktop: Reload did not navigate the same game child frame back to the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
+          // Boot the real remote runtime once per locale on desktop. Other viewports
+          // still validate the localized shell, player wiring and accessibility.
+          if (viewport.name === 'desktop') {
+            let src = (await iframe.getAttribute('src')) || '';
+            if (!src || !src.startsWith(runtimeUrl)) {
+              const loadButton = page.locator('button[onclick*="startGame"]').last();
+              if (await loadButton.count()) {
+                await loadButton.click();
+                try {
+                  await page.waitForFunction(
+                    (expected) => document.querySelector('iframe')?.getAttribute('src')?.startsWith(expected),
+                    runtimeUrl,
+                    { timeout: 10000 },
+                  );
+                } catch {
+                  errors.push(`${label}: clicking the localized player CTA did not assign embed.runtimeUrl to the iframe.`);
+                }
+              } else {
+                errors.push(`${label}: iframe is lazy but no startGame control was found.`);
               }
             }
 
-            const afterReload = (await iframe.getAttribute('src')) || '';
-            if (!afterReload.startsWith(runtimeUrl)) errors.push('desktop: Reload did not restore the configured iframe src.');
-          } else {
-            warnings.push('desktop: no Reload control found.');
-          }
+            src = (await iframe.getAttribute('src')) || '';
+            if (runtimeUrl && !src.startsWith(runtimeUrl)) errors.push(`${label}: iframe src does not match embed.runtimeUrl after interaction.`);
 
-          const fullscreen = page.getByRole('button', { name: /fullscreen/i }).first();
-          if (!(await fullscreen.count())) warnings.push('desktop: no Fullscreen control found.');
+            const contentFrame = await getContentFrame(iframe);
+            if (!contentFrame) {
+              errors.push(`${label}: browser could not resolve the iframe content frame.`);
+            } else if (runtimeUrl) {
+              const booted = await waitForRuntimeNavigation(contentFrame, runtimeUrl);
+              if (!booted) {
+                const failedAtRuntimeOrigin = requestFailures.filter((item) => item.includes(runtimeOrigin(runtimeUrl))).slice(-3);
+                errors.push(`${label}: game child frame did not reach the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
+                for (const failure of failedAtRuntimeOrigin) warnings.push(`${label}: runtime request failure: ${failure}`);
+              }
+            }
+
+            if (runtimeUrl && contentFrame) {
+              const reload = page.locator('button[onclick*="reloadGame"]').first();
+              if (await reload.count()) {
+                const blankNavigation = contentFrame.waitForURL('about:blank', {
+                  timeout: 5000,
+                  waitUntil: 'commit',
+                }).then(() => true).catch(() => false);
+
+                await reload.click();
+                const sawBlank = await blankNavigation;
+                if (!sawBlank) {
+                  errors.push(`${label}: Reload did not navigate the game child frame to about:blank; current frame URL is ${contentFrame.url() || 'empty'}.`);
+                } else {
+                  const rebooted = await waitForRuntimeNavigation(contentFrame, runtimeUrl, 15000);
+                  if (!rebooted) {
+                    errors.push(`${label}: Reload did not navigate the same game child frame back to the configured runtime origin; current frame URL is ${contentFrame.url() || 'empty'}.`);
+                  }
+                }
+
+                const afterReload = (await iframe.getAttribute('src')) || '';
+                if (!afterReload.startsWith(runtimeUrl)) errors.push(`${label}: Reload did not restore the configured iframe src.`);
+              } else {
+                warnings.push(`${label}: no reloadGame control found.`);
+              }
+
+              const fullscreen = page.locator('button[onclick*="fullGame"]').first();
+              if (!(await fullscreen.count())) warnings.push(`${label}: no fullGame control found.`);
+            }
+          }
         }
       }
+
+      await page.screenshot({ path: path.join(artifactsDir, `${slug(locale)}-${viewport.name}.png`), fullPage: true });
+
+      for (const error of pageErrors) errors.push(`${label}: pageerror: ${error}`);
+      if (consoleErrors.length > 0) warnings.push(`${label}: ${consoleErrors.length} console error message(s) observed; inspect browser QA artifact/logs.`);
+
+      await context.close();
     }
-
-    await page.screenshot({ path: path.join(artifactsDir, `${viewport.name}.png`), fullPage: true });
-
-    for (const error of pageErrors) errors.push(`${viewport.name}: pageerror: ${error}`);
-    if (consoleErrors.length > 0) warnings.push(`${viewport.name}: ${consoleErrors.length} console error message(s) observed; inspect browser QA artifact/logs.`);
-
-    await context.close();
   }
 } catch (error) {
   errors.push(`Browser QA failed to run: ${error.message}`);
