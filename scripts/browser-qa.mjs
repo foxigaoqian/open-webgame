@@ -34,6 +34,7 @@ const mime = (file) => {
   if (ext === '.js' || ext === '.mjs') return 'text/javascript; charset=utf-8';
   if (ext === '.json') return 'application/json; charset=utf-8';
   if (ext === '.svg') return 'image/svg+xml';
+  if (ext === '.ico') return 'image/x-icon';
   if (ext === '.png') return 'image/png';
   if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
   if (ext === '.webp') return 'image/webp';
@@ -136,6 +137,46 @@ try {
 
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
       if (overflow) errors.push(`${label}: horizontal overflow detected.`);
+
+
+const faviconLinks = await page.evaluate(() => [...document.querySelectorAll('link[rel~="icon"]')].map((link) => ({
+  href: link.href,
+  type: link.type || '',
+  sizes: link.sizes?.value || '',
+})));
+const pngIcon = faviconLinks.find((icon) => icon.type.toLowerCase() === 'image/png' && icon.sizes.split(/\s+/).includes('32x32'));
+const icoIcon = faviconLinks.find((icon) => icon.href.endsWith('/favicon.ico'));
+if (!pngIcon) errors.push(`${label}: static 32x32 PNG favicon declaration is missing.`);
+if (!icoIcon) errors.push(`${label}: ICO favicon fallback declaration is missing.`);
+
+for (const [kind, icon, expectedType] of [
+  ['PNG', pngIcon, 'image/png'],
+  ['ICO', icoIcon, 'image/x-icon'],
+]) {
+  if (!icon) continue;
+  try {
+    const iconResponse = await context.request.get(icon.href, { failOnStatusCode: false });
+    if (!iconResponse.ok()) {
+      errors.push(`${label}: ${kind} favicon returned HTTP ${iconResponse.status()}.`);
+      continue;
+    }
+    const contentType = String(iconResponse.headers()['content-type'] || '').toLowerCase();
+    if (!contentType.includes(expectedType)) {
+      errors.push(`${label}: ${kind} favicon content-type is ${contentType || 'missing'}; expected ${expectedType}.`);
+    }
+    const body = await iconResponse.body();
+    if (kind === 'PNG') {
+      const signature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+      if (body.length < signature.length || !signature.every((byte, index) => body[index] === byte)) {
+        errors.push(`${label}: PNG favicon does not contain a valid PNG signature.`);
+      }
+    } else if (body.length < 4 || body[0] !== 0x00 || body[1] !== 0x00 || body[2] !== 0x01 || body[3] !== 0x00) {
+      errors.push(`${label}: ICO favicon does not contain a valid ICO signature.`);
+    }
+  } catch (error) {
+    errors.push(`${label}: ${kind} favicon request failed: ${error.message}`);
+  }
+}
 
       if (config.i18n?.enabled) {
         const toggle = page.locator('.langToggle').first();
