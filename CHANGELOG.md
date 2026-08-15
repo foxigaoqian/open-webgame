@@ -2,6 +2,23 @@
 
 All notable project changes are documented here.
 
+## 0.3.2 — 2026-08-15
+
+### Added
+
+- Production favicon baseline: real `favicon.ico` plus a real 32×32 PNG, statically declared in every locale page.
+- Browser QA enforcement for favicon declarations, HTTP responses, MIME types and PNG/ICO file signatures.
+- Live HTTP QA discovery of favicon URLs from every indexable locale page, including production MIME validation.
+- `npm run qa:release` as the single aggregate release-readiness command covering live gates, Browser/axe and Lighthouse.
+
+### Changed
+
+- `SKILL.md`, `AGENTS.md`, Zero-Config build briefs, site blueprint and final QA now treat browser-tab identity as a production hard gate.
+- `npm run qa` no longer prints a premature `Deployment-ready: YES`; it reports non-browser gate status and leaves final readiness to `qa:release`.
+- The minimal iframe example now follows the least-privilege rule instead of requesting gyroscope, accelerometer and web-share by default.
+- The previously stale Machine-Enforced Gates section in `SKILL.md` now lists the current content/site/i18n/security/HTTP/browser/Lighthouse pipeline.
+- Package version bumped to `0.3.2`.
+
 ## 0.3.1 — 2026-08-14
 
 ### Added
