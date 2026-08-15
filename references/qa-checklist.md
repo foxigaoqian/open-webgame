@@ -229,6 +229,20 @@ Verify:
 - [ ] Game binaries are not mirrored without authorization
 - [ ] Production use considers creator/host terms
 
+## Reliability / Release Evidence
+
+- [ ] `site.origin` contains scheme + host only
+- [ ] `site.basePath` contains any deployment subpath
+- [ ] All page canonicals derive correctly from origin + basePath + route
+- [ ] Every tracked claim declares stable/volatile freshness behavior
+- [ ] Volatile claims are inside their `maxAgeDays` window
+- [ ] `package-lock.json` exists and `npm ci` succeeds
+- [ ] High-severity dependency audit passes
+- [ ] Final `qa:release` passes
+- [ ] `qa-artifacts/release-qa.json` exists and records the tested commit SHA/time
+- [ ] No editable `status.deploymentReady` field is used as release evidence
+
+
 ## Acceptance Result
 
 Use one of:

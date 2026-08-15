@@ -1,34 +1,72 @@
-import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from './lib.mjs';
+import { spawnSync } from 'node:child_process';
+import { loadConfig, parseArgs } from './lib.mjs';
 
 const args = parseArgs();
-const config = args.config || 'open-webgame.json';
+const configPath = args.config || 'open-webgame.json';
 const html = args.html || 'index.html';
 const siteDir = args['site-dir'] || path.dirname(html);
+const config = loadConfig(configPath);
+const artifactsDir = path.resolve(process.cwd(), 'qa-artifacts');
+const artifactPath = path.join(artifactsDir, 'release-qa.json');
 
+const gitResult = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: process.cwd(), encoding: 'utf8' });
+const commit = String(process.env.GITHUB_SHA || (gitResult.status === 0 ? gitResult.stdout.trim() : '') || 'unknown');
+const checkedAt = new Date().toISOString();
+const blockingIssues = Array.isArray(config.status?.blockingIssues) ? config.status.blockingIssues : [];
+const releaseErrors = [];
+
+if (config.status?.research !== 'resolved') releaseErrors.push('status.research must be resolved before release QA.');
+if (config.status?.onPageSeo !== 'pass') releaseErrors.push('status.onPageSeo must be pass before release QA.');
+if (blockingIssues.length > 0) releaseErrors.push(`status.blockingIssues must be empty before release QA (${blockingIssues.length} remaining).`);
+
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const checks = [
-  ['Live non-browser gates', ['scripts/qa.mjs', '--config', config, '--html', html, '--site-dir', siteDir]],
-  ['Browser + accessibility', ['scripts/browser-qa.mjs', '--config', config, '--site-dir', siteDir]],
-  ['Lighthouse', ['scripts/lighthouse-qa.mjs', '--config', config, '--site-dir', siteDir]],
+  { name: 'Dependency security', executable: npmCommand, args: ['run', 'check:deps'] },
+  { name: 'Live non-browser gates', executable: process.execPath, args: ['scripts/qa.mjs', '--config', configPath, '--html', html, '--site-dir', siteDir] },
+  { name: 'Browser + accessibility', executable: process.execPath, args: ['scripts/browser-qa.mjs', '--config', configPath, '--site-dir', siteDir] },
+  { name: 'Lighthouse', executable: process.execPath, args: ['scripts/lighthouse-qa.mjs', '--config', configPath, '--site-dir', siteDir] },
 ];
 
-let failed = false;
-for (const [name, commandArgs] of checks) {
-  console.log(`\n=== ${name} ===`);
-  const result = spawnSync(process.execPath, commandArgs, {
+let failed = releaseErrors.length > 0;
+const results = [];
+for (const check of checks) {
+  console.log(`\n=== ${check.name} ===`);
+  const result = spawnSync(check.executable, check.args, {
     cwd: process.cwd(),
     stdio: 'inherit',
   });
-  if (result.status !== 0) failed = true;
+  const pass = result.status === 0;
+  results.push({ name: check.name, pass, exitCode: result.status });
+  if (!pass) failed = true;
 }
 
+fs.mkdirSync(artifactsDir, { recursive: true });
+const artifact = {
+  schemaVersion: '1',
+  projectSchemaVersion: config.schemaVersion || null,
+  status: failed ? 'fail' : 'pass',
+  deploymentReady: !failed,
+  checkedAt,
+  commit,
+  config: path.relative(process.cwd(), path.resolve(configPath)),
+  siteDir: path.relative(process.cwd(), path.resolve(siteDir)),
+  releaseErrors,
+  blockingIssues,
+  checks: results,
+};
+fs.writeFileSync(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
+
 console.log('\n=== Open WebGame Release Readiness ===');
+console.log(`Evidence: ${path.relative(process.cwd(), artifactPath)}`);
 if (failed) {
   console.log('Deployment-ready: NO');
-  console.log('At least one production hard gate failed.');
+  for (const error of releaseErrors) console.log(`  ERROR: ${error}`);
+  console.log('At least one production hard gate or release precondition failed.');
   process.exit(1);
 }
 
 console.log('Deployment-ready: YES');
-console.log('Live config/content/site/i18n/SEO/security/HTTP/embed, Browser/axe and Lighthouse gates all passed.');
+console.log(`Release evidence is bound to commit ${commit}.`);
+console.log('Dependency audit, live config/content/freshness/site/i18n/SEO/security/HTTP/embed, Browser/axe and Lighthouse gates all passed.');

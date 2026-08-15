@@ -64,6 +64,27 @@ export function normalizeUrl(value) {
   }
 }
 
+export function normalizeBasePath(value = '') {
+  const raw = String(value || '').trim();
+  if (!raw || raw === '/') return '';
+  return `/${raw.replace(/^\/+|\/+$/g, '')}`;
+}
+
+export function getSiteBaseUrl(config) {
+  const origin = String(config?.site?.origin || '').trim().replace(/\/$/, '');
+  if (!origin) return '';
+  const basePath = normalizeBasePath(config?.site?.basePath || '');
+  return `${origin}${basePath}/`;
+}
+
+export function resolveSiteUrl(config, route = '/') {
+  const base = getSiteBaseUrl(config);
+  if (!base) return '';
+  const cleanRoute = String(route || '/').split(/[?#]/)[0];
+  const relative = cleanRoute === '/' ? '' : cleanRoute.replace(/^\/+/, '');
+  return new URL(relative, base).href;
+}
+
 export function stripTags(value) {
   return String(value ?? '')
     .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')

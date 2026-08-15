@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.3.3",
   "game": {
     "name": "Example Game",
     "developer": "",
@@ -11,7 +11,8 @@
   "site": {
     "language": "en",
     "mode": "auto",
-    "domain": "",
+    "origin": "",
+    "basePath": "",
     "canonical": "",
     "stack": "static-html",
     "deploymentTarget": "unspecified"
@@ -68,12 +69,11 @@
   "status": {
     "research": "pending",
     "onPageSeo": "pending",
-    "deploymentReady": false,
     "blockingIssues": [
       "Game research has not been completed.",
-      "Content claims have not been sourced.",
+      "Content claims have not been sourced and classified by freshness.",
       "Embed status has not been resolved.",
-      "Production canonical has not been resolved."
+      "Production site.origin + site.basePath have not been resolved."
     ]
   }
 }

@@ -153,7 +153,7 @@ if (config.site?.mode === 'play-first') {
   }
 }
 
-if (config.status?.deploymentReady === true) {
+if (config.status?.onPageSeo === 'pass') {
   const siteDir = path.resolve(process.cwd(), args['site-dir'] || path.dirname(htmlPath));
   const robotsPath = path.join(siteDir, 'robots.txt');
   const sitemapPath = path.join(siteDir, 'sitemap.xml');

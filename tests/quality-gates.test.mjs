@@ -60,6 +60,21 @@ const runI18nAudit = (siteDir) => spawnSync(process.execPath, [
   encoding: 'utf8',
 });
 
+const writeTempConfig = (config, prefix) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const file = path.join(dir, 'open-webgame.json');
+  fs.writeFileSync(file, `${JSON.stringify(config, null, 2)}\n`);
+  return file;
+};
+
+const runConfigAudit = (config) => spawnSync(process.execPath, [
+  'scripts/check-config.mjs', '--config', writeTempConfig(config, 'open-webgame-config-'),
+], { cwd: process.cwd(), encoding: 'utf8' });
+
+const runContentAudit = (config) => spawnSync(process.execPath, [
+  'scripts/content-audit.mjs', '--config', writeTempConfig(config, 'open-webgame-content-'),
+], { cwd: process.cwd(), encoding: 'utf8' });
+
 test('strict schema accepts the valid fixture', () => {
   const errors = validateConfigSchema(readJson(validConfigPath));
   assert.deepEqual(errors, []);
@@ -69,6 +84,38 @@ test('strict schema rejects a misspelled config property', () => {
   const errors = validateConfigSchema(readJson(invalidTypoPath));
   assert.ok(errors.some((error) => error.includes('unknown property "primayKeyword"')));
   assert.ok(errors.some((error) => error.includes('missing required property "primaryKeyword"')));
+});
+
+test('config audit rejects an origin that contains the deployment path', () => {
+  const config = readJson(validConfigPath);
+  config.site.origin = 'https://fixture.invalid/game';
+  config.site.basePath = '';
+  const result = runConfigAudit(config);
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /origin must contain only scheme \+ host/i);
+});
+
+test('content audit accepts a fresh volatile claim', () => {
+  const config = readJson(validConfigPath);
+  const today = new Date().toISOString().slice(0, 10);
+  config.status.research = 'resolved';
+  config.site.mode = 'guide';
+  config.sources = [{ id: 'official', type: 'official-site', url: 'https://fixture.invalid/official', retrievedAt: today }];
+  config.claims = [{ id: 'release', text: 'Fixture release state is current.', sourceIds: ['official'], status: 'verified', volatility: 'volatile', maxAgeDays: 7 }];
+  const result = runContentAudit(config);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
+
+test('content audit rejects a stale volatile claim', () => {
+  const config = readJson(validConfigPath);
+  const stale = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  config.status.research = 'resolved';
+  config.site.mode = 'guide';
+  config.sources = [{ id: 'official', type: 'official-site', url: 'https://fixture.invalid/official', retrievedAt: stale }];
+  config.claims = [{ id: 'release', text: 'Fixture release state is stale.', sourceIds: ['official'], status: 'verified', volatility: 'volatile', maxAgeDays: 7 }];
+  const result = runContentAudit(config);
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  assert.match(`${result.stdout}\n${result.stderr}`, /is stale/i);
 });
 
 test('SEO audit accepts alt="" for a decorative image', () => {

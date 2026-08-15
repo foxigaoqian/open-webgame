@@ -245,6 +245,53 @@ npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/s
 
 A relevant hard-gate failure always means `deployment-ready: NO`. Passing this individual command list is not, by itself, the final release decision. Use `npm run qa:release` after deployment URLs are live; only the release aggregate may return `Deployment-ready: YES`.
 
+# v0.3.3 Reliability Hardening
+
+Production configuration and release evidence must remain trustworthy over time.
+
+## Canonical URL model
+
+Use `site.origin` for scheme + host only and `site.basePath` for an optional deployment subpath. Do not put a path inside a domain/origin value.
+
+Example GitHub Pages deployment:
+
+```json
+{
+  "site": {
+    "origin": "https://username.github.io",
+    "basePath": "/game-site",
+    "canonical": "https://username.github.io/game-site/"
+  }
+}
+```
+
+Derive page canonicals, hreflang URLs, sitemap URLs and production asset URLs from the same origin/base-path model. A mismatch is a hard config failure.
+
+## Factual freshness
+
+Every tracked claim must declare `volatility: "stable" | "volatile"`.
+
+For volatile facts, also set `maxAgeDays`. The referenced source must have a current `retrievedAt`; `check:content` fails when the newest supporting source is older than the allowed window.
+
+Treat current browser/runtime availability, release state, price/availability, active hosted build/version and similarly changeable facts as volatile. Do not let a source-backed claim become permanently trusted merely because it was once correct.
+
+## Reproducible dependencies
+
+This repository uses a committed `package-lock.json`. Prefer `npm ci` for QA/CI and run `npm run check:deps`. High-severity dependency audit findings are hard failures; fix or upgrade the affected dependency rather than suppressing the gate.
+
+## Release evidence, not a readiness flag
+
+`open-webgame.json` no longer stores an editable `status.deploymentReady` boolean. Project status stores research/SEO progress and blocking issues only.
+
+The final readiness decision is computed by:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+Every run writes `qa-artifacts/release-qa.json` containing pass/fail, timestamp, tested commit SHA, blocking issues and aggregate check results. Only a passing release artifact bound to the tested code may support `Deployment-ready: YES` in the completion report.
+
+
 # Inputs
 
 Minimum input:
@@ -788,7 +835,7 @@ npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.ht
 
 Only `qa:release` may print `Deployment-ready: YES`, because it requires live HTTP/embed, Browser/axe and Lighthouse to pass in the same release decision.
 
-A command failure means the corresponding hard gate has not passed. Do not set `status.deploymentReady = true` to bypass it.
+A command failure means the corresponding hard gate has not passed. Do not bypass a failing gate or claim readiness without a passing `qa:release` artifact for the tested code.
 
 # Final QA Gate
 

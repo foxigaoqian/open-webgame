@@ -56,9 +56,9 @@ if (home && config.site?.canonical && normalizeUrl(home.canonical) !== normalize
 
 const indexable = pages.filter((page) => page.indexable !== false);
 const sitemapPath = path.join(siteDir, 'sitemap.xml');
-if (config.status?.deploymentReady === true) {
+if (config.status?.onPageSeo === 'pass') {
   if (!fs.existsSync(sitemapPath)) {
-    errors.push('Deployment-ready site requires sitemap.xml.');
+    errors.push('On-Page SEO pass requires sitemap.xml.');
   } else {
     const sitemap = fs.readFileSync(sitemapPath, 'utf8');
     for (const page of indexable) {

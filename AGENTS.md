@@ -121,8 +121,8 @@ When `i18n.enabled = true`:
 - `site.mode = "play-first"` only with `embed.status = "verified"`
 - `status.onPageSeo = "pass"` before production readiness
 - `status.blockingIssues` must be empty before production readiness
-- a real HTTPS production canonical is required for `status.deploymentReady = true`
-- do not change readiness flags merely to silence a failing gate
+- a real HTTPS `site.origin` plus normalized `site.basePath` must resolve to the configured production canonical
+- do not claim readiness merely to silence a failing gate; require a passing commit-bound `qa:release` artifact
 
 ### Browser/accessibility/performance gate
 
@@ -150,7 +150,7 @@ npm run init:game -- "Game Name"
 npm run init:game -- "Game Name" --languages en,ja,ko
 
 # Install QA dependencies
-npm install
+npm ci
 
 # Validate strict schema + semantic config rules
 npm run check:config -- --config path/to/open-webgame.json
@@ -229,6 +229,16 @@ In addition to the existing game/content/design/SEO gates:
 - generate and statically declare real PNG + ICO favicons and keep favicon QA green
 - run Lighthouse before first production launch and fix hard-threshold failures rather than lowering the threshold to hide regressions
 - use `qa:release` for the final deployment-ready decision; `npm run qa` alone is not sufficient
+
+## v0.3.3 reliability requirements
+
+- use `site.origin` (scheme + host only) plus `site.basePath`; never mix a deployment path into a domain/origin field
+- derive and validate every page canonical from the shared URL model
+- every tracked claim declares `volatility`; volatile claims require `maxAgeDays` and fresh supporting `sources[].retrievedAt`
+- use the committed `package-lock.json`, `npm ci` and the high-severity dependency audit gate
+- do not store or manually toggle `status.deploymentReady`
+- final readiness comes only from `qa:release`, which writes `qa-artifacts/release-qa.json` bound to the tested commit SHA
+
 
 ## Working order
 

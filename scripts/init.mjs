@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from './lib.mjs';
+import { normalizeBasePath, parseArgs } from './lib.mjs';
 
 const args = parseArgs();
 const gameName = String(args._[0] || '').trim();
 if (!gameName) {
-  console.error('Usage: npm run init:game -- "Game Name" [--domain example.com] [--languages en,ja,ko] [--out output/game-name] [--force]');
+  console.error('Usage: npm run init:game -- "Game Name" [--origin https://example.com] [--base-path /games/name] [--languages en,ja,ko] [--out output/game-name] [--force]');
   process.exit(1);
 }
 
@@ -26,8 +26,18 @@ if (fs.existsSync(configPath) && !args.force) {
   process.exit(1);
 }
 
-const domain = String(args.domain || '').trim();
-const canonical = domain ? `https://${domain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/` : '';
+let origin = String(args.origin || '').trim();
+const legacyDomain = String(args.domain || '').trim();
+if (!origin && legacyDomain) {
+  if (legacyDomain.replace(/^https?:\/\//, '').includes('/')) {
+    console.error('Legacy --domain must contain only a hostname. Use --origin https://host and --base-path /subpath for path deployments.');
+    process.exit(1);
+  }
+  origin = `https://${legacyDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+}
+if (origin) origin = origin.replace(/\/$/, '');
+const basePath = normalizeBasePath(args['base-path'] || '');
+const canonical = origin ? `${origin}${basePath}/` : '';
 const schemaUrl = 'https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json';
 const requestedLanguages = String(args.languages || 'en')
   .split(',')
@@ -50,7 +60,7 @@ const languageLabels = {
 
 const config = {
   $schema: schemaUrl,
-  schemaVersion: '0.3',
+  schemaVersion: '0.3.3',
   game: {
     name: gameName,
     developer: '',
@@ -61,7 +71,8 @@ const config = {
   site: {
     language: defaultLanguage,
     mode: 'auto',
-    domain,
+    origin,
+    basePath,
     canonical,
     stack: 'static-html',
     deploymentTarget: 'unspecified',
@@ -116,20 +127,19 @@ const config = {
   status: {
     research: 'pending',
     onPageSeo: 'pending',
-    deploymentReady: false,
     blockingIssues: [
       'Resolve the real game entity and official sources.',
-      'Record source-backed factual claims.',
+      'Record source-backed factual claims and mark volatile facts with a freshness window.',
       'Resolve browser/embed status.',
       ...(languages.length > 1 ? ['Generate and QA every configured language route, hreflang set and multilingual sitemap.'] : []),
-      ...(canonical ? [] : ['Resolve the production domain/canonical before deployment.']),
+      ...(canonical ? [] : ['Resolve production site.origin + site.basePath before release QA.']),
       'Generate production site identity assets including favicon.ico and favicon-32x32.png.',
       'Run On-Page SEO, security, live HTTP, browser/axe, Lighthouse and final release QA.',
     ],
   },
 };
 
-const brief = `# Open WebGame build brief\n\nGame keyword: **${gameName}**\n\nThis project was bootstrapped in Zero-Config Mode. The next agent must follow \`SKILL.md\` and treat \`open-webgame.json\` as the single source of truth.\n\n## Defaults\n\n- Languages: ${languages.join(', ')}\n- Default language: ${defaultLanguage}\n- Stack: static HTML\n- Research: automatic\n- Mode: play-first only when a real third-party runtime is verified; otherwise guide mode\n- On-Page SEO: mandatory\n- Multilingual SEO: ${languages.length > 1 ? 'enabled; localize intent/metadata/content and generate hreflang + x-default + sitemap alternates' : 'disabled'}\n- Content provenance: mandatory for factual claims\n- Iframe permissions: least privilege\n- Site identity: generate a real \`favicon.ico\` plus a real 32x32 PNG favicon and declare both statically in every locale page\n- Responsive browser QA: mandatory\n- Accessibility + Lighthouse QA: mandatory before deployment-ready\n- Clarifying questions: avoid unless entity resolution or deployment is genuinely blocked\n\n## Required sequence\n\n1. Resolve the exact game and official sources.\n2. Add sources and source-backed claims to \`open-webgame.json\`.\n3. Verify browser playability and update \`embed\` + \`site.mode\`.\n4. Define search intent and update \`seo\` + \`pages\`.\n5. If multilingual, create language-specific page entries sharing translation keys, then localize metadata and content for each language's real search intent.\n6. Derive visual DNA and update \`design\`.\n7. Generate the site with minimum iframe permissions and real favicon assets.\n8. Run config, content, site, i18n, SEO, security, HTTP and embed QA.\n9. Run Playwright browser/axe QA at desktop/tablet/mobile widths; favicon declarations and bytes must pass.\n10. Run Lighthouse shell QA.\n11. Run \`npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site\` for the final readiness decision.\n12. Set \`status.deploymentReady\` to true only after every hard gate passes.\n`;
+const brief = `# Open WebGame build brief\n\nGame keyword: **${gameName}**\n\nThis project was bootstrapped in Zero-Config Mode. The next agent must follow \`SKILL.md\` and treat \`open-webgame.json\` as the single source of truth.\n\n## Defaults\n\n- Languages: ${languages.join(', ')}\n- Default language: ${defaultLanguage}\n- Stack: static HTML\n- Research: automatic\n- Mode: play-first only when a real third-party runtime is verified; otherwise guide mode\n- URL model: keep \`site.origin\` host-only and deployment subpaths in \`site.basePath\`; derive canonicals from both\n- On-Page SEO: mandatory\n- Multilingual SEO: ${languages.length > 1 ? 'enabled; localize intent/metadata/content and generate hreflang + x-default + sitemap alternates' : 'disabled'}\n- Content provenance: mandatory for factual claims\n- Content freshness: every claim declares \`volatility\`; volatile claims require \`maxAgeDays\` and fresh source \`retrievedAt\` values\n- Iframe permissions: least privilege\n- Site identity: generate a real \`favicon.ico\` plus a real 32x32 PNG favicon and declare both statically in every locale page\n- Responsive browser QA: mandatory\n- Accessibility + Lighthouse QA: mandatory before deployment-ready\n- Readiness: computed by \`qa:release\`; do not store or manually toggle a deploymentReady boolean\n- Clarifying questions: avoid unless entity resolution or deployment is genuinely blocked\n\n## Required sequence\n\n1. Resolve the exact game and official sources.\n2. Add sources and source-backed claims to \`open-webgame.json\`; classify each claim as stable or volatile.\n3. For volatile facts such as release state, browser availability, runtime/build status, price or supported platforms, set an appropriate \`maxAgeDays\` and keep referenced \`retrievedAt\` timestamps fresh.\n4. Verify browser playability and update \`embed\` + \`site.mode\`.\n5. Define search intent and update \`seo\` + \`pages\`; derive canonicals from \`site.origin + site.basePath + page.path\`.\n6. If multilingual, create language-specific page entries sharing translation keys, then localize metadata and content for each language's real search intent.\n7. Derive visual DNA and update \`design\`.\n8. Generate the site with minimum iframe permissions and real favicon assets.\n9. Run config, content freshness, site, i18n, SEO, security, HTTP and embed QA.\n10. Run Playwright browser/axe QA at desktop/tablet/mobile widths; favicon declarations and bytes must pass.\n11. Run Lighthouse shell QA.\n12. Run \`npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site\` for the final readiness decision and preserve its release artifact.\n`;
 
 fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
 fs.writeFileSync(briefPath, brief, 'utf8');

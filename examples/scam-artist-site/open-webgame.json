@@ -1,17 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.3.3",
   "game": {
     "name": "Scam Artist",
     "developer": "greenpixels",
     "genre": "Idle / Incremental / Building",
     "officialUrl": "https://greenpixels.itch.io/scam-artist-prototype",
-    "platforms": ["Web browser", "Windows", "Linux"]
+    "platforms": ["Web browser", "Windows"]
   },
   "site": {
     "language": "en",
     "mode": "play-first",
-    "domain": "foxigaoqian.github.io/open-webgame",
+    "origin": "https://foxigaoqian.github.io",
+    "basePath": "/open-webgame",
     "canonical": "https://foxigaoqian.github.io/open-webgame/",
     "stack": "static-html",
     "deploymentTarget": "github-pages"
@@ -54,37 +55,69 @@
       "type": "itch",
       "url": "https://greenpixels.itch.io/scam-artist-prototype",
       "label": "Official Scam Artist prototype page",
-      "retrievedAt": "2026-08-14"
+      "retrievedAt": "2026-08-15"
     },
     {
       "id": "steam-official",
       "type": "steam",
       "url": "https://store.steampowered.com/app/4979460/Scam_Artist/",
       "label": "Official Steam store listing",
-      "retrievedAt": "2026-08-14"
+      "retrievedAt": "2026-08-15"
     }
   ],
   "claims": [
     {
       "id": "browser-build",
-      "text": "The Scam Artist prototype has an HTML5 browser build.",
+      "text": "The Scam Artist prototype currently has an HTML5 browser build on itch.io.",
       "sourceIds": ["itch-official"],
       "status": "verified",
-      "usedIn": ["hero", "player", "faq"]
+      "volatility": "volatile",
+      "maxAgeDays": 14,
+      "usedIn": ["hero", "player", "faq", "structured-data"]
+    },
+    {
+      "id": "steam-release",
+      "text": "The full Steam release is currently listed as coming soon.",
+      "sourceIds": ["steam-official"],
+      "status": "verified",
+      "volatility": "volatile",
+      "maxAgeDays": 7,
+      "usedIn": ["faq"]
+    },
+    {
+      "id": "platforms",
+      "text": "The current prototype is playable in a web browser, while the coming-soon Steam listing publishes Windows system requirements.",
+      "sourceIds": ["itch-official", "steam-official"],
+      "status": "verified",
+      "volatility": "volatile",
+      "maxAgeDays": 14,
+      "usedIn": ["structured-data", "faq"]
     },
     {
       "id": "developer",
       "text": "Scam Artist is developed by greenpixels.",
       "sourceIds": ["itch-official", "steam-official"],
       "status": "verified",
+      "volatility": "stable",
       "usedIn": ["structured-data", "footer", "faq"]
     },
     {
       "id": "controls",
-      "text": "The prototype uses drag-and-drop placement and supports touch-oriented interaction.",
+      "text": "The current prototype uses drag-and-drop placement, hold-to-rearrange controls and touch interaction, including two-finger camera movement on mobile.",
       "sourceIds": ["itch-official"],
       "status": "verified",
+      "volatility": "volatile",
+      "maxAgeDays": 30,
       "usedIn": ["controls", "faq"]
+    },
+    {
+      "id": "core-systems",
+      "text": "The current prototype includes room expansion and renovation, gameplay-affecting decorations, and Scam Society research progression.",
+      "sourceIds": ["itch-official"],
+      "status": "verified",
+      "volatility": "volatile",
+      "maxAgeDays": 30,
+      "usedIn": ["how-to-play", "tips", "progression"]
     }
   ],
   "pages": [
@@ -127,7 +160,6 @@
   "status": {
     "research": "resolved",
     "onPageSeo": "pass",
-    "deploymentReady": true,
     "blockingIssues": []
   }
 }

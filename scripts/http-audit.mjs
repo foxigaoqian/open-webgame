@@ -96,7 +96,7 @@ async function fetchStatus(url) {
   const options = {
     redirect: 'follow',
     signal: AbortSignal.timeout(15000),
-    headers: { 'user-agent': 'OpenWebGame-QA/0.3 (+https://github.com/foxigaoqian/open-webgame)' },
+    headers: { 'user-agent': 'OpenWebGame-QA/0.3.3 (+https://github.com/foxigaoqian/open-webgame)' },
   };
 
   let response = await fetch(url, { ...options, method: 'HEAD' });

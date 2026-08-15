@@ -134,9 +134,9 @@ for (const [translationKey, group] of groups) {
 if (groups.size === 0) errors.push('i18n.enabled requires indexable pages with language and translationKey metadata.');
 
 const sitemapPath = path.join(siteDir, 'sitemap.xml');
-if (config.status?.deploymentReady === true) {
+if (config.status?.onPageSeo === 'pass') {
   if (!fs.existsSync(sitemapPath)) {
-    errors.push('Deployment-ready multilingual sites require sitemap.xml.');
+    errors.push('On-Page SEO pass for a multilingual site requires sitemap.xml.');
   } else {
     const sitemap = fs.readFileSync(sitemapPath, 'utf8');
     if (!/xmlns:xhtml=/i.test(sitemap)) errors.push('Multilingual sitemap.xml must declare the xhtml namespace.');

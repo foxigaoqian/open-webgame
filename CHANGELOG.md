@@ -2,6 +2,26 @@
 
 All notable project changes are documented here.
 
+## 0.3.3 — 2026-08-15
+
+### Added
+
+- `site.origin` + `site.basePath` as the canonical deployment URL model, with page-canonical consistency checks.
+- `claims[].volatility` and `maxAgeDays` freshness enforcement backed by `sources[].retrievedAt`.
+- Regression coverage for URL-model misuse and stale/fresh volatile claims.
+- Committed `package-lock.json`, `npm ci` CI installs and `npm run check:deps` high-severity dependency auditing.
+- Commit-bound `qa-artifacts/release-qa.json` evidence from the final release gate.
+
+### Changed
+
+- Project schema version is now `0.3.3`.
+- Removed the manually editable `status.deploymentReady` project field; release readiness is computed by `qa:release`.
+- Scam Artist config now models GitHub Pages as origin `https://foxigaoqian.github.io` + base path `/open-webgame`.
+- Current browser-build status is classified as volatile with a freshness window.
+- Browser QA workflow now executes the final `qa:release:example` aggregate itself.
+- Lighthouse upgraded from 12.x to 13.4.1 after the dependency audit exposed high-severity transitive findings in the older chain.
+
+
 ## 0.3.2 — 2026-08-15
 
 ### Added
