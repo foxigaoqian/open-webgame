@@ -1,0 +1,43 @@
+name: One-time sync multilingual README
+
+on:
+  push:
+    branches: [fix/multilingual-dropdown-hardening]
+    paths:
+      - '.github/workflows/one-time-sync-multilingual-readme.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Sync README state
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('README.md')
+          s = p.read_text()
+          old = 'The live Scam Artist case currently remains a **single-language English example**. Multilingual capability is covered by the project contract and regression fixtures; do not confuse that with a translated Scam Artist deployment.'
+          new = 'The live Scam Artist case is deployed in **English, Japanese and Korean**, with separate indexable locale routes and a visible dropdown language switcher.'
+          if old not in s:
+              raise SystemExit('Expected stale README sentence was not found.')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          git rm .github/workflows/one-time-sync-multilingual-readme.yml
+
+      - name: Commit README sync
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: sync live multilingual case status"
+          git push origin HEAD:fix/multilingual-dropdown-hardening
