@@ -22,8 +22,8 @@
     "xDefaultLanguage": "en",
     "languages": [
       {"code": "en", "label": "English", "prefix": ""},
-      {"code": "ja", "label": "日本語", "prefix": "ja"},
-      {"code": "ko", "label": "한국어", "prefix": "ko"}
+      {"code": "ja", "label": "日本語", "prefix": "/ja"},
+      {"code": "ko", "label": "한국어", "prefix": "/ko"}
     ]
   },
   "seo": {
