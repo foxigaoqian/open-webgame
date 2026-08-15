@@ -1,10 +1,11 @@
-name: Deploy Scam Artist demo to GitHub Pages
+name: Deploy Open WebGame demos to GitHub Pages
 
 on:
   push:
     branches: [main]
     paths:
       - 'examples/scam-artist-site/**'
+      - 'examples/super-slime-black-hole-site/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -35,6 +36,8 @@ jobs:
         run: |
           mkdir -p _site
           cp -R examples/scam-artist-site/. _site/
+          mkdir -p _site/super-slime-black-hole
+          cp -R examples/super-slime-black-hole-site/. _site/super-slime-black-hole/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact
