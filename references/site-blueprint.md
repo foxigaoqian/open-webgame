@@ -18,6 +18,21 @@ Official Links / Attribution
 Footer
 ```
 
+## Browser identity
+
+Every production site needs real browser identity assets in addition to the visible page design.
+
+Baseline deliverables:
+
+```text
+favicon.ico
+favicon-32x32.png
+```
+
+Declare both statically in every page `<head>`. Nested locale routes must resolve the icon paths correctly. Do not rely on JavaScript favicon injection, and do not substitute a text/base64 placeholder with an image extension.
+
+The favicon should be legible at tab size and should derive from the current game's visual identity when a responsible asset can be produced. It does not need to duplicate the full site logo.
+
 ## Hero
 
 The hero should immediately communicate:
