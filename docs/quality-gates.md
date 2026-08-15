@@ -57,6 +57,31 @@ Important image rule:
 
 The audit also checks one canonical, one meta description, required Open Graph metadata, game/entity identification, heading structure warnings, crawlable content, JSON-LD expectations, player/runtime consistency, robots and sitemap requirements.
 
+## Browser identity / favicon
+
+Every generated production site must include static browser identity metadata rather than relying on JavaScript to inject it after page load.
+
+Required baseline:
+
+```html
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+```
+
+Nested locale pages must use a correct relative or absolute path to the same real icon assets.
+
+The production baseline requires:
+
+- a real binary `favicon.ico`
+- a real binary 32×32 PNG favicon
+- static `<head>` declarations on every locale page
+- HTTP 200 for production icon URLs
+- correct image MIME types
+- valid PNG/ICO file signatures in Browser QA
+
+Do not create a text file containing base64 and merely name it `.png` or `.ico`.
+
 ## Live HTTP resources
 
 Offline HTML can look correct while the production URLs are broken.
@@ -72,8 +97,11 @@ The live gate resolves and checks production-facing resources including:
 - configured canonical URLs
 - indexable page canonicals
 - `og:image`
+- favicon URLs declared by indexable locale pages
 - sitemap URL declared in `robots.txt`
 - URLs listed in `sitemap.xml`
+
+For declared PNG/ICO favicons the live gate also validates compatible response MIME types.
 
 A 404/5xx or network failure is a hard failure in live QA.
 
@@ -98,6 +126,9 @@ It checks:
 - page boot
 - visible H1
 - horizontal overflow
+- language dropdown behavior when multilingual
+- static PNG + ICO favicon declarations
+- favicon HTTP/MIME/file signatures on the generated site
 - lazy player CTA behavior
 - iframe `src` assignment
 - a real child frame navigation to the configured runtime origin
@@ -134,7 +165,7 @@ The browser game is normally lazy-loaded, so Lighthouse evaluates the website sh
 
 The Scam Artist regression case demonstrates why this gate exists: replacing an oversized first-screen image and lazy-loading below-fold screenshots reduced measured mobile-shell LCP from about 7.0s to about 1.9s in CI while keeping the source artwork on the creator's existing itch-hosted image infrastructure.
 
-## Aggregate QA
+## Aggregate non-browser QA
 
 Offline, deterministic checks:
 
@@ -142,13 +173,33 @@ Offline, deterministic checks:
 npm run qa -- --config path/to/open-webgame.json --html path/to/index.html --offline
 ```
 
-Full live checks:
+Full live non-browser checks:
 
 ```bash
-npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+npm run qa -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
 ```
 
-First production launch additionally requires Browser QA and Lighthouse.
+A successful `npm run qa` means the applicable non-browser gates passed. It must **not** be interpreted as the final deployment-ready decision because Browser/axe and Lighthouse remain separate production gates.
+
+## Final release readiness
+
+Use one command for the final production decision:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+`qa:release` runs, in order:
+
+1. live config/content/site/i18n/SEO/security/HTTP/embed gates
+2. Playwright Browser + axe QA
+3. Lighthouse shell QA
+
+Only this aggregate release command may print:
+
+```text
+Deployment-ready: YES
+```
 
 A failed hard gate means:
 
