@@ -21,6 +21,7 @@ if (!i18n?.enabled) {
 const languages = Array.isArray(i18n.languages) ? i18n.languages : [];
 const codes = languages.map((item) => String(item?.code || '').trim());
 const codeSet = new Set(codes);
+const languageByCode = new Map(languages.map((item) => [String(item?.code || '').trim(), item]));
 if (codes.length < 2) errors.push('i18n.enabled requires at least two configured languages.');
 if (codeSet.size !== codes.length) errors.push('i18n.languages contains duplicate language codes.');
 if (!codeSet.has(i18n.defaultLanguage)) errors.push('i18n.defaultLanguage must exist in i18n.languages.');
@@ -30,12 +31,44 @@ if (config.site?.language !== i18n.defaultLanguage) {
   errors.push('site.language must match i18n.defaultLanguage for a multilingual project.');
 }
 
+const prefixes = new Set();
+for (const language of languages) {
+  const code = String(language?.code || '').trim();
+  const prefix = String(language?.prefix || '').trim();
+  if (code === i18n.defaultLanguage) {
+    if (prefix !== '') errors.push(`Default language ${code} must use an empty prefix.`);
+  } else {
+    if (!prefix.startsWith('/')) errors.push(`Language ${code} prefix must start with /; found ${prefix || '(empty)'}.`);
+    if (prefix.endsWith('/')) errors.push(`Language ${code} prefix must not end with /; found ${prefix}.`);
+    if (prefix === '/') errors.push(`Language ${code} prefix cannot be root /.`);
+  }
+  if (prefixes.has(prefix)) errors.push(`Duplicate language prefix: ${prefix || '(root)'}.`);
+  prefixes.add(prefix);
+}
+
 const pages = Array.isArray(config.pages) ? config.pages.filter((page) => page?.indexable) : [];
 const groups = new Map();
 for (const page of pages) {
   if (!page.language) errors.push(`Page ${page.path} is missing language.`);
   if (!page.translationKey) errors.push(`Page ${page.path} is missing translationKey.`);
   if (page.language && !codeSet.has(page.language)) errors.push(`Page ${page.path} uses unconfigured language ${page.language}.`);
+
+  const language = languageByCode.get(page.language);
+  if (language) {
+    const prefix = String(language.prefix || '').trim();
+    if (page.language === i18n.defaultLanguage) {
+      const nonDefaultPrefixes = languages
+        .filter((item) => item.code !== i18n.defaultLanguage)
+        .map((item) => String(item.prefix || '').trim())
+        .filter(Boolean);
+      if (nonDefaultPrefixes.some((candidate) => page.path === `${candidate}/` || page.path.startsWith(`${candidate}/`))) {
+        errors.push(`Default-language page ${page.path} is nested under a non-default locale prefix.`);
+      }
+    } else if (prefix && !(page.path === `${prefix}/` || page.path.startsWith(`${prefix}/`))) {
+      errors.push(`Page ${page.path} for ${page.language} must live under configured prefix ${prefix}/.`);
+    }
+  }
+
   if (!page.translationKey || !page.language) continue;
   if (!groups.has(page.translationKey)) groups.set(page.translationKey, new Map());
   const group = groups.get(page.translationKey);
