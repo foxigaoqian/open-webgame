@@ -29,7 +29,7 @@ permissions:
 jobs:
   browser-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -43,17 +43,11 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Run live HTTP + embed gates
-        run: npm run qa:live:example
-
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright browser + axe QA
-        run: npm run qa:browser:example
-
-      - name: Run Lighthouse QA
-        run: npm run qa:lighthouse:example
+      - name: Run final release QA
+        run: npm run qa:release:example
 
       - name: Upload browser quality artifacts
         if: always()
