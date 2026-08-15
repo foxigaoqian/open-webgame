@@ -2,7 +2,7 @@
 
 Open WebGame supports real multilingual site generation. This is not a translation-widget feature.
 
-A multilingual build must create separate crawlable routes, localized metadata/content, reciprocal `hreflang`, `x-default`, self-canonicals and multilingual sitemap alternates.
+A multilingual build must create separate crawlable routes, localized metadata/content, reciprocal `hreflang`, `x-default`, self-canonicals and multilingual sitemap alternates. All locale URLs must also respect the shared `site.origin` + `site.basePath` deployment model.
 
 ## Bootstrap
 
@@ -115,7 +115,7 @@ Do not always send users back to the homepage when an equivalent localized page 
 
 ## Sitemap
 
-Deployment-ready multilingual sites need the XHTML namespace and alternate links for each translated URL.
+Production multilingual sites with On-Page SEO marked pass need the XHTML namespace and alternate links for each translated URL.
 
 ```xml
 <urlset
@@ -149,6 +149,6 @@ The gate checks:
 - self canonical
 - reciprocal language alternates
 - `x-default`
-- multilingual sitemap namespace and alternates for deployment-ready builds
+- multilingual sitemap namespace and alternates for production On-Page SEO builds
 
 A failed multilingual SEO gate means `deployment-ready: NO`.

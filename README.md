@@ -71,6 +71,32 @@ npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.ht
 
 Only the full release aggregate may report `Deployment-ready: YES`.
 
+## v0.3.3 — Reliability Hardening
+
+v0.3.3 closes the remaining configuration/readiness drift gaps:
+
+```text
+origin + basePath canonical model
+source-backed volatile-claim freshness windows
+committed package-lock + npm ci + high-severity dependency audit
+commit-bound qa-artifacts/release-qa.json
+```
+
+A GitHub Pages-style deployment is represented as:
+
+```json
+{
+  "origin": "https://username.github.io",
+  "basePath": "/game-site",
+  "canonical": "https://username.github.io/game-site/"
+}
+```
+
+Final readiness is no longer stored as a manually editable project boolean. `npm run qa:release` computes the result and records the tested commit SHA and timestamp in the release artifact.
+
+The dependency audit performed during this upgrade also exposed high-severity transitive findings in the old Lighthouse 12 toolchain; the QA stack was upgraded to Lighthouse 13.4.1 instead of weakening the audit threshold.
+
+
 ## v0.3.1 — Quality Gates + Multilingual SEO
 
 v0.3.1 turns more production expectations into executable tests.
@@ -192,7 +218,7 @@ Clone the repository and use [`SKILL.md`](./SKILL.md) as the agent instruction f
 ```bash
 git clone https://github.com/foxigaoqian/open-webgame.git
 cd open-webgame
-npm install
+npm ci
 ```
 
 Minimum user input:
@@ -403,6 +429,7 @@ open-webgame/
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── package.json
+├── package-lock.json
 ├── LICENSE
 ├── schema/
 │   └── open-webgame.schema.json
@@ -422,6 +449,7 @@ open-webgame/
 │   ├── browser-qa.mjs
 │   ├── lighthouse-qa.mjs
 │   ├── qa.mjs
+│   ├── release-qa.mjs
 │   └── release-qa.mjs
 ├── tests/
 │   ├── fixtures/
