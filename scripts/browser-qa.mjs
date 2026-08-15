@@ -15,6 +15,7 @@ const warnings = [];
 
 const pages = Array.isArray(config.pages) ? config.pages : [];
 const home = pages.find((page) => page.path === '/') || { file: 'index.html', path: '/', language: config.site?.language || 'en' };
+const defaultLanguage = config.i18n?.defaultLanguage || config.site?.language || 'en';
 const pageTargets = config.i18n?.enabled
   ? pages.filter((page) => page.indexable !== false)
   : [home];
@@ -184,9 +185,10 @@ try {
             errors.push(`${label}: iframe data-src/src does not match embed.runtimeUrl.`);
           }
 
-          // Boot the real remote runtime once per locale on desktop. Other viewports
-          // still validate the localized shell, player wiring and accessibility.
-          if (viewport.name === 'desktop') {
+          // Every locale validates its shell, player wiring and accessibility.
+          // The shared remote game runtime is booted only once on the default
+          // locale desktop page to avoid third-party hotlink/rate-limit flakiness.
+          if (viewport.name === 'desktop' && locale === defaultLanguage) {
             let src = (await iframe.getAttribute('src')) || '';
             if (!src || !src.startsWith(runtimeUrl)) {
               const loadButton = page.locator('button[onclick*="startGame"]').last();
