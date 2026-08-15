@@ -17,78 +17,77 @@ The header uses a compact dropdown language switcher. Each locale is a separate 
 - game-specific visual direction rather than a generic reskin
 - play-first page architecture
 - a verified itch.io-hosted HTML5 runtime URL
-- lazy loading behind a `Load Game` action
-- reload and fullscreen controls
-- official artwork/screenshots loaded from itch.io
-- localized English, Japanese and Korean visible page content
-- per-language `<html lang>`, canonical, Open Graph URL and structured data language
-- reciprocal `hreflang` for `en`, `ja`, `ko` and `x-default`
-- multilingual sitemap alternate entries
-- accessible dropdown language navigation between all locale pages
+- lazy loading, reload and fullscreen controls
+- localized English, Japanese and Korean static content
+- reciprocal hreflang + x-default and multilingual sitemap alternates
+- real ICO + PNG browser favicons
 - game-specific How to Play / Tips / FAQ content
-- `VideoGame` and `FAQPage` structured data
-- responsive desktop/mobile layout
 - creator attribution and unofficial-site disclosure
-- production canonical / Open Graph URL
-- `robots.txt` and `sitemap.xml`
-- strict `open-webgame.json` project contract
+- strict schema `0.3.3` project contract
+- canonical URL model using `site.origin` + `site.basePath`
+- source-backed stable/volatile claims with freshness checks
 - automated config, multilingual SEO, SEO, HTTP, embed, browser, axe and Lighthouse QA
+- final commit-bound release evidence
 
 ## Single source of truth
 
-Project state lives in:
+[`open-webgame.json`](./open-webgame.json) records verified game identity, deployment URL model, locale routes, runtime URL, search intent, visual direction, source provenance and editable project QA state.
 
-[`open-webgame.json`](./open-webgame.json)
+GitHub Pages is represented as:
 
-It records the verified game identity, live canonicals, locale routes, runtime URL, search intent, visual direction and readiness state.
-
-Do not update the iframe, locale routes, canonical, sitemap or readiness claims without keeping this config synchronized.
-
-## SEO / deployment status
-
-The GitHub Pages case has real production URLs for all three locale pages:
-
-```text
-https://foxigaoqian.github.io/open-webgame/
-https://foxigaoqian.github.io/open-webgame/ja/
-https://foxigaoqian.github.io/open-webgame/ko/
+```json
+{
+  "origin": "https://foxigaoqian.github.io",
+  "basePath": "/open-webgame",
+  "canonical": "https://foxigaoqian.github.io/open-webgame/"
+}
 ```
 
-The locale pages identify `Scam Artist`, use self-referencing canonicals, expose reciprocal hreflang alternates, and are represented in the multilingual sitemap.
+Do not put `/open-webgame` inside an origin/domain field.
 
-Current automated contract:
+## SEO / release status
+
+Project config can state:
 
 ```text
 Research: RESOLVED
 Embed config: VERIFIED
 Multilingual SEO: PASS
 On-Page SEO: PASS
-Default canonical: https://foxigaoqian.github.io/open-webgame/
-Deployment-ready: YES
 Blocking issues: none
 ```
 
-This status refers to the repository's own GitHub Pages example. A fork or newly generated production site must replace the canonical/domain with its own deployment and pass QA again.
+It intentionally does **not** store an editable deployment-ready boolean.
+
+The final production decision comes from:
+
+```bash
+npm run qa:release:example
+```
+
+A passing run writes:
+
+```text
+qa-artifacts/release-qa.json
+```
+
+That artifact records `Deployment-ready: YES` as a computed result together with the check time and tested commit SHA. A fork or new deployment must update its origin/basePath/canonicals, refresh volatile claims when required, and produce its own passing release evidence.
 
 ## Run QA
 
 From the repository root:
 
 ```bash
+npm ci
+npm run check:deps
 npm run qa:example
+npx playwright install chromium
+npm run qa:release:example
 ```
 
-Run the live runtime HTTP/header check separately:
-
-```bash
-npm run verify:embed -- --config examples/scam-artist-site/open-webgame.json
-```
-
-First-production verification also uses the Browser QA workflow for real iframe boot/reload, accessibility and Lighthouse checks across every configured locale.
+The final release aggregate covers live HTTP/embed, Browser/axe and Lighthouse in addition to the deterministic gates.
 
 ## Run locally
-
-Serve the directory with any static server, for example:
 
 ```bash
 cd examples/scam-artist-site
@@ -103,9 +102,9 @@ http://localhost:8080/ja/
 http://localhost:8080/ko/
 ```
 
-## Runtime note
+## Runtime / freshness note
 
-The example references the itch.io-hosted browser build rather than mirroring game files. Runtime URLs can change when a developer uploads a new web build, so production projects should keep the runtime configurable and re-verify it.
+The example references the itch.io-hosted browser build rather than mirroring game files. Runtime availability can change when the creator updates or removes a web build, so the browser-build claim is marked `volatile` with a freshness window and must be re-verified when it expires.
 
 ## Rights / attribution
 
