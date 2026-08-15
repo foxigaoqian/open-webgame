@@ -21,6 +21,7 @@ The reusable part is the production workflow and information architecture. The v
 6. **Important indexable content must exist outside the iframe.**
 7. **Every production build must pass the On-Page SEO Gate.**
 8. **A broken player or failed On-Page SEO Gate means `deployment-ready: NO`.**
+9. **Production output must include real statically declared favicon assets and pass the full release-readiness gate before `deployment-ready: YES`.**
 
 Read and follow:
 
@@ -42,6 +43,7 @@ Research: automatic
 Site mode: auto → play-first only after runtime verification, otherwise guide
 On-Page SEO: mandatory
 Responsive QA: mandatory
+Browser identity / favicon: mandatory
 Output: complete website folder
 Clarifying questions: avoid unless genuinely blocked
 ```
@@ -153,6 +155,29 @@ For SEO and accessibility:
 
 Do not convert intentional decorative empty alt text into keyword-filled alt text.
 
+## Browser identity / favicon
+
+Every generated production site must include real browser identity assets. Do not assume a visible site logo automatically becomes the browser-tab icon.
+
+Required baseline for static HTML:
+
+```html
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+```
+
+Rules:
+
+- generate a real binary `favicon.ico`
+- generate a real binary 32x32 PNG favicon
+- declare favicon links statically in `<head>`; do not depend on JavaScript injection
+- use correct relative/absolute paths on nested locale routes
+- keep the icon legible at browser-tab size and derive it from the current game's visual identity when appropriate
+- Browser QA must verify the favicon declarations, HTTP response, MIME type and PNG/ICO file signatures
+- Live HTTP QA must verify production favicon URLs, not only the local build
+- a missing/broken favicon is a production hard-gate failure
+
 ## Live production resource QA
 
 Correct-looking HTML is not enough if production URLs are dead.
@@ -171,6 +196,7 @@ Browser QA now verifies more than the iframe attribute:
 
 - desktop/tablet/mobile shell
 - horizontal overflow
+- static PNG + ICO favicon declarations and valid icon resources
 - lazy-load CTA
 - configured iframe URL assignment
 - a real child frame navigating to the runtime origin
@@ -217,7 +243,7 @@ npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
 npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
-A relevant hard-gate failure always means `deployment-ready: NO`.
+A relevant hard-gate failure always means `deployment-ready: NO`. Passing this individual command list is not, by itself, the final release decision. Use `npm run qa:release` after deployment URLs are live; only the release aggregate may return `Deployment-ready: YES`.
 
 # Inputs
 
@@ -320,7 +346,7 @@ Before building the full website, test the runtime in the smallest possible page
 <style>html,body,iframe{margin:0;width:100%;height:100%;border:0}</style>
 <iframe
   src="REAL_RUNTIME_URL"
-  allow="autoplay; fullscreen *; gamepad; gyroscope; accelerometer; web-share"
+  allow="autoplay; fullscreen *; gamepad"
   allowfullscreen>
 </iframe>
 ```
@@ -665,6 +691,7 @@ For static HTML:
 - minimal JavaScript
 - responsive desktop/tablet/mobile layout
 - no broken placeholder links in production
+- real `favicon.ico` + `favicon-32x32.png` with static `<head>` declarations
 - no fake game player
 - important content present in HTML source
 
@@ -739,13 +766,27 @@ When the repository scripts are available, run them. Documentation-only self-rev
 
 ```bash
 npm run check:config -- --config path/to/open-webgame.json
+npm run check:content -- --config path/to/open-webgame.json
+npm run check:site -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run check:i18n -- --config path/to/open-webgame.json --site-dir path/to/site
 npm run check:seo -- --config path/to/open-webgame.json --html path/to/index.html
+npm run check:security -- --config path/to/open-webgame.json --html path/to/index.html
+npm run check:http -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
 npm run verify:embed:config -- --config path/to/open-webgame.json
 npm run verify:embed -- --config path/to/open-webgame.json
-npm run qa -- --config path/to/open-webgame.json --html path/to/index.html
+npm test
+npx playwright install chromium
+npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
+npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
-The offline embed gate validates configuration and rejects obvious project-page/runtime mistakes. The live embed command checks reachability and framing headers. Neither replaces a real browser boot/input/fullscreen/mobile smoke test.
+`npm run qa` aggregates the non-browser gates and intentionally does **not** grant final release readiness. For the final production decision run:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+Only `qa:release` may print `Deployment-ready: YES`, because it requires live HTTP/embed, Browser/axe and Lighthouse to pass in the same release decision.
 
 A command failure means the corresponding hard gate has not passed. Do not set `status.deploymentReady = true` to bypass it.
 
@@ -797,6 +838,16 @@ A project is complete only when all applicable gates pass.
 - [ ] No accidental noindex
 - [ ] No keyword stuffing, hidden text or doorway patterns
 
+## Browser identity / release quality
+
+- [ ] `favicon.ico` exists and is a valid icon file
+- [ ] `favicon-32x32.png` exists and is a valid PNG
+- [ ] Every locale declares favicon links statically in `<head>`
+- [ ] Production favicon URLs return successfully with compatible MIME types
+- [ ] Browser/axe QA passes required locales and viewports
+- [ ] Lighthouse hard thresholds pass
+- [ ] `npm run qa:release` passes before reporting deployment-ready
+
 ## Attribution
 
 - [ ] Developer is credited
@@ -825,8 +876,9 @@ When invoked for a game keyword, deliver:
 9. Deployable site code
 10. On-page SEO implementation
 11. robots.txt + sitemap.xml for production
-12. Attribution/disclosure
-13. QA result
+12. Browser identity assets (`favicon.ico` + `favicon-32x32.png`)
+13. Attribution/disclosure
+14. QA result including Browser/axe, Lighthouse and release readiness
 ```
 
 Completion summary:
@@ -856,6 +908,8 @@ Stop and report a blocker instead of pretending the project is complete when:
 - production canonical is unresolved
 - primary content would live only inside the iframe
 - On-Page SEO Gate fails
+- production favicon assets/declarations are missing or broken
+- Browser/axe, Lighthouse or final `qa:release` hard gate fails
 
 A polished fake player is worse than an honest official Play link.
 
