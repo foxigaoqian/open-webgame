@@ -44,7 +44,32 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Strict project schema** — AJV rejects unknown or misspelled configuration fields.
 - **Browser + accessibility QA** — Playwright runs desktop/tablet/mobile, verifies the real runtime child frame, runs axe and saves real screenshots/reports.
 - **Performance QA** — Lighthouse evaluates the lazy-loaded site shell and enforces minimum quality thresholds.
+- **Browser identity QA** — every production site ships real PNG + ICO favicons; Browser QA and live HTTP QA verify declarations, MIME types and file validity.
+- **Release readiness** — `qa:release` is the only aggregate command allowed to return `Deployment-ready: YES`.
 - **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
+
+## v0.3.2 — Browser Identity + Release Readiness
+
+v0.3.2 closes two production gaps found while testing the live multilingual case.
+
+New hardening:
+
+```text
+Static favicon.ico + favicon-32x32.png
+Favicon HTTP / MIME / binary-signature QA
+Production favicon URL checks
+Least-privilege iframe example
+Non-browser QA no longer claims final readiness
+qa:release = live gates + Browser/axe + Lighthouse
+```
+
+Final production decision:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+Only the full release aggregate may report `Deployment-ready: YES`.
 
 ## v0.3.1 — Quality Gates + Multilingual SEO
 
@@ -224,6 +249,8 @@ Extract visual DNA
         ↓
 Design a game-native play-first or guide site
         ↓
+Generate real static favicon/browser identity assets
+        ↓
 Implement On-Page + multilingual SEO
         ↓
 Static + live HTTP gates
@@ -329,6 +356,14 @@ npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
 npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
 ```
 
+Final release-readiness decision:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+```
+
+`npm run qa` covers non-browser gates only. It must not be treated as the final deployment-ready decision.
+
 See [`docs/quality-gates.md`](./docs/quality-gates.md).
 
 ## Output Contract
@@ -346,6 +381,8 @@ Multilingual SEO: PASS
 Browser QA: PASS
 Accessibility: PASS
 Lighthouse: PASS
+Favicon: PASS
+Release QA: PASS
 Canonical: https://examplegame.com/
 Design direction: pixel-art management / dark resource UI
 Pages: /, /ja/, /ko/
@@ -384,7 +421,8 @@ open-webgame/
 │   ├── verify-embed.mjs
 │   ├── browser-qa.mjs
 │   ├── lighthouse-qa.mjs
-│   └── qa.mjs
+│   ├── qa.mjs
+│   └── release-qa.mjs
 ├── tests/
 │   ├── fixtures/
 │   └── quality-gates.test.mjs

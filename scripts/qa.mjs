@@ -35,7 +35,13 @@ if (failed) {
   console.log('At least one hard gate failed.');
   process.exit(1);
 }
-console.log('Deployment-ready: YES');
-console.log(offline
-  ? 'Automated offline gates passed. Run live HTTP/embed and Playwright browser QA before first production launch.'
-  : 'Automated config/content/site/i18n/SEO/security/HTTP/embed gates passed. Run Playwright browser QA before first production launch.');
+
+if (offline) {
+  console.log('Offline deterministic gates: PASS');
+  console.log('Deployment-ready: NO');
+  console.log('Pending: live HTTP/embed, Browser/axe and Lighthouse release gates.');
+} else {
+  console.log('Live non-browser gates: PASS');
+  console.log('Deployment-ready: NO');
+  console.log('Pending: Browser/axe and Lighthouse release gates. Run npm run qa:release for the final readiness decision.');
+}

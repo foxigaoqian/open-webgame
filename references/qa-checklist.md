@@ -1,6 +1,6 @@
 # QA Checklist
 
-A website is not complete because the hero looks good. It is complete only when the game, design, content, On-Page SEO, responsive behavior, performance and attribution all pass.
+A website is not complete because the hero looks good. It is complete only when the game, design, content, On-Page SEO, responsive behavior, performance, browser identity and attribution all pass.
 
 ## Game Runtime
 
@@ -28,6 +28,18 @@ A website is not complete because the hero looks good. It is complete only when 
 - [ ] Player is visually prominent
 - [ ] CTA labels match the game's tone without becoming misleading
 
+## Browser Identity / Favicon
+
+- [ ] Production site includes a real `favicon.ico`
+- [ ] Production site includes a real 32×32 PNG favicon
+- [ ] Every locale page declares favicon links statically in `<head>`; do not rely on JavaScript injection
+- [ ] PNG favicon uses `type="image/png"` and `sizes="32x32"`
+- [ ] ICO fallback is declared for broad browser compatibility
+- [ ] Favicon URLs resolve correctly from nested locale routes
+- [ ] Production favicon URLs return HTTP 200 with an image MIME type
+- [ ] Browser QA validates PNG/ICO file signatures so text/base64 placeholders cannot masquerade as image files
+- [ ] Browser tab identity is visually checked at least once in a clean profile/incognito-style session when practical
+
 ## Content
 
 - [ ] Game description is factually grounded
@@ -40,6 +52,21 @@ A website is not complete because the hero looks good. It is complete only when 
 - [ ] Release/demo/prototype status is current
 - [ ] Important indexable content exists outside the iframe
 - [ ] Page is not thin filler wrapped around a game player
+
+## Multilingual
+
+When `i18n.enabled = true`:
+
+- [ ] Every configured locale has a real crawlable route
+- [ ] Each locale page has the correct `<html lang>`
+- [ ] Search intent, title, meta description, H1, copy, FAQ, alt text and navigation are localized
+- [ ] Every locale self-canonicalizes
+- [ ] Reciprocal hreflang links include every translation plus `x-default`
+- [ ] Language switcher is visible and keyboard accessible
+- [ ] Equivalent routes keep the same `translationKey`
+- [ ] Multilingual sitemap alternates are present
+- [ ] Browser/axe QA covers every locale shell
+- [ ] Lighthouse covers every indexable locale homepage/target required by the project
 
 # Mandatory On-Page SEO Gate
 
@@ -171,6 +198,17 @@ Verify:
 - [ ] no horizontal scrolling
 - [ ] useful SEO body copy remains readable on mobile
 
+## Accessibility / Browser QA
+
+- [ ] Browser QA runs against every required locale shell
+- [ ] Serious/critical axe WCAG 2 A/AA violations are fixed
+- [ ] Lazy player action assigns the configured runtime URL
+- [ ] Real child frame reaches the runtime origin for a play-first site
+- [ ] Reload proves a real re-navigation cycle when offered
+- [ ] Fullscreen control exists when offered
+- [ ] Favicon declarations/resources pass browser QA
+- [ ] Browser screenshots are preserved as evidence when CI is available
+
 ## Performance
 
 - [ ] Website UI loads before the game payload
@@ -179,6 +217,8 @@ Verify:
 - [ ] Screenshots below the fold are lazy-loaded when practical
 - [ ] No unnecessary framework/library weight
 - [ ] Layout does not shift badly when media loads
+- [ ] Lighthouse hard thresholds pass
+- [ ] LCP is <= 4.0s and should be optimized toward <= 2.5s
 
 ## Attribution / Disclosure
 
@@ -206,9 +246,20 @@ Game Embed: PASS | FAIL
 On-Page SEO: PASS | FAIL
 Canonical: <production URL or pending>
 Indexable pages: <list/count>
+Browser/axe: PASS | FAIL
+Lighthouse: PASS | FAIL
+Favicon: PASS | FAIL
 Blocking issues: <none or list>
+```
+
+`npm run qa` passing by itself is not a deployment-ready decision. It covers non-browser gates only.
+
+Use the full release gate for the final production decision:
+
+```bash
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
 ```
 
 Any broken iframe is a `FAIL` for a play-first build.
 
-Any failed On-Page SEO Gate is a `FAIL` for a production/deployment-ready build.
+Any failed On-Page SEO, browser/accessibility, favicon, live HTTP or Lighthouse hard gate is a `FAIL` for a production/deployment-ready build.

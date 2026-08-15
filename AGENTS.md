@@ -41,6 +41,7 @@ On-Page SEO: mandatory
 Content provenance: mandatory
 Least-privilege iframe permissions: mandatory
 Responsive QA: mandatory
+Browser identity / favicon: mandatory
 Accessibility QA: mandatory
 Performance QA: mandatory before first production launch
 Output: complete website folder
@@ -104,6 +105,15 @@ When `i18n.enabled = true`:
 - generate multilingual sitemap alternates
 - run `check:i18n` as a hard gate
 
+### Browser identity gate
+
+- generate a real `favicon.ico` and real 32x32 PNG favicon
+- declare both statically in every locale page `<head>`
+- never rely on JavaScript favicon injection
+- nested locale paths must resolve to the correct icon assets
+- Browser QA validates icon declarations, MIME and file signatures
+- live HTTP QA validates production favicon URLs
+
 ### Config/readiness gate
 
 - config must pass strict AJV schema validation; unknown/misspelled properties are errors
@@ -119,6 +129,7 @@ When `i18n.enabled = true`:
 Before first production launch:
 
 - Browser QA must run at approximately 1440 / 768 / 390 widths
+- favicon declarations/resources must pass on required locale shells
 - lazy game loading must assign the configured runtime
 - a real child frame must navigate to the runtime origin
 - Reload must prove a fresh child-frame navigation cycle when the site offers Reload
@@ -184,6 +195,9 @@ npm run qa:browser -- --config path/to/open-webgame.json --site-dir path/to/site
 # Lighthouse shell QA
 npm run qa:lighthouse -- --config path/to/open-webgame.json --site-dir path/to/site
 
+# Final release-readiness decision (live + browser/axe + Lighthouse)
+npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.html --site-dir path/to/site
+
 # Repository regression case
 npm run qa:example
 ```
@@ -212,7 +226,9 @@ In addition to the existing game/content/design/SEO gates:
 - when multilingual, run `check:i18n` and keep translation groups complete
 - run axe as part of Browser QA and fix serious/critical host-shell violations
 - prove the actual runtime child frame boots, not just that an iframe `src` string exists
+- generate and statically declare real PNG + ICO favicons and keep favicon QA green
 - run Lighthouse before first production launch and fix hard-threshold failures rather than lowering the threshold to hide regressions
+- use `qa:release` for the final deployment-ready decision; `npm run qa` alone is not sufficient
 
 ## Working order
 
@@ -228,10 +244,12 @@ create/update open-webgame.json
 → research mechanics + controls + visual DNA
 → derive design direction
 → build play-first or guide site
+→ generate static favicon/browser identity assets
 → implement On-Page + multilingual SEO
 → run regression + static/live gates
 → browser + axe QA
 → Lighthouse QA
+→ qa:release
 → final readiness decision
 ```
 
