@@ -1,11 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.3.3",
   "game": { "name": "Fixture Game" },
   "site": {
     "language": "en",
     "mode": "guide",
-    "domain": "fixture.invalid",
+    "origin": "https://fixture.invalid",
+    "basePath": "/game",
     "canonical": "https://fixture.invalid/game/"
   },
   "i18n": {
@@ -50,7 +51,6 @@
   "status": {
     "research": "pending",
     "onPageSeo": "pending",
-    "deploymentReady": false,
     "blockingIssues": []
   }
 }
