@@ -1,4 +1,4 @@
-import { isHttpUrl, isProductionHttpsUrl, loadConfig, parseArgs, printResult } from './lib.mjs';
+import { getSiteBaseUrl, isHttpUrl, isProductionHttpsUrl, loadConfig, normalizeBasePath, normalizeUrl, parseArgs, printResult, resolveSiteUrl } from './lib.mjs';
 import { validateConfigSchema } from './schema-validator.mjs';
 
 const args = parseArgs();
@@ -11,8 +11,33 @@ if (config.game?.officialUrl && !isHttpUrl(config.game.officialUrl)) {
   errors.push('game.officialUrl must be an http(s) URL when provided.');
 }
 
-if (config.site?.canonical && !isHttpUrl(config.site.canonical)) {
+const origin = String(config.site?.origin || '').trim();
+const basePath = String(config.site?.basePath || '');
+const canonical = String(config.site?.canonical || '').trim();
+
+if (origin) {
+  if (!isProductionHttpsUrl(origin)) {
+    errors.push('site.origin must be a real production HTTPS origin when provided.');
+  } else {
+    const url = new URL(origin);
+    if (url.pathname !== '/' || url.search || url.hash) errors.push('site.origin must contain only scheme + host; put deployment subpaths in site.basePath.');
+    if (origin.endsWith('/')) errors.push('site.origin must not end with a trailing slash.');
+  }
+}
+
+if (basePath !== normalizeBasePath(basePath)) {
+  errors.push('site.basePath must be empty or a normalized leading-slash path without a trailing slash (example: /open-webgame).');
+}
+
+if (canonical && !isHttpUrl(canonical)) {
   errors.push('site.canonical must be an http(s) URL when provided.');
+}
+
+if (origin && canonical) {
+  const expectedHome = getSiteBaseUrl(config);
+  if (normalizeUrl(canonical) !== normalizeUrl(expectedHome)) {
+    errors.push(`site.canonical must equal origin + basePath (${expectedHome}).`);
+  }
 }
 
 if (config.embed?.officialPage && !isHttpUrl(config.embed.officialPage)) {
@@ -33,18 +58,29 @@ if (runtime) {
   }
 }
 
-if (config.status?.deploymentReady === true) {
-  if (config.status?.research !== 'resolved') errors.push('deploymentReady requires status.research = "resolved".');
-  if (config.status?.onPageSeo !== 'pass') errors.push('deploymentReady requires status.onPageSeo = "pass".');
-  if (!isProductionHttpsUrl(config.site?.canonical || '')) errors.push('deploymentReady requires a real HTTPS production canonical; placeholders/localhost are not allowed.');
-  if (Array.isArray(config.status?.blockingIssues) && config.status.blockingIssues.length > 0) errors.push('deploymentReady cannot be true while status.blockingIssues is non-empty.');
-  if (config.site?.mode === 'play-first' && config.embed?.status !== 'verified') errors.push('deploymentReady play-first sites require a verified embed.');
-  if (!Array.isArray(config.sources) || config.sources.length === 0) errors.push('deploymentReady requires recorded research sources.');
-  if (!Array.isArray(config.pages) || config.pages.length === 0) errors.push('deploymentReady requires pages[].');
+for (const page of Array.isArray(config.pages) ? config.pages : []) {
+  if (origin && page?.path && page?.canonical) {
+    const expected = resolveSiteUrl(config, page.path);
+    if (normalizeUrl(page.canonical) !== normalizeUrl(expected)) {
+      errors.push(`Page ${page.path} canonical must resolve from site.origin + site.basePath (${expected}).`);
+    }
+  }
 }
 
-if (config.site?.mode === 'auto' && config.status?.research === 'resolved') {
-  warnings.push('Research is resolved but site.mode is still "auto"; choose play-first or guide before production QA.');
+if (config.status?.research === 'resolved') {
+  if (config.site?.mode === 'auto') errors.push('Resolved research requires site.mode to be play-first or guide.');
+  if (!Array.isArray(config.sources) || config.sources.length === 0) errors.push('Resolved research requires recorded research sources.');
+  if (!Array.isArray(config.pages) || config.pages.length === 0) errors.push('Resolved research requires pages[].');
+}
+
+if (config.status?.onPageSeo === 'pass') {
+  if (config.status?.research !== 'resolved') errors.push('On-Page SEO pass requires status.research = "resolved".');
+  if (!isProductionHttpsUrl(origin)) errors.push('On-Page SEO pass requires a real production site.origin.');
+  if (!isProductionHttpsUrl(canonical)) errors.push('On-Page SEO pass requires a real production site.canonical.');
+}
+
+if (Array.isArray(config.status?.blockingIssues) && config.status.blockingIssues.length > 0 && config.status?.onPageSeo === 'pass') {
+  warnings.push('On-Page SEO is marked pass while blockingIssues remain; final release QA will still report Deployment-ready: NO if a hard gate fails.');
 }
 
 const ok = printResult(`Open WebGame config audit: ${configPath}`, errors, warnings);
