@@ -71,9 +71,15 @@ if (home) {
   const homePath = path.join(siteDir, home.file);
   if (fs.existsSync(homePath)) {
     const html = fs.readFileSync(homePath, 'utf8');
+    const hrefs = [...html.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)].map((match) => match[1].trim());
     for (const page of indexable) {
       if (page.path === '/') continue;
-      const linked = html.includes(`href="${page.path}"`) || html.includes(`href='${page.path}'`) || html.includes(`href=".${page.path}"`) || html.includes(`href='.${page.path}'`);
+      const linked = hrefs.some((href) => {
+        if (!href || href.startsWith('#')) return false;
+        if (/^https?:\/\//i.test(href)) return normalizeUrl(href) === normalizeUrl(page.canonical);
+        const local = href.split(/[?#]/)[0];
+        return local === page.path || local === `.${page.path}`;
+      });
       if (!linked) warnings.push(`Homepage does not appear to link to indexable route ${page.path}; review orphan risk.`);
     }
   }
