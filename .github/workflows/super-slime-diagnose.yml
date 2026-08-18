@@ -1,0 +1,38 @@
+name: Super Slime Runtime Diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/diagnose-super-slime.mjs'
+      - '.github/workflows/super-slime-diagnose.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Diagnose live Super Slime boot
+        run: node scripts/diagnose-super-slime.mjs
+      - name: Upload diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: super-slime-runtime-diagnostic
+          path: qa-artifacts/super-slime-diagnostic/
+          retention-days: 7
