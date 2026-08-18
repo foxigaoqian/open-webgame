@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
+  "schemaVersion": "0.3.3",
+  "game": {
+    "name": "Fields of Mistria",
+    "developer": "NPC Studio",
+    "genre": "Farming Sim / Life Sim / RPG / Simulation",
+    "officialUrl": "https://store.steampowered.com/app/2142790/Fields_of_Mistria/",
+    "platforms": ["Windows", "Linux", "SteamOS"]
+  },
+  "site": {
+    "language": "en",
+    "mode": "guide",
+    "origin": "https://foxigaoqian.github.io",
+    "basePath": "/open-webgame/fields-of-mistria",
+    "canonical": "https://foxigaoqian.github.io/open-webgame/fields-of-mistria/",
+    "stack": "static-html",
+    "deploymentTarget": "github-pages"
+  },
+  "i18n": {"enabled": false,"defaultLanguage": "en","xDefaultLanguage": "en","languages": [{"code": "en","label": "English","prefix": ""}]},
+  "seo": {
+    "primaryIntent": "Fields of Mistria wiki + 1.0 guide",
+    "primaryKeyword": "Fields of Mistria",
+    "secondaryIntents": ["Fields of Mistria wiki","Fields of Mistria 1.0","Fields of Mistria guide","Fields of Mistria romance","Fields of Mistria marriage","Fields of Mistria beginner guide","Fields of Mistria patch notes","Fields of Mistria system requirements"],
+    "canonicalPagePurpose": "Provide a current, source-backed Fields of Mistria 1.0 Wiki that covers latest official news, core systems, beginner progression, romance and marriage, farming, magic, mines, PC requirements, trust pages and official links without pretending the Steam game is browser-playable."
+  },
+  "embed": {"status": "unsupported","officialPage": "https://store.steampowered.com/app/2142790/Fields_of_Mistria/","host": "store.steampowered.com"},
+  "design": {"direction": "Bright nostalgic pixel-farming field guide with sky blue, grass green, cream paper panels, coral relationship accents and chunky game-native borders.","palette": ["#86c9df","#fff8dc","#5b9f67","#d97682","#e7ae4c","#263546"],"density": "medium","notes": "Derived from official Fields of Mistria 1.0 Steam artwork: bright blue skies, green fields, warm cream UI surfaces and expressive pixel-art / anime-fantasy character presentation. Structure follows the Wiki content-depth benchmark, not the Dear Passengers visual skin."},
+  "sources": [
+    {"id":"steam-main","type":"steam","url":"https://store.steampowered.com/app/2142790/Fields_of_Mistria/","label":"Official Fields of Mistria Steam store page","retrievedAt":"2026-08-18"},
+    {"id":"official-home","type":"official-site","url":"https://www.fieldsofmistria.com/","label":"Official Fields of Mistria website","retrievedAt":"2026-08-18"},
+    {"id":"official-faq","type":"official-site","url":"https://www.fieldsofmistria.com/faq","label":"Official Fields of Mistria FAQ","retrievedAt":"2026-08-18"},
+    {"id":"official-presskit","type":"official-site","url":"https://www.fieldsofmistria.com/presskit","label":"Official Fields of Mistria press kit","retrievedAt":"2026-08-18"},
+    {"id":"patch-100","type":"devlog","url":"https://www.fieldsofmistria.com/post/fields-of-mistria-s-1-0-update-patch-notes-are-here","label":"Official Fields of Mistria 1.0 patch notes","retrievedAt":"2026-08-18"},
+    {"id":"patch-102","type":"devlog","url":"https://www.fieldsofmistria.com/post/patch-notes-v1-0-2","label":"Official Fields of Mistria v1.0.2 patch notes","retrievedAt":"2026-08-18"}
+  ],
+  "claims": [
+    {"id":"full-release","text":"Fields of Mistria fully released into version 1.0 on August 5, 2026 after entering Early Access on August 5, 2024.","sourceIds":["steam-main","patch-100"],"status":"verified","volatility":"volatile","maxAgeDays":30,"usedIn":["hero","facts","news","faq","structured-data"]},
+    {"id":"current-version","text":"NPC Studio published Fields of Mistria patch v1.0.2 on August 18, 2026.","sourceIds":["patch-102"],"status":"verified","volatility":"volatile","maxAgeDays":3,"usedIn":["hero","facts","news","update-guide","faq"]},
+    {"id":"developer","text":"Fields of Mistria is developed and published by NPC Studio.","sourceIds":["steam-main","official-presskit"],"status":"verified","volatility":"stable","usedIn":["hero","facts","structured-data","attribution"]},
+    {"id":"core-systems","text":"The official game description includes character/farm customization, farming, fishing, mining, crafting, animal raising, magic, seasonal quests and festivals, 30+ villagers, romance and ancient-ruin exploration.","sourceIds":["steam-main","official-home"],"status":"verified","volatility":"stable","usedIn":["overview","systems","guides","faq"]},
+    {"id":"romance","text":"The current official description names 12 marriage candidates, and version 1.0 adds 10-heart proposal events, weddings, marriage and children.","sourceIds":["steam-main","patch-100"],"status":"verified","volatility":"stable","usedIn":["systems","romance-guide","update-guide","faq"]},
+    {"id":"town-progression","text":"Version 1.0 makes the Town Repair questline completable, raises Town Renown to 100 and allows the Museum to be completed.","sourceIds":["patch-100"],"status":"verified","volatility":"stable","usedIn":["news","getting-started","update-guide"]},
+    {"id":"platforms","text":"The current Steam listing publishes Windows and Linux/SteamOS system requirements, and NPC Studio's FAQ identifies Steam Deck compatibility.","sourceIds":["steam-main","official-faq"],"status":"verified","volatility":"volatile","maxAgeDays":30,"usedIn":["facts","release-state","requirements","structured-data"]},
+    {"id":"console-tba","text":"NPC Studio's current press kit lists console as TBA rather than announcing a console release date.","sourceIds":["official-presskit"],"status":"verified","volatility":"volatile","maxAgeDays":30,"usedIn":["release-state","faq"]},
+    {"id":"browser-unavailable","text":"No verified official browser/HTML5 runtime is provided by the current official Steam or Fields of Mistria distribution; the game is treated as a native PC Wiki build.","sourceIds":["steam-main","official-home"],"status":"verified","volatility":"volatile","maxAgeDays":7,"usedIn":["news","release-state","faq","disclaimer"]},
+    {"id":"patch-102-details","text":"Patch v1.0.2 adds hairstyles, performance and localization updates, fixes the Shooting Star Festival softlock and resolves multiple gameplay and crash issues.","sourceIds":["patch-102"],"status":"verified","volatility":"volatile","maxAgeDays":7,"usedIn":["news","update-guide","faq"]}
+  ],
+  "pages": [
+    {"path":"/","file":"index.html","intent":"Fields of Mistria 1.0 wiki hub with current news, systems, beginner guidance and official source links","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/","title":"Fields of Mistria Wiki & 1.0 Guide | Farming, Romance, Magic","indexable":true,"language":"en","translationKey":"home"},
+    {"path":"/guides/getting-started/","file":"guides/getting-started/index.html","intent":"Fields of Mistria beginner priorities, daily loop, stamina and town progression","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/guides/getting-started/","title":"Fields of Mistria Beginner Guide | First Days & Progression","indexable":true,"language":"en","translationKey":"guides-getting-started"},
+    {"path":"/guides/romance-marriage/","file":"guides/romance-marriage/index.html","intent":"Fields of Mistria 1.0 romance, proposal, wedding, marriage and children guide","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/guides/romance-marriage/","title":"Fields of Mistria Romance & Marriage Guide | 1.0","indexable":true,"language":"en","translationKey":"guides-romance-marriage"},
+    {"path":"/guides/farming-magic-mines/","file":"guides/farming-magic-mines/index.html","intent":"Fields of Mistria farming, magic, mines, resources and skill progression guide","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/guides/farming-magic-mines/","title":"Fields of Mistria Farming, Magic & Mines Guide | 1.0","indexable":true,"language":"en","translationKey":"guides-farming-magic-mines"},
+    {"path":"/updates/1-0/","file":"updates/1-0/index.html","intent":"Fields of Mistria 1.0 update features and current patch status","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/updates/1-0/","title":"Fields of Mistria 1.0 Update Guide | Patch v1.0.2","indexable":true,"language":"en","translationKey":"updates-1-0"},
+    {"path":"/about/","file":"about/index.html","intent":"About the independent Fields of Mistria Wiki and its source policy","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/about/","title":"About | Fields of Mistria Wiki","indexable":true,"language":"en","translationKey":"about"},
+    {"path":"/privacy/","file":"privacy/index.html","intent":"Privacy policy for the Fields of Mistria Wiki","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/privacy/","title":"Privacy Policy | Fields of Mistria Wiki","indexable":true,"language":"en","translationKey":"privacy"},
+    {"path":"/disclaimer/","file":"disclaimer/index.html","intent":"Unofficial fan guide disclaimer and rights attribution","canonical":"https://foxigaoqian.github.io/open-webgame/fields-of-mistria/disclaimer/","title":"Disclaimer | Fields of Mistria Wiki","indexable":true,"language":"en","translationKey":"disclaimer"}
+  ],
+  "security": {"allowedIframePermissions":[],"requireNoopenerForBlankTargets":true,"allowInlineScripts":true},
+  "status": {"research":"resolved","onPageSeo":"pass","blockingIssues":[]}
+}
