@@ -35,13 +35,13 @@
       "Super Slime Black Hole how to play",
       "Super Slime Black Hole tips"
     ],
-    "canonicalPagePurpose": "Let users play a directly embeddable HTML5 slime black-hole browser build and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
+    "canonicalPagePurpose": "Let users play the correct Super Slime: Black Hole GameDistribution HTML5 build and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
   },
   "embed": {
     "status": "verified",
-    "runtimeUrl": "https://html5.gamemonetize.games/hcx5y4cogxnwjvozussfta9q00905zv6/",
-    "officialPage": "https://gamemonetize.com/growball-feed-to-grow-game",
-    "host": "html5.gamemonetize.games"
+    "runtimeUrl": "https://html5.gamedistribution.com/a5ad329e688a43ecbdb5611008a56c3a/",
+    "officialPage": "https://www.kizi.com/games/super-slime-black-hole",
+    "host": "html5.gamedistribution.com"
   },
   "design": {
     "direction": "Bright gummy 3D casual-game interface with aqua slime, berry-pink action accents, rounded blob shapes and strong dark outlines.",
@@ -55,20 +55,27 @@
       "type": "other",
       "url": "https://apps.apple.com/us/app/super-big-slime-black-hole-3d/id6446140658",
       "label": "Official Apple App Store listing by Supercent, Inc.",
-      "retrievedAt": "2026-08-15"
+      "retrievedAt": "2026-08-18"
     },
     {
       "id": "google-official",
       "type": "other",
       "url": "https://play.google.com/store/apps/details?id=io.supercent.bigslimemanyslime",
       "label": "Official Google Play listing by Supercent, Inc.",
-      "retrievedAt": "2026-08-15"
+      "retrievedAt": "2026-08-18"
     },
     {
-      "id": "gamemonetize-browser",
+      "id": "kizi-browser",
       "type": "verified-gameplay",
-      "url": "https://gamemonetize.com/growball-feed-to-grow-game",
-      "label": "GameMonetize HTML5 page with explicit third-party iframe code",
+      "url": "https://www.kizi.com/games/super-slime-black-hole",
+      "label": "Kizi Super Slime: Black Hole browser page",
+      "retrievedAt": "2026-08-18"
+    },
+    {
+      "id": "gamedistribution-runtime",
+      "type": "verified-gameplay",
+      "url": "https://html5.gamedistribution.com/a5ad329e688a43ecbdb5611008a56c3a/?gd_sdk_referrer_url=https%3A%2F%2Fwww.kizi.com%2Fgames%2Fsuper-slime-black-hole",
+      "label": "GameDistribution HTML5 runtime used for the Kizi Super Slime: Black Hole page",
       "retrievedAt": "2026-08-18"
     }
   ],
@@ -84,7 +91,7 @@
     {
       "id": "core-loop",
       "text": "The core loop is to swallow objects smaller than the slime, grow larger, and progress to bigger targets under time pressure.",
-      "sourceIds": ["apple-official", "google-official", "gamemonetize-browser"],
+      "sourceIds": ["apple-official", "google-official", "kizi-browser"],
       "status": "verified",
       "volatility": "stable",
       "usedIn": ["hero", "how-to-play", "tips", "faq"]
@@ -116,8 +123,8 @@
     },
     {
       "id": "browser-build",
-      "text": "GameMonetize publishes a mobile-ready HTML5 slime black-hole build and explicitly provides iframe code for third-party websites.",
-      "sourceIds": ["gamemonetize-browser"],
+      "text": "The correct Super Slime: Black Hole browser build uses GameDistribution runtime ID a5ad329e688a43ecbdb5611008a56c3a.",
+      "sourceIds": ["kizi-browser", "gamedistribution-runtime"],
       "status": "verified",
       "volatility": "volatile",
       "maxAgeDays": 14,
