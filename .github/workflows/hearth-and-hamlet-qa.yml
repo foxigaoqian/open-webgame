@@ -1,0 +1,89 @@
+name: Hearth and Hamlet Site QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/hearth-and-hamlet-site/**'
+      - 'scripts/**'
+      - 'schema/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/hearth-and-hamlet-qa.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/hearth-and-hamlet-site/**'
+      - 'scripts/**'
+      - 'schema/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/hearth-and-hamlet-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Dependency security audit
+        run: npm run check:deps
+
+      - name: Validate project config
+        run: npm run check:config -- --config examples/hearth-and-hamlet-site/open-webgame.json
+
+      - name: Validate source-backed content
+        run: npm run check:content -- --config examples/hearth-and-hamlet-site/open-webgame.json
+
+      - name: Validate site architecture
+        run: npm run check:site -- --config examples/hearth-and-hamlet-site/open-webgame.json --site-dir examples/hearth-and-hamlet-site
+
+      - name: Validate multilingual SEO
+        run: npm run check:i18n -- --config examples/hearth-and-hamlet-site/open-webgame.json --site-dir examples/hearth-and-hamlet-site
+
+      - name: Validate On-Page SEO
+        run: npm run check:seo -- --config examples/hearth-and-hamlet-site/open-webgame.json --html examples/hearth-and-hamlet-site/index.html --site-dir examples/hearth-and-hamlet-site
+
+      - name: Validate iframe permissions
+        run: npm run check:security -- --config examples/hearth-and-hamlet-site/open-webgame.json --html examples/hearth-and-hamlet-site/index.html
+
+      - name: Validate embed configuration
+        run: npm run verify:embed:config -- --config examples/hearth-and-hamlet-site/open-webgame.json
+
+      - name: Run regression tests
+        run: npm test
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser and accessibility QA
+        run: npm run qa:browser -- --config examples/hearth-and-hamlet-site/open-webgame.json --site-dir examples/hearth-and-hamlet-site --artifacts qa-artifacts/hearth-and-hamlet-browser
+
+      - name: Run Lighthouse QA
+        run: npm run qa:lighthouse -- --config examples/hearth-and-hamlet-site/open-webgame.json --site-dir examples/hearth-and-hamlet-site --artifacts qa-artifacts/hearth-and-hamlet-lighthouse
+
+      - name: Upload QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hearth-and-hamlet-quality-artifacts
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
