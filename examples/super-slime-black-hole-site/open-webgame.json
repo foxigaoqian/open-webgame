@@ -35,13 +35,13 @@
       "Super Slime Black Hole how to play",
       "Super Slime Black Hole tips"
     ],
-    "canonicalPagePurpose": "Let users play the Kiz10-hosted HTML5 version and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
+    "canonicalPagePurpose": "Let users play a directly embeddable HTML5 slime black-hole browser build and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
   },
   "embed": {
     "status": "verified",
-    "runtimeUrl": "https://kiz10.com/embed/super-slime---black-hole-game/",
-    "officialPage": "https://kiz10.com/super-slime---black-hole-game/",
-    "host": "kiz10.com"
+    "runtimeUrl": "https://html5.gamemonetize.games/hcx5y4cogxnwjvozussfta9q00905zv6/",
+    "officialPage": "https://gamemonetize.com/growball-feed-to-grow-game",
+    "host": "html5.gamemonetize.games"
   },
   "design": {
     "direction": "Bright gummy 3D casual-game interface with aqua slime, berry-pink action accents, rounded blob shapes and strong dark outlines.",
@@ -65,11 +65,11 @@
       "retrievedAt": "2026-08-15"
     },
     {
-      "id": "kiz10-browser",
-      "type": "other",
-      "url": "https://kiz10.com/super-slime---black-hole-game/",
-      "label": "Kiz10 HTML5 browser page and public iframe embed",
-      "retrievedAt": "2026-08-15"
+      "id": "gamemonetize-browser",
+      "type": "verified-gameplay",
+      "url": "https://gamemonetize.com/growball-feed-to-grow-game",
+      "label": "GameMonetize HTML5 page with explicit third-party iframe code",
+      "retrievedAt": "2026-08-18"
     }
   ],
   "claims": [
@@ -84,14 +84,14 @@
     {
       "id": "core-loop",
       "text": "The core loop is to swallow objects smaller than the slime, grow larger, and progress to bigger targets under time pressure.",
-      "sourceIds": ["apple-official", "google-official", "kiz10-browser"],
+      "sourceIds": ["apple-official", "google-official", "gamemonetize-browser"],
       "status": "verified",
       "volatility": "stable",
       "usedIn": ["hero", "how-to-play", "tips", "faq"]
     },
     {
       "id": "bosses",
-      "text": "The game includes giant boss encounters where the slime's size and collected mass matter for the fight.",
+      "text": "The mobile game includes giant boss encounters where the slime's size and collected mass matter for the fight.",
       "sourceIds": ["apple-official", "google-official"],
       "status": "verified",
       "volatility": "stable",
@@ -116,21 +116,12 @@
     },
     {
       "id": "browser-build",
-      "text": "Kiz10 currently lists an HTML5 browser version and publishes an iframe embed for Super Slime - Black Hole Game.",
-      "sourceIds": ["kiz10-browser"],
+      "text": "GameMonetize publishes a mobile-ready HTML5 slime black-hole build and explicitly provides iframe code for third-party websites.",
+      "sourceIds": ["gamemonetize-browser"],
       "status": "verified",
       "volatility": "volatile",
       "maxAgeDays": 14,
-      "usedIn": ["hero", "player", "faq"]
-    },
-    {
-      "id": "browser-platforms",
-      "text": "Kiz10 currently lists the browser-hosted version for desktop, mobile and tablet browsers.",
-      "sourceIds": ["kiz10-browser"],
-      "status": "verified",
-      "volatility": "volatile",
-      "maxAgeDays": 14,
-      "usedIn": ["guide", "structured-data"]
+      "usedIn": ["player", "faq"]
     }
   ],
   "pages": [
