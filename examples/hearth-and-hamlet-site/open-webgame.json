@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/foxigaoqian/open-webgame/main/schema/open-webgame.schema.json",
+  "schemaVersion": "0.3.3",
+  "game": {
+    "name": "Hearth and Hamlet",
+    "developer": "Phorust Studios",
+    "genre": "Casual / Simulation / Strategy / Incremental City Builder",
+    "officialUrl": "https://store.steampowered.com/app/4315040/Hearth_and_Hamlet/",
+    "platforms": ["Windows", "Linux", "SteamOS"]
+  },
+  "site": {
+    "language": "en",
+    "mode": "guide",
+    "origin": "https://hearth-and-hamlet.dearpassengerscrew-new.workers.dev",
+    "basePath": "",
+    "canonical": "https://hearth-and-hamlet.dearpassengerscrew-new.workers.dev/",
+    "stack": "static-html",
+    "deploymentTarget": "cloudflare-workers"
+  },
+  "i18n": {
+    "enabled": false,
+    "defaultLanguage": "en",
+    "xDefaultLanguage": "en",
+    "languages": [{"code": "en", "label": "English", "prefix": ""}]
+  },
+  "seo": {
+    "primaryIntent": "game guide + demo + release date",
+    "primaryKeyword": "Hearth and Hamlet",
+    "secondaryIntents": ["Hearth and Hamlet demo", "Hearth and Hamlet release date", "Hearth and Hamlet guide", "Hearth and Hamlet gameplay", "Hearth and Hamlet Steam"],
+    "canonicalPagePurpose": "Help users understand Hearth and Hamlet, find the official Steam demo and full game, and learn the verified resource, worker, research, policy, magic and trade systems without inventing a browser player."
+  },
+  "embed": {
+    "status": "unsupported",
+    "officialPage": "https://store.steampowered.com/app/4315040/Hearth_and_Hamlet/",
+    "host": "store.steampowered.com"
+  },
+  "design": {
+    "direction": "Cozy medieval pixel-management interface with parchment panels, forest greens, warm hearth orange, squared pixel edges and compact kingdom-management information.",
+    "palette": ["#263b2d", "#4f6750", "#f3efe2", "#b17a49", "#d8974f", "#f2cf74"],
+    "density": "medium",
+    "notes": "Derived from the game's official Steam artwork and screenshots: top-down green settlements, wood-and-parchment UI, compact resource bars and warm medieval pixel art."
+  },
+  "sources": [
+    {"id": "steam-main", "type": "steam", "url": "https://store.steampowered.com/app/4315040/Hearth_and_Hamlet/", "label": "Official Hearth and Hamlet Steam store page", "retrievedAt": "2026-08-18"},
+    {"id": "steam-demo", "type": "steam", "url": "https://store.steampowered.com/app/4564480/Hearth_and_Hamlet_Demo/", "label": "Official Hearth and Hamlet Demo Steam listing", "retrievedAt": "2026-08-18"},
+    {"id": "steam-announcements", "type": "devlog", "url": "https://steamcommunity.com/app/4315040/announcements/", "label": "Official Hearth and Hamlet Steam announcements", "retrievedAt": "2026-08-18"},
+    {"id": "itch-developer", "type": "itch", "url": "https://phorust.itch.io/", "label": "Phorust developer profile on itch.io listing Hearth and Hamlet Demo without a browser-play signal", "retrievedAt": "2026-08-18"}
+  ],
+  "claims": [
+    {"id": "developer-publishers", "text": "Hearth and Hamlet is developed by Phorust Studios and the current Steam listing names Runic Forge and Gamersky Games as publishers.", "sourceIds": ["steam-main"], "status": "verified", "volatility": "stable", "usedIn": ["hero", "structured-data", "faq", "attribution"]},
+    {"id": "release-date", "text": "The announced full release date for Hearth and Hamlet is August 19, 2026.", "sourceIds": ["steam-main", "steam-announcements"], "status": "verified", "volatility": "volatile", "maxAgeDays": 30, "usedIn": ["title-context", "hero", "demo-release", "faq", "structured-data"]},
+    {"id": "demo", "text": "An official Hearth and Hamlet demo launched on Steam on April 20, 2026.", "sourceIds": ["steam-demo", "steam-announcements"], "status": "verified", "volatility": "volatile", "maxAgeDays": 30, "usedIn": ["hero", "demo-release", "faq"]},
+    {"id": "core-loop", "text": "Hearth and Hamlet is an incremental medieval city builder built around gathering resources, assigning workers, constructing buildings and steadily growing a settlement.", "sourceIds": ["steam-main", "steam-demo"], "status": "verified", "volatility": "stable", "usedIn": ["hero", "overview", "guide", "faq"]},
+    {"id": "management-systems", "text": "Official descriptions include policies and laws, permanent research, magic and alchemy, trade with neighboring kingdoms and soldier recruitment.", "sourceIds": ["steam-main"], "status": "verified", "volatility": "stable", "usedIn": ["overview", "systems", "guide", "faq"]},
+    {"id": "resources", "text": "The official feature list names food, wood, stone and gold among the resources workers can gather.", "sourceIds": ["steam-main"], "status": "verified", "volatility": "stable", "usedIn": ["overview", "guide", "faq"]},
+    {"id": "platforms", "text": "The current full-game Steam page publishes system requirements for Windows and Linux/SteamOS.", "sourceIds": ["steam-main"], "status": "verified", "volatility": "volatile", "maxAgeDays": 30, "usedIn": ["structured-data", "config"]},
+    {"id": "browser-unavailable", "text": "No verified official browser/HTML5 runtime was found for Hearth and Hamlet in the official Steam distribution or the developer's itch.io listing during this build.", "sourceIds": ["steam-main", "steam-demo", "itch-developer"], "status": "verified", "volatility": "volatile", "maxAgeDays": 7, "usedIn": ["availability", "demo-release", "faq", "footer"]}
+  ],
+  "pages": [
+    {"path": "/", "file": "index.html", "intent": "learn about Hearth and Hamlet, find its demo and release information, and understand its verified kingdom-building systems", "canonical": "https://hearth-and-hamlet.dearpassengerscrew-new.workers.dev/", "title": "Hearth and Hamlet Guide, Demo & Release Date | Gameplay Tips", "indexable": true, "language": "en", "translationKey": "home"}
+  ],
+  "security": {"allowedIframePermissions": [], "requireNoopenerForBlankTargets": true, "allowInlineScripts": true},
+  "status": {"research": "resolved", "onPageSeo": "pass", "blockingIssues": []}
+}
