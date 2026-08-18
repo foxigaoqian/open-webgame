@@ -9,7 +9,7 @@ a{color:var(--grass-dark);text-underline-offset:3px}a:hover{color:#244f34}img{ma
 .brand-mark{width:34px;height:34px;flex:0 0 34px;border:3px solid var(--line);border-radius:8px;display:grid;place-items:center;background:var(--grass);color:white;box-shadow:3px 3px 0 var(--line);font-size:20px}
 .nav-links{margin-left:auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;min-width:0}.nav-links a{text-decoration:none;font-weight:800;font-size:.92rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border:3px solid var(--line);border-radius:10px;padding:10px 15px;font-weight:900;background:var(--paper);box-shadow:4px 4px 0 var(--line);transition:.12s transform,.12s box-shadow;color:var(--ink)}
-.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line);color:var(--ink)}.btn.primary{background:var(--grass);color:white}.btn.rose{background:var(--rose);color:white}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line);color:var(--ink)}.btn.primary{background:var(--grass-dark);color:white}.btn.rose{background:#a34756;color:white}
 .hero{padding:54px 0 28px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;min-width:0}
 .eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:.82rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:#e8f5d7;border:2px solid #7b9d59;border-radius:999px;padding:6px 10px}
 h1,h2,h3{line-height:1.15;margin-top:0}h1{font-size:clamp(2.7rem,7vw,5.4rem);letter-spacing:-.055em;margin:.18em 0 .25em}h1 .soft{color:var(--grass-dark)}
