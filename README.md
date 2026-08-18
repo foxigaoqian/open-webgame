@@ -40,6 +40,7 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Game-native visual design** — derive palette, typography mood, cards, borders, shadows, texture and interaction style from the current game.
 - **Play-first architecture** — put the game near the top when embedding is verified, with lazy load, reload, fullscreen and official fallback behavior.
 - **Mandatory On-Page SEO** — search intent, title, H1, canonical, metadata, internal links, structured data, images, robots and sitemap are hard QA requirements.
+- **Focused index strategy** — start with one strong game page; index only distinct, standalone player intents and keep support/duplicate routes out of sitemap and hreflang clusters.
 - **Real multilingual SEO** — optional localized routes, reciprocal hreflang, x-default, locale canonicals and multilingual sitemap validation.
 - **Strict project schema** — AJV rejects unknown or misspelled configuration fields.
 - **Browser + accessibility QA** — Playwright runs desktop/tablet/mobile, verifies the real runtime child frame, runs axe and saves real screenshots/reports.
@@ -339,9 +340,10 @@ A production page must then pass checks for:
 - no accidental `noindex`
 - production `robots.txt`
 - production `sitemap.xml`
+- exact agreement between declared indexability, page robots directives and sitemap membership
 - mobile usability + performance readiness
 
-See [`references/on-page-seo.md`](./references/on-page-seo.md) and [`references/qa-checklist.md`](./references/qa-checklist.md).
+See [`references/on-page-seo.md`](./references/on-page-seo.md), [`references/focused-game-seo.md`](./references/focused-game-seo.md) and [`references/qa-checklist.md`](./references/qa-checklist.md).
 
 ## Multilingual SEO
 

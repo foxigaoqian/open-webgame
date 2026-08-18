@@ -76,9 +76,11 @@ A production site cannot pass QA unless every applicable item below passes.
 
 - [ ] Primary game entity is explicitly defined
 - [ ] Primary search intent is explicitly defined
+- [ ] Every proposed route has a player task, standalone-value reason and explicit indexability decision
 - [ ] Primary keyword/query is natural and accurate
 - [ ] Homepage opening section makes the game/topic obvious without relying on the iframe
 - [ ] Game name appears naturally in the important page signals
+- [ ] Opening copy answers the player's need without exposing internal research/workflow labels
 
 ## Title and meta
 
@@ -159,6 +161,11 @@ A production site cannot pass QA unless every applicable item below passes.
 - [ ] Production `robots.txt` exists
 - [ ] Production `sitemap.xml` exists
 - [ ] Sitemap contains canonical indexable production URLs only
+- [ ] Every indexable canonical appears in the sitemap
+- [ ] Every non-indexable HTML route emits `noindex,follow`
+- [ ] Non-indexable routes are absent from sitemap and hreflang clusters
+- [ ] `pages[].indexable`, robots directives, canonical, sitemap and hreflang agree
+- [ ] `noindex` pages are crawlable so search engines can see the directive
 - [ ] Staging/preview URLs are not in the production sitemap
 
 ## Performance / Core Web Vitals readiness

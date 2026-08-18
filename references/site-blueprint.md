@@ -143,6 +143,8 @@ Add only when there is real content depth:
 
 Each page must satisfy a distinct user intent. Do not generate thin doorway pages.
 
+Classify every proposed route before building it. Index only pages with distinct standalone value. Keep useful duplicate, tool-state or operational routes accessible with `noindex,follow`, omit them from sitemap/hreflang output, and follow [`focused-game-seo.md`](./focused-game-seo.md).
+
 ## Design derivation
 
 Create a design brief from official visual assets before coding.

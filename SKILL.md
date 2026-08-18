@@ -27,6 +27,7 @@ Read and follow:
 
 - [`references/iframe-verification.md`](./references/iframe-verification.md)
 - [`references/on-page-seo.md`](./references/on-page-seo.md)
+- [`references/focused-game-seo.md`](./references/focused-game-seo.md)
 - [`references/site-blueprint.md`](./references/site-blueprint.md)
 - [`references/qa-checklist.md`](./references/qa-checklist.md)
 
@@ -67,6 +68,8 @@ Use claims for facts that materially affect the user: controls, platforms, brows
 ## Page architecture
 
 Populate `pages[]` before generating deeper routes. Every page needs a distinct path, output file, intent, canonical and indexability decision. Create a route only when a distinct real user intent has enough useful content. Avoid duplicate intent pages and orphan routes.
+
+Treat indexability as a limited budget. Start with one strong canonical page. Keep useful but thin, duplicate, filtered or operational routes accessible with `noindex,follow`, and omit them from sitemaps and hreflang clusters. The HTML robots directive, canonical, sitemap and `pages[].indexable` decision must agree. Follow [`references/focused-game-seo.md`](./references/focused-game-seo.md).
 
 ## Least-privilege embeds
 
@@ -442,6 +445,19 @@ Do not force modifiers such as `free`, `online`, `unblocked`, `codes`, `download
 
 The page structure must be driven by actual player intent, not by a generic SEO checklist.
 
+Before creating routes, build an index plan:
+
+```text
+Route: <path>
+Player task: <one distinct task>
+Standalone value: <why this deserves a page>
+Indexable: yes | no
+Canonical: <production URL>
+Internal links: <where discovery comes from>
+```
+
+If two proposed pages solve substantially the same player task, merge them. If a support page remains useful but lacks standalone search value, keep it accessible with `noindex,follow` and omit it from sitemap/hreflang output.
+
 ## Phase 5 — Build the game research brief
 
 ### Identity
@@ -675,7 +691,7 @@ robots.txt
 sitemap.xml
 ```
 
-The sitemap must contain canonical indexable production URLs only.
+The sitemap must contain every canonical indexable production URL and no non-indexable URL. Non-indexable HTML routes must emit `noindex,follow`; do not block them in `robots.txt`, because crawlers need to fetch the directive. Hreflang clusters contain indexable localized equivalents only.
 
 Multi-page sites must not contain orphan pages.
 
