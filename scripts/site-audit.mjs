@@ -16,7 +16,25 @@ const paths = new Set();
 const files = new Set();
 const canonicals = new Set();
 const intents = new Map();
+const pageDocuments = new Map();
 let home = null;
+
+const getAttribute = (tag, name) => {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, 'i'));
+  return match ? match[1].trim() : '';
+};
+
+const getRobotsDirectives = (html) => [...html.matchAll(/<meta\b[^>]*>/gi)]
+  .filter((match) => getAttribute(match[0], 'name').toLowerCase() === 'robots')
+  .flatMap((match) => getAttribute(match[0], 'content').toLowerCase().split(/[\s,]+/))
+  .filter(Boolean);
+
+const decodeXml = (value) => value
+  .replaceAll('&amp;', '&')
+  .replaceAll('&lt;', '<')
+  .replaceAll('&gt;', '>')
+  .replaceAll('&quot;', '"')
+  .replaceAll('&apos;', "'");
 
 for (const page of pages) {
   const route = String(page.path || '').trim();
@@ -33,7 +51,20 @@ for (const page of pages) {
   files.add(file);
 
   const abs = path.resolve(siteDir, file || '__missing__');
-  if (!fs.existsSync(abs)) errors.push(`Page file does not exist: ${file}.`);
+  if (!fs.existsSync(abs)) {
+    errors.push(`Page file does not exist: ${file}.`);
+  } else {
+    const html = fs.readFileSync(abs, 'utf8');
+    pageDocuments.set(route, html);
+    const directives = getRobotsDirectives(html);
+    const hasNoindex = directives.includes('noindex') || directives.includes('none');
+    if (page.indexable === false && !hasNoindex) {
+      errors.push(`Non-indexable page ${route} must emit a robots noindex directive.`);
+    }
+    if (page.indexable !== false && hasNoindex) {
+      errors.push(`Indexable page ${route} must not emit a robots noindex directive.`);
+    }
+  }
 
   if (!canonical.startsWith('https://')) errors.push(`Page ${route} canonical must be HTTPS.`);
   const normalizedCanonical = normalizeUrl(canonical);
@@ -42,8 +73,9 @@ for (const page of pages) {
 
   if (!intent) errors.push(`Page ${route} is missing intent.`);
   if (page.indexable !== false) {
-    if (intents.has(intent)) warnings.push(`Indexable pages share intent "${intent}": ${intents.get(intent)} and ${route}. Review cannibalization.`);
-    else intents.set(intent, route);
+    const normalizedIntent = intent.toLowerCase().replace(/\s+/g, ' ');
+    if (intents.has(normalizedIntent)) errors.push(`Indexable pages share intent "${intent}": ${intents.get(normalizedIntent)} and ${route}. Merge them or declare a distinct player task.`);
+    else intents.set(normalizedIntent, route);
   }
 
   if (route === '/') home = page;
@@ -61,8 +93,15 @@ if (config.status?.onPageSeo === 'pass') {
     errors.push('On-Page SEO pass requires sitemap.xml.');
   } else {
     const sitemap = fs.readFileSync(sitemapPath, 'utf8');
+    const sitemapUrls = [...sitemap.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)]
+      .map((match) => normalizeUrl(decodeXml(match[1].trim())));
+    const sitemapUrlSet = new Set(sitemapUrls);
+    if (sitemapUrlSet.size !== sitemapUrls.length) errors.push('sitemap.xml contains duplicate <loc> URLs.');
     for (const page of indexable) {
-      if (!sitemap.includes(page.canonical)) errors.push(`sitemap.xml is missing ${page.canonical}.`);
+      if (!sitemapUrlSet.has(normalizeUrl(page.canonical))) errors.push(`sitemap.xml is missing ${page.canonical}.`);
+    }
+    for (const page of pages.filter((candidate) => candidate.indexable === false)) {
+      if (sitemapUrlSet.has(normalizeUrl(page.canonical))) errors.push(`sitemap.xml must omit non-indexable page ${page.canonical}.`);
     }
   }
 }
@@ -70,7 +109,7 @@ if (config.status?.onPageSeo === 'pass') {
 if (home) {
   const homePath = path.join(siteDir, home.file);
   if (fs.existsSync(homePath)) {
-    const html = fs.readFileSync(homePath, 'utf8');
+    const html = pageDocuments.get('/') || fs.readFileSync(homePath, 'utf8');
     const hrefs = [...html.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)].map((match) => match[1].trim());
     for (const page of indexable) {
       if (page.path === '/') continue;

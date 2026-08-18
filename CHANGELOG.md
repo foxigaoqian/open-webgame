@@ -2,6 +2,17 @@
 
 All notable project changes are documented here.
 
+## Unreleased
+
+### Added
+
+- Focused game SEO guidance distilled into reusable one-entity/one-intent, player-language, index-budget and internal-link rules.
+- Regression coverage for duplicate indexable intents, non-indexable page directives and exact sitemap/indexability agreement.
+
+### Changed
+
+- Site architecture QA now fails duplicate indexable intents, indexable pages carrying `noindex`, non-indexable HTML pages missing `noindex`, and non-indexable canonicals leaked into the sitemap.
+
 ## 0.3.3 — 2026-08-15
 
 ### Added

@@ -150,6 +150,8 @@ Do not pad word count. There is no required minimum word count.
 
 The page should be as detailed as necessary to satisfy the intent and no longer.
 
+Lead with the answer a player came for. Use player-facing labels such as `Quick answer`, `How to play`, `Controls` and `Beginner tips`. Keep internal research labels such as `evidence ledger`, `verification state` or `source registry` out of public copy; preserve that rigor in project data instead.
+
 ## 8. Keyword and entity use
 
 Use the exact game name in important locations where natural:
@@ -267,7 +269,11 @@ Production output must include:
 
 Requirements:
 
-- sitemap includes canonical indexable URLs only
+- sitemap includes every canonical indexable URL and no non-indexable URL
+- each non-indexable HTML route emits `noindex,follow` and is omitted from the sitemap
+- `pages[].indexable`, HTML robots directives, canonical policy, sitemap membership and hreflang membership agree
+- non-indexable routes are omitted from hreflang clusters
+- `noindex` pages are not blocked in robots.txt; crawlers must fetch them to see the directive
 - robots.txt does not accidentally block production pages/assets required for rendering
 - do not put staging or preview URLs in the production sitemap
 
@@ -285,6 +291,8 @@ Do not create pages such as:
 when they all satisfy the same intent with near-identical content.
 
 Create a separate route only when it has a distinct user purpose and enough real information to deserve its own page.
+
+Useful support pages that do not meet that bar may remain accessible with `noindex,follow`. `noindex` is an index-budget decision, not a requirement to delete the page.
 
 Avoid scaled doorway content and mass-produced pages with only the game name changed.
 
@@ -347,6 +355,8 @@ A build fails the SEO gate if any of these are true:
 - page is thin/filler content around a player
 - important images cause avoidable layout shifts or have misleading alt text
 - multi-page site has orphan or duplicate-intent pages
+- indexability, robots, canonical, sitemap or hreflang signals disagree
+- non-indexable HTML page lacks `noindex` or appears in the sitemap
 - sitemap/robots are missing from a production deliverable
 - structured data contains invented facts
 - production page is accidentally noindexed
@@ -364,3 +374,5 @@ Blocking SEO issues: <none or list>
 ```
 
 A project cannot be marked `deployment-ready: YES` while `ON-PAGE SEO: FAIL`.
+
+See [`focused-game-seo.md`](./focused-game-seo.md) for the focused one-entity/one-intent pattern and index-budget decision table.
