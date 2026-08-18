@@ -29,7 +29,7 @@
   },
   "seo": {
     "primaryIntent": "play + beginner guide",
-    "primaryKeyword": "Super Slime Black Hole",
+    "primaryKeyword": "Super Big Slime: Black Hole 3D",
     "secondaryIntents": [
       "Super Slime Black Hole online",
       "Super Slime Black Hole how to play",
@@ -135,9 +135,9 @@
     {
       "path": "/",
       "file": "index.html",
-      "intent": "play Super Slime: Black Hole and learn the beginner loop in English",
+      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in English",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/",
-      "title": "Play Super Slime: Black Hole Online | Guide & Tips",
+      "title": "Play Super Big Slime: Black Hole 3D Online | Guide & Tips",
       "indexable": true,
       "language": "en",
       "translationKey": "home"
@@ -145,9 +145,9 @@
     {
       "path": "/ja/",
       "file": "ja/index.html",
-      "intent": "play Super Slime: Black Hole and learn the beginner loop in Japanese",
+      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in Japanese",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/ja/",
-      "title": "Super Slime: Black Holeをブラウザでプレイ | 攻略ガイド",
+      "title": "Super Big Slime: Black Hole 3Dをブラウザでプレイ | 攻略ガイド",
       "indexable": true,
       "language": "ja",
       "translationKey": "home"
@@ -155,9 +155,9 @@
     {
       "path": "/ko/",
       "file": "ko/index.html",
-      "intent": "play Super Slime: Black Hole and learn the beginner loop in Korean",
+      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in Korean",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/ko/",
-      "title": "Super Slime: Black Hole 온라인 플레이 | 공략과 팁",
+      "title": "Super Big Slime: Black Hole 3D 온라인 플레이 | 공략과 팁",
       "indexable": true,
       "language": "ko",
       "translationKey": "home"
