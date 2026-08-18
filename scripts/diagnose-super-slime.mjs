@@ -8,11 +8,15 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 const page = await context.newPage();
 const events = [];
-const push = (type, value) => events.push({ at: new Date().toISOString(), type, value: String(value).slice(0, 1200) });
+const push = (type, value) => events.push({ at: new Date().toISOString(), type, value: String(value).slice(0, 1800) });
 
 page.on('console', (msg) => push(`console:${msg.type()}`, msg.text()));
 page.on('pageerror', (err) => push('pageerror', err.stack || err.message));
 page.on('requestfailed', (req) => push('requestfailed', `${req.failure()?.errorText || 'failed'} ${req.url()}`));
+page.on('response', (res) => {
+  const u = res.url();
+  if (res.status() >= 400 || /kiz10|cdn|unity|game|html5/i.test(u)) push(`response:${res.status()}`, u);
+});
 context.on('page', (popup) => {
   push('popup', popup.url());
   popup.on('console', (msg) => push(`popup-console:${msg.type()}`, msg.text()));
@@ -32,8 +36,7 @@ try {
   await page.waitForTimeout(5000);
   await snapshot('01-after-outer-play');
 
-  const gameFrameElement = page.locator('#game');
-  const gameFrame = await gameFrameElement.contentFrame();
+  const gameFrame = page.frame({ name: 'game' });
   if (!gameFrame) throw new Error('Kiz10 iframe did not attach');
   push('kiz10-frame-url', gameFrame.url());
   push('kiz10-title', await gameFrame.title().catch(() => ''));
@@ -63,15 +66,25 @@ try {
   }
   if (!clicked) push('inner-play-click', 'no clickable candidate found');
 
-  await page.waitForTimeout(15000);
+  await page.waitForTimeout(18000);
   await snapshot('02-after-inner-play');
 
   for (const frame of page.frames()) {
     let canvasCount = 0;
     let iframeCount = 0;
+    let text = '';
     try { canvasCount = await frame.locator('canvas').count(); } catch {}
     try { iframeCount = await frame.locator('iframe').count(); } catch {}
-    push('frame-state', JSON.stringify({ url: frame.url(), canvasCount, iframeCount }));
+    try { text = (await frame.locator('body').innerText({ timeout: 1500 })).slice(0, 500); } catch {}
+    push('frame-state', JSON.stringify({ name: frame.name(), url: frame.url(), canvasCount, iframeCount, text }));
+  }
+
+  const runtimeFrames = page.frames().filter((frame) => frame.name() === 'box-game-swf' || frame.url() !== 'about:blank' && frame !== page.mainFrame() && frame.name() !== 'game');
+  if (!runtimeFrames.some((frame) => frame.name() === 'box-game-swf' && frame.url() !== 'about:blank')) {
+    push('runtime-verdict', 'FAIL: box-game-swf never navigated away from about:blank');
+    process.exitCode = 2;
+  } else {
+    push('runtime-verdict', 'PASS: runtime child frame navigated');
   }
 } catch (err) {
   push('fatal', err.stack || err.message);
