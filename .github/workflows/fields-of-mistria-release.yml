@@ -1,0 +1,42 @@
+name: Fields of Mistria Release QA
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Open WebGame demos to GitHub Pages"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Dependency security audit
+        run: npm run check:deps
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run final live release QA
+        run: npm run qa:release -- --config examples/fields-of-mistria-site/open-webgame.json --html examples/fields-of-mistria-site/index.html --site-dir examples/fields-of-mistria-site
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fields-of-mistria-release-artifacts
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 14

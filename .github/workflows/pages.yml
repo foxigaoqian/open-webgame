@@ -6,6 +6,7 @@ on:
     paths:
       - 'examples/scam-artist-site/**'
       - 'examples/super-slime-black-hole-site/**'
+      - 'examples/fields-of-mistria-site/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -38,6 +39,8 @@ jobs:
           cp -R examples/scam-artist-site/. _site/
           mkdir -p _site/super-slime-black-hole
           cp -R examples/super-slime-black-hole-site/. _site/super-slime-black-hole/
+          mkdir -p _site/fields-of-mistria
+          cp -R examples/fields-of-mistria-site/. _site/fields-of-mistria/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact
