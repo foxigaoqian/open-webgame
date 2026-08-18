@@ -1,11 +1,14 @@
 const game=document.getElementById('game');
 const load=document.getElementById('load');
-const RUNTIME_URL='https://html5.gamemonetize.games/hcx5y4cogxnwjvozussfta9q00905zv6/';
+const RUNTIME_BASE='https://html5.gamedistribution.com/a5ad329e688a43ecbdb5611008a56c3a/';
 
-// The original Kiz10 embed wraps another provider and its downstream frame blocks
-// github.io in the frame-ancestor chain. GameMonetize explicitly publishes this
-// HTML5 build with third-party iframe code, so use its direct runtime instead.
-if(game) game.dataset.src=RUNTIME_URL;
+// GameDistribution requires gd_sdk_referrer_url to be the exact page that hosts
+// the iframe. Build it from the current localized page instead of copying Kizi's
+// referrer parameter.
+const pageReferrer=window.location.href.split('#')[0].split('?')[0];
+const pageLocale=(document.documentElement.lang||'en').toLowerCase();
+const runtimeUrl=`${RUNTIME_BASE}?gd_sdk_referrer_url=${encodeURIComponent(pageReferrer)}&siteLocale=${encodeURIComponent(pageLocale)}&locale=${encodeURIComponent(pageLocale)}`;
+if(game) game.dataset.src=runtimeUrl;
 
 window.startGame=function(){
   if(game&&!game.src)game.src=game.dataset.src;
@@ -25,24 +28,26 @@ window.fullGame=function(){
 (function updateRuntimeCopy(){
   const lang=(document.documentElement.lang||'en').toLowerCase().split('-')[0];
   const copy={
-    en:{note:'The player lazy-loads a directly embeddable HTML5 build published by GameMonetize. The original mobile game is published by Supercent; this page is an unofficial discovery and guide site.',disclaimer:'Unofficial discovery and guide page. Super Big Slime: Black Hole 3D is published by Supercent, Inc. Browser gameplay is loaded from a GameMonetize HTML5 build that is explicitly offered for website embedding.',bar:'SUPER SLIME · HTML5 BROWSER BUILD'},
-    ja:{note:'プレイヤーは GameMonetize がサイト埋め込み用に公開している HTML5 ビルドを直接読み込みます。モバイル版の開発・配信元は Supercent で、このページは非公式の案内・攻略サイトです。',disclaimer:'非公式の案内・攻略ページです。Super Big Slime: Black Hole 3D の配信元は Supercent, Inc. です。ブラウザ版はサイト埋め込み用として公開されている GameMonetize の HTML5 ビルドを読み込みます。',bar:'SUPER SLIME · HTML5 ブラウザ版'},
-    ko:{note:'플레이어는 GameMonetize가 웹사이트 임베드용으로 공개한 HTML5 빌드를 직접 불러옵니다. 원본 모바일 게임은 Supercent가 배급하며, 이 페이지는 비공식 안내 및 공략 사이트입니다.',disclaimer:'비공식 안내 및 공략 페이지입니다. Super Big Slime: Black Hole 3D는 Supercent, Inc.가 배급합니다. 브라우저 플레이는 웹사이트 임베드용으로 공개된 GameMonetize HTML5 빌드를 사용합니다.',bar:'SUPER SLIME · HTML5 브라우저 빌드'}
+    en:{note:'The player loads the GameDistribution HTML5 runtime used for Super Slime: Black Hole. The original mobile game is published by Supercent; this page is an unofficial discovery and guide site.',disclaimer:'Unofficial discovery and guide page. Super Big Slime: Black Hole 3D is published by Supercent, Inc. Browser gameplay is loaded from the GameDistribution HTML5 runtime for Super Slime: Black Hole.',bar:'SUPER SLIME · GAMEDISTRIBUTION HTML5 BUILD'},
+    ja:{note:'プレイヤーは Super Slime: Black Hole の GameDistribution HTML5 ランタイムを読み込みます。モバイル版の開発・配信元は Supercent で、このページは非公式の案内・攻略サイトです。',disclaimer:'非公式の案内・攻略ページです。Super Big Slime: Black Hole 3D の配信元は Supercent, Inc. です。ブラウザ版は Super Slime: Black Hole の GameDistribution HTML5 ランタイムを読み込みます。',bar:'SUPER SLIME · GAMEDISTRIBUTION HTML5'},
+    ko:{note:'플레이어는 Super Slime: Black Hole의 GameDistribution HTML5 런타임을 불러옵니다. 원본 모바일 게임은 Supercent가 배급하며, 이 페이지는 비공식 안내 및 공략 사이트입니다.',disclaimer:'비공식 안내 및 공략 페이지입니다. Super Big Slime: Black Hole 3D는 Supercent, Inc.가 배급합니다. 브라우저 플레이는 Super Slime: Black Hole의 GameDistribution HTML5 런타임을 사용합니다.',bar:'SUPER SLIME · GAMEDISTRIBUTION HTML5'}
   };
   const t=copy[lang]||copy.en;
   const note=document.querySelector('#play .sectionNote');if(note)note.textContent=t.note;
   const disclaimer=document.querySelector('#play .disclaimer');if(disclaimer)disclaimer.textContent=t.disclaimer;
   const bar=document.querySelector('#play .gamebar strong');if(bar)bar.textContent=t.bar;
+
   document.querySelectorAll('.sourceCard').forEach((card)=>{
-    if(/Kiz10/i.test(card.textContent||'')){
-      card.href='https://gamemonetize.com/growball-feed-to-grow-game';
-      const strong=card.querySelector('strong');if(strong)strong.textContent='GameMonetize ↗';
-      const small=card.querySelector('small');if(small)small.textContent='Direct HTML5 embed source';
+    if(/GameMonetize|Kiz10/i.test(card.textContent||'')){
+      card.href='https://www.kizi.com/games/super-slime-black-hole';
+      const strong=card.querySelector('strong');if(strong)strong.textContent='Kizi / GameDistribution ↗';
+      const small=card.querySelector('small');if(small)small.textContent='Verified browser game source';
     }
   });
-  document.querySelectorAll('footer, .notice, #faq details').forEach((node)=>{
-    if(/Kiz10/i.test(node.textContent||'')){
-      node.innerHTML=node.innerHTML.replace(/Kiz10-hosted version/gi,'GameMonetize-hosted HTML5 version').replace(/Kiz10 web build/gi,'GameMonetize HTML5 build').replace(/Kiz10/g,'GameMonetize');
+  document.querySelectorAll('footer a').forEach((link)=>{
+    if(/gamemonetize|kiz10/i.test(link.href||'')||/GameMonetize|Kiz10/i.test(link.textContent||'')){
+      link.href='https://www.kizi.com/games/super-slime-black-hole';
+      link.textContent='Kizi';
     }
   });
 })();
