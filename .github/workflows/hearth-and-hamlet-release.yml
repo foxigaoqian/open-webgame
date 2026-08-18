@@ -1,0 +1,49 @@
+name: Hearth and Hamlet Release QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/hearth-and-hamlet-site/**'
+      - '.github/workflows/hearth-and-hamlet-release.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Dependency security audit
+        run: npm run check:deps
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run final live release QA
+        run: npm run qa:release -- --config examples/hearth-and-hamlet-site/open-webgame.json --html examples/hearth-and-hamlet-site/index.html --site-dir examples/hearth-and-hamlet-site
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hearth-and-hamlet-release-artifacts
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
