@@ -10,7 +10,7 @@
   },
   "site": {
     "language": "en",
-    "mode": "play-first",
+    "mode": "guide",
     "origin": "https://foxigaoqian.github.io",
     "basePath": "/open-webgame/super-slime-black-hole",
     "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/",
@@ -28,18 +28,17 @@
     ]
   },
   "seo": {
-    "primaryIntent": "play + beginner guide",
+    "primaryIntent": "browser play access + beginner guide",
     "primaryKeyword": "Super Big Slime: Black Hole 3D",
     "secondaryIntents": [
       "Super Slime Black Hole online",
       "Super Slime Black Hole how to play",
       "Super Slime Black Hole tips"
     ],
-    "canonicalPagePurpose": "Let users play the Kiz10-hosted HTML5 version and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
+    "canonicalPagePurpose": "Help users reach the working Kiz10-hosted browser version and understand the verified eat-and-grow loop, boss goal, maps, customization and beginner strategy."
   },
   "embed": {
-    "status": "verified",
-    "runtimeUrl": "https://kiz10.com/embed/super-slime---black-hole-game/",
+    "status": "unsupported",
     "officialPage": "https://kiz10.com/super-slime---black-hole-game/",
     "host": "kiz10.com"
   },
@@ -68,8 +67,8 @@
       "id": "kiz10-browser",
       "type": "other",
       "url": "https://kiz10.com/super-slime---black-hole-game/",
-      "label": "Kiz10 HTML5 browser page and public iframe embed",
-      "retrievedAt": "2026-08-15"
+      "label": "Kiz10 HTML5 browser page and public iframe shell",
+      "retrievedAt": "2026-08-18"
     }
   ],
   "claims": [
@@ -116,7 +115,7 @@
     },
     {
       "id": "browser-build",
-      "text": "Kiz10 currently lists an HTML5 browser version and publishes an iframe embed for Super Slime - Black Hole Game.",
+      "text": "Kiz10 currently lists an HTML5 browser version of Super Slime - Black Hole Game; this site sends users to the Kiz10 page instead of claiming the downstream game can run in a third-party nested iframe.",
       "sourceIds": ["kiz10-browser"],
       "status": "verified",
       "volatility": "volatile",
@@ -137,7 +136,7 @@
     {
       "path": "/",
       "file": "index.html",
-      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in English",
+      "intent": "reach the browser version of Super Big Slime: Black Hole 3D and learn the beginner loop in English",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/",
       "title": "Play Super Big Slime: Black Hole 3D Online | Guide & Tips",
       "indexable": true,
@@ -147,7 +146,7 @@
     {
       "path": "/ja/",
       "file": "ja/index.html",
-      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in Japanese",
+      "intent": "reach the browser version of Super Big Slime: Black Hole 3D and learn the beginner loop in Japanese",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/ja/",
       "title": "Super Big Slime: Black Hole 3Dをブラウザでプレイ | 攻略ガイド",
       "indexable": true,
@@ -157,7 +156,7 @@
     {
       "path": "/ko/",
       "file": "ko/index.html",
-      "intent": "play Super Big Slime: Black Hole 3D and learn the beginner loop in Korean",
+      "intent": "reach the browser version of Super Big Slime: Black Hole 3D and learn the beginner loop in Korean",
       "canonical": "https://foxigaoqian.github.io/open-webgame/super-slime-black-hole/ko/",
       "title": "Super Big Slime: Black Hole 3D 온라인 플레이 | 공략과 팁",
       "indexable": true,
