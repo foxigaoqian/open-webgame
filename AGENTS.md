@@ -21,6 +21,10 @@ Read these in this order when relevant:
 - Reusable page architecture: `references/site-blueprint.md`
 - Final acceptance gate: `references/qa-checklist.md`
 - Design derivation rules: `DESIGN.md`
+- Entity-authority / ranking architecture: `references/entity-authority.md`
+- Editorial trust / source system: `references/editorial-authority.md`
+- Structural UI world system: `references/ui-world-system.md`
+- Post-launch growth lifecycle: `docs/growth-lifecycle.md`
 - Real implementation examples: `examples/`
 
 For a generated site, `open-webgame.json` is the project-level source of truth for game identity, canonical URL, languages, search intent, runtime URL, design direction and readiness state. Do not let HTML, schema, sitemap or documentation silently disagree with it.
@@ -73,6 +77,8 @@ A generated site is not deployment-ready unless all relevant gates pass.
 
 - derive the visual system again for every game
 - do not ship a recolored generic gaming template
+- for long-form authority sites, define a structural UI world/metaphor in addition to palette and typography
+- section labels, status boards, source blocks, media captions and CTA vocabulary should feel like one coherent game-native interface when the game supports a strong metaphor
 - preserve readability, accessibility and mobile usability
 - use real generated-site screenshots for showcase/QA evidence; do not present fake promotional UI as product output
 
@@ -87,6 +93,23 @@ A generated site is not deployment-ready unless all relevant gates pass.
 - informative images need meaningful alt text
 - decorative images should use `alt=""`; omitting the `alt` attribute entirely is a failure
 - do not mark `On-Page SEO: PASS` while placeholder/staging URLs remain
+
+### Entity-authority gate
+
+For ranking-focused Steam/native guide builds:
+
+- capture a current SERP + competitor baseline before final architecture
+- treat competitor pages as architecture evidence, not factual authority
+- use an entity homepage as the canonical game document
+- plan a central guide/editorial hub when the site is intended to grow
+- separate maintained guides/trackers from dated reports
+- provide a dedicated FAQ and public source/claim ledger when the topic depth/volatility justifies them
+- distinguish Official / Developer Confirmed / Verified / Player Report / Unknown states
+- update an existing parent page before creating a new child URL
+- use GSC/query evidence for later page splits when available
+- keep website-language decisions separate from game-language support
+- leave V1 with a documented V0–V6 growth plan
+- never promise a Top 3 ranking; treat ranking as an external outcome
 
 ### Multilingual SEO gate
 
