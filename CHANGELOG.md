@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4 — Entity Authority Engine
+
+- Added mandatory SERP/competitor baseline for ranking-focused guide/wiki builds.
+- Added entity-authority playbook inspired by the structural lessons of Dear Passengers.
+- Added central editorial hub, dedicated FAQ, public source/claim ledger, maintained-guide and dated-report patterns.
+- Added query-to-page decision discipline to reduce thin/cannibalizing page generation.
+- Added website-language vs game-language separation.
+- Added game-native structural UI world system beyond palette/genre styling.
+- Added V0–V6 post-launch growth lifecycle.
+- Expanded output contract to include ranking baseline, page classes, UI world brief and growth plan.
+- Updated Wiki blueprint and design guidance.
+
 All notable project changes are documented here.
 
 ## 0.3.3 — 2026-08-15
