@@ -32,6 +32,50 @@ Player mood:
 
 These observations should come from official or clearly attributable game material, not from the game title alone.
 
+## Structural UI world
+
+Visual DNA answers what the site should look like. A memorable authority site also needs to answer **what kind of interface world the user is inside**.
+
+Before coding a long-form guide/wiki homepage, record when appropriate:
+
+```
+World metaphor:
+User role:
+Primary document/object:
+Status language:
+Chapter language:
+CTA language:
+Evidence/source language:
+Media caption language:
+```
+
+Examples:
+
+- airline co-op → operations board / crew briefing
+- dressmaking → atelier ledger / work order / pattern book
+- detective → case file / evidence board
+- factory → production console
+- survival → expedition log / field manual
+
+The metaphor should be derived from the game and used consistently across:
+
+- section labels;
+- status/fact boards;
+- card categories;
+- source/evidence blocks;
+- image captions;
+- CTA vocabulary;
+- article metadata.
+
+Do not force a metaphor when the game has no strong world language.
+
+> Theme must be structural, not decorative.
+
+A needle icon on a generic blog does not create a dressmaking design system. A plane icon on a generic template does not create an airline operations interface.
+
+For deeper rules, see [`references/ui-world-system.md`](./references/ui-world-system.md).
+
+
 ## Translation into UI
 
 Use the brief to make concrete design decisions.
