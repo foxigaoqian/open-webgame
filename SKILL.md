@@ -22,6 +22,11 @@ The reusable part is the production workflow and information architecture. The v
 7. **Every production build must pass the On-Page SEO Gate.**
 8. **A broken player or failed On-Page SEO Gate means `deployment-ready: NO`.**
 9. **Production output must include real statically declared favicon assets and pass the full release-readiness gate before `deployment-ready: YES`.**
+10. **For guide/wiki projects, capture a current SERP + competitor baseline before final page architecture.**
+11. **A growing wiki must distinguish maintained guides, dated reports, FAQ, and source/claim evidence instead of treating every URL as the same article type.**
+12. **Do not confuse website editorial language with the game's supported software languages.**
+13. **For long-form authority sites, derive a structural UI world/metaphor from the game; palette swapping alone is not game-native design.**
+14. **The first release must include a post-launch growth plan; a ranking project is not finished when V1 deploys.**
 
 Read and follow:
 
@@ -29,6 +34,10 @@ Read and follow:
 - [`references/on-page-seo.md`](./references/on-page-seo.md)
 - [`references/site-blueprint.md`](./references/site-blueprint.md)
 - [`references/qa-checklist.md`](./references/qa-checklist.md)
+- [`references/entity-authority.md`](./references/entity-authority.md)
+- [`references/editorial-authority.md`](./references/editorial-authority.md)
+- [`references/ui-world-system.md`](./references/ui-world-system.md)
+- [`docs/growth-lifecycle.md`](./docs/growth-lifecycle.md)
 
 # Zero-Config Mode
 
@@ -292,6 +301,245 @@ npm run qa:release -- --config path/to/open-webgame.json --html path/to/index.ht
 Every run writes `qa-artifacts/release-qa.json` containing pass/fail, timestamp, tested commit SHA, blocking issues and aggregate check results. Only a passing release artifact bound to the tested code may support `Deployment-ready: YES` in the completion report.
 
 
+# v0.4 Entity Authority Engine
+
+v0.4 adds the layer that technical SEO alone cannot provide: **entity authority, editorial maintenance, SERP-aware page architecture, game-native UI world-building, and post-launch growth**.
+
+The objective is not to promise a Top 3 position. Rankings are external outcomes. The skill must instead maximize controllable quality and make the site capable of competing for difficult game SERPs.
+
+## Authority mode for Steam/native games
+
+For Steam/native/upcoming games with no verified browser runtime, default to an **entity-authority wiki** rather than a one-page guide.
+
+Before final architecture:
+
+1. resolve the exact game entity;
+2. capture the current SERP and competitor archetypes;
+3. identify whether the query is pre-release, launch-window, post-release, or mature;
+4. identify stale/incorrect competitor coverage and real player questions;
+5. define an entity homepage, editorial hub, FAQ/source system, and only the high-value deep routes justified by real intent.
+
+See [`references/entity-authority.md`](./references/entity-authority.md).
+
+## SERP baseline is mandatory for ranking-focused guide builds
+
+Record:
+
+- exact entity query;
+- game-modified query;
+- dominant result types;
+- leading independent sites;
+- current official result;
+- obvious information gaps;
+- repeated community questions;
+- ambiguity with common-word meanings or other entities;
+- language-specific SERPs when localization is being considered.
+
+Do not use competitor content as a source of truth. Competitors are evidence of search architecture, not factual authority.
+
+## Editorial authority system
+
+A serious wiki should behave like a maintained editorial product.
+
+Use distinct page classes:
+
+- Entity homepage
+- Maintained guide
+- Status tracker
+- Dated report
+- FAQ hub
+- Source ledger
+- Reference page
+- Utility/tool page
+- Playable page
+
+For maintained guides and reports, expose useful editorial metadata such as:
+
+- page class/category;
+- publication date;
+- materially updated date;
+- checked game/build status;
+- honest editorial desk/byline;
+- reporting rule;
+- source list.
+
+Do not invent a fake author persona.
+
+See [`references/editorial-authority.md`](./references/editorial-authority.md).
+
+## Dated reports + maintained guides
+
+Active games need both.
+
+Use a dated report to preserve a meaningful historical event.
+
+Use a maintained guide/tracker for a question whose current answer evolves.
+
+Examples:
+
+```
+Dated:
+  /updates/build-410/
+  /news/console-announcement/
+
+Maintained:
+  /bugs/
+  /platforms/
+  /controller/
+  /system-requirements/
+```
+
+Do not create a new page for every tiny hotfix.
+
+## Central guide/editorial hub
+
+A growing authority wiki should normally expose one crawlable hub such as:
+
+```
+/guides/
+/news/
+/briefings/
+```
+
+It should separate:
+
+1. latest verified updates;
+2. maintained guides;
+3. how the source/reporting process works.
+
+This is more useful than a generic chronological blog archive.
+
+## Dedicated FAQ + source ledger
+
+Use a dedicated FAQ as a broad query catcher and router.
+
+For source-heavy or volatile games, add a public source/claim ledger that can show:
+
+- claim;
+- status;
+- source;
+- last checked;
+- affected pages;
+- what could change the claim.
+
+Recommended visible states:
+
+```
+OFFICIAL
+DEVELOPER CONFIRMED
+VERIFIED IN CURRENT BUILD
+PLAYER REPORT
+UNDER VERIFICATION
+UNKNOWN
+```
+
+A player workaround must never be styled as an official fix without evidence.
+
+## Query-to-page discipline
+
+When a new question appears:
+
+```
+Question
+  ↓
+Can an existing parent page answer it well?
+  ├─ yes → improve the parent
+  └─ no
+      ↓
+Is it repeated / independently useful?
+  ├─ no → FAQ or ignore
+  └─ yes
+      ↓
+Can the new page add substantial original value?
+  ├─ no → keep consolidated
+  └─ yes → create one stable URL
+```
+
+Search Console impressions are strong evidence for later page splits.
+
+## Website language vs game language
+
+These are different claims.
+
+A website can publish editorial content in a language the game does not support. It must not imply software localization.
+
+Do not automatically mirror the entire site into every locale.
+
+Prefer:
+
+1. localized entity homepage;
+2. locale SERP / GSC validation;
+3. deep localized pages only when justified;
+4. hreflang only between real equivalent pages.
+
+## Game-native UI world system
+
+Visual DNA is not enough.
+
+For a memorable authority site, define a structural UI metaphor:
+
+```
+World metaphor:
+User role:
+Primary document/object:
+Status language:
+Chapter language:
+CTA language:
+Evidence/source language:
+Media caption language:
+```
+
+Examples:
+
+- airline game → operations board / crew briefing
+- dressmaking game → atelier ledger / work order / pattern book
+- detective game → case file / evidence board
+- factory game → production console
+- survival game → expedition log
+
+The metaphor should shape section labels, status cards, source blocks, captions and CTA vocabulary without reducing usability.
+
+See [`references/ui-world-system.md`](./references/ui-world-system.md).
+
+## Post-launch growth lifecycle
+
+Every ranking-focused guide project must leave V1 with a growth plan.
+
+```
+V0  Research baseline
+V1  Entity establishment
+V1.5 Freshness + evidence
+V2  Topic depth
+V3  Locale depth
+V4  Adjacent audience
+V5  Utility / engagement
+V6  Authority moat
+```
+
+Do not advance because a calendar says so. Advance when search, player, and product evidence justify it.
+
+See [`docs/growth-lifecycle.md`](./docs/growth-lifecycle.md).
+
+## Ranking measurement
+
+A "Top 3" request must be treated as an objective, not a promise.
+
+After launch, track:
+
+- indexation;
+- impressions by query and page;
+- first long-tail visibility;
+- exact-entity homepage impressions;
+- CTR;
+- average position by topic cluster;
+- natural backlinks/citations;
+- branded/direct traffic;
+- update speed;
+- stale-content decay.
+
+The skill should explain that it can improve ranking probability through architecture and maintenance, but cannot guarantee a search-engine position.
+
+
 # Inputs
 
 Minimum input:
@@ -537,7 +785,7 @@ These are heuristics, not fixed templates.
 
 # Default Site Architecture
 
-Start with one strong page unless real search intent justifies more routes.
+For a verified browser-play project, start with one strong play-first page unless real intent justifies more routes. For a Steam/native guide project with ranking ambitions, use the entity-authority architecture in `references/site-blueprint.md` rather than forcing a single-page default.
 
 Recommended order:
 
@@ -699,8 +947,12 @@ A production result should be ready for:
 - canonical URL inspection
 - indexing request where appropriate
 - query/impression/CTR monitoring
+- topic-cluster movement
+- exact-entity homepage impressions
+- page-split opportunities
+- stale/decaying content
 
-Do not pretend Search Console is connected unless it actually is.
+Do not pretend Search Console is connected unless it actually is. When GSC data is available, use it to decide whether to update a parent page, create a new child page, or leave a question consolidated.
 
 # Optional Multi-page Expansion
 
@@ -926,6 +1178,10 @@ When invoked for a game keyword, deliver:
 12. Browser identity assets (`favicon.ico` + `favicon-32x32.png`)
 13. Attribution/disclosure
 14. QA result including Browser/axe, Lighthouse and release readiness
+15. SERP / competitor baseline for ranking-focused guide projects
+16. Page-class plan (entity homepage, maintained guides, trackers, reports, FAQ/source ledger as applicable)
+17. Game-native UI world brief
+18. Post-launch growth lifecycle and measurement plan
 ```
 
 Completion summary:
