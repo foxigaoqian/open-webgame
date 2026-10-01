@@ -38,6 +38,9 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Source-backed claims** — material factual content is connected to `sources[]` and `claims[]` instead of living only in prompt prose.
 - **Real HTML5 embed verification** — find and test the actual browser runtime instead of putting an itch.io project detail page in an iframe.
 - **Game-native visual design** — derive palette, typography mood, cards, borders, shadows, texture and interaction style from the current game.
+- **Structural UI world** — for authority sites, derive a game-native interface metaphor so labels, status boards, cards, evidence blocks and CTA language feel like one coherent world.
+- **Entity-authority architecture** — ranking-focused Steam/native games use an entity homepage, central guide/editorial hub, FAQ/source system, maintained guides and dated reports instead of a one-page SEO template.
+- **Post-launch growth lifecycle** — continue from entity establishment into freshness, topic depth, locale depth, adjacent audience and utilities based on evidence rather than calendar-driven page production.
 - **Play-first architecture** — put the game near the top when embedding is verified, with lazy load, reload, fullscreen and official fallback behavior.
 - **Mandatory On-Page SEO** — search intent, title, H1, canonical, metadata, internal links, structured data, images, robots and sitemap are hard QA requirements.
 - **Real multilingual SEO** — optional localized routes, reciprocal hreflang, x-default, locale canonicals and multilingual sitemap validation.
@@ -47,6 +50,33 @@ It resolves the real game first, verifies a real browser runtime when one exists
 - **Browser identity QA** — every production site ships real PNG + ICO favicons; Browser QA and live HTTP QA verify declarations, MIME types and file validity.
 - **Release readiness** — `qa:release` is the only aggregate command allowed to return `Deployment-ready: YES`.
 - **No fake features** — never invent controls, codes, upgrades, release dates, mobile support, leaderboards or game systems to fill SEO copy.
+
+## v0.4 — Entity Authority Engine
+
+v0.4 adds the ranking/authority layer learned from successful entity-first game sites such as Dear Passengers.
+
+New strategy layer:
+
+```
+Current SERP + competitor baseline
+Entity homepage
+Central editorial / guide hub
+Dedicated FAQ
+Public source / claim ledger
+Maintained guides + dated reports
+Game-native structural UI world
+Demand-driven locale depth
+Post-launch growth lifecycle
+```
+
+The goal is not to promise a Top 3 ranking. Search position is an external outcome. The system instead makes ranking-focused guide sites more complete, current, source-traceable and expandable after launch.
+
+New references:
+
+- [`references/entity-authority.md`](./references/entity-authority.md)
+- [`references/editorial-authority.md`](./references/editorial-authority.md)
+- [`references/ui-world-system.md`](./references/ui-world-system.md)
+- [`docs/growth-lifecycle.md`](./docs/growth-lifecycle.md)
 
 ## v0.3.2 — Browser Identity + Release Readiness
 
