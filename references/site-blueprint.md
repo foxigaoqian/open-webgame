@@ -143,6 +143,82 @@ Footer
 
 This is the baseline pattern modeled after the successful `dear-passengers.com` structure. Adapt section names and visual language to the specific game rather than copying airline-themed labels or styling.
 
+## Authority Wiki blueprint
+
+For a ranking-focused Steam/native game, the homepage is only the center of the system. Do not stop at a generic homepage plus random guide pages.
+
+Recommended V1 authority structure:
+
+```
+/
+├── guides/ or news/
+├── faq/
+├── sources/          # when claim volatility/source depth justifies it
+├── <core maintained guides>
+├── <trackers>
+└── localized entity homepages when justified
+```
+
+The exact routes depend on the game.
+
+### Homepage responsibilities
+
+The homepage should behave like the canonical entity document:
+
+- exact identity;
+- official action;
+- current status;
+- latest meaningful update;
+- core gameplay loop;
+- high-value current questions;
+- confirmed/unknown or official/player-report boundary;
+- key system/platform facts;
+- developer/publisher;
+- official channels;
+- FAQ preview;
+- deep-guide entry points;
+- independent-site disclosure.
+
+Do not turn the homepage into a chronological article card feed.
+
+### Central editorial hub
+
+A growing wiki should normally expose a hub that separates:
+
+```
+Latest verified updates
+Maintained guides / trackers
+How this desk works
+```
+
+Use `/guides/`, `/news/`, or another clear game-native path.
+
+### FAQ
+
+A dedicated FAQ can capture broad friction and route users to focused guides. It is not a substitute for deep pages when an intent becomes independently valuable.
+
+### Source / claim ledger
+
+For volatile games, expose a public evidence page when useful. A claim can be:
+
+- Official
+- Developer Confirmed
+- Verified in Current Build
+- Player Report
+- Under Verification
+- Unknown
+
+### Dated reports vs trackers
+
+Use dated reports for meaningful events and one long-lived tracker for evolving status.
+
+Do not create a fresh URL for every minor hotfix.
+
+### Post-launch architecture
+
+The first release is not the final information architecture. Use the growth lifecycle in `docs/growth-lifecycle.md` to move from entity establishment to topic depth, locale depth, adjacent audience and utilities only when evidence justifies it.
+
+
 ## Wiki Hero
 
 The Wiki hero should communicate:
