@@ -11,6 +11,24 @@ const html = readText(htmlPath);
 const errors = [];
 const warnings = [];
 
+// --- Third-party availability is downgraded to warnings (P0 fix) ---
+// Live availability of third-party URLs is outside this project's control.
+// A failing itch.io og:image (or any other external host) must not block CI.
+// Only first-party URLs (same host as site canonical) can fail the gate.
+const hostOf = (value) => {
+  try {
+    return new URL(String(value)).hostname.toLowerCase();
+  } catch {
+    return '';
+  }
+};
+const siteHost = hostOf(config.site?.canonical || '');
+// Hosts known to intermittently fail automated checks (bot/hotlink protection).
+// Always warning-only, even if they somehow look first-party.
+const KNOWN_FLAKY_HOSTS = new Set(['itch.io', 'www.itch.io', 'img.itch.zone']);
+const isFirstPartyUrl = (url) => siteHost === '' || hostOf(url) === siteHost;
+const isWarningOnly = (url) => KNOWN_FLAKY_HOSTS.has(hostOf(url)) || !isFirstPartyUrl(url);
+
 const targets = new Map();
 const addTarget = (url, label, expectedTypes = []) => {
   const value = String(url || '').trim();
@@ -112,10 +130,13 @@ async function fetchStatus(url) {
 
 for (const [url, target] of targets) {
   const labels = [...target.labels];
+  // Third-party / known-flaky failures are warnings, never gate failures.
+  const bucket = isWarningOnly(url) ? warnings : errors;
+  const scope = bucket === warnings ? '[third-party] ' : '';
   try {
     const response = await fetchStatus(url);
     if (!response.ok) {
-      errors.push(`${labels.join(', ')} returned HTTP ${response.status}: ${url}`);
+      bucket.push(`${scope}${labels.join(', ')} returned HTTP ${response.status}: ${url}`);
       continue;
     }
     if (response.url && response.url !== url) {
@@ -125,11 +146,11 @@ for (const [url, target] of targets) {
       const contentType = String(response.headers.get('content-type') || '').toLowerCase();
       const accepted = [...target.expectedTypes].some((expected) => contentType.includes(expected));
       if (!accepted) {
-        errors.push(`${labels.join(', ')} returned content-type ${contentType || 'missing'}; expected one of ${[...target.expectedTypes].join(', ')}: ${url}`);
+        bucket.push(`${scope}${labels.join(', ')} returned content-type ${contentType || 'missing'}; expected one of ${[...target.expectedTypes].join(', ')}: ${url}`);
       }
     }
   } catch (error) {
-    errors.push(`${labels.join(', ')} could not be fetched: ${url} (${error.message})`);
+    bucket.push(`${scope}${labels.join(', ')} could not be fetched: ${url} (${error.message})`);
   }
 }
 
