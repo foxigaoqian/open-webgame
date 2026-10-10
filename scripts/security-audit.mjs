@@ -1,4 +1,5 @@
-import { attr, loadConfig, parseArgs, printResult, readText } from './lib.mjs';
+import { parse } from 'node-html-parser';
+import { loadConfig, parseArgs, printResult, readText } from './lib.mjs';
 
 const args = parseArgs();
 const configPath = args.config || 'open-webgame.json';
@@ -8,12 +9,26 @@ const html = readText(htmlPath);
 const errors = [];
 const warnings = [];
 
+// Case-insensitive attribute lookup. Mirrors the old attr() helper from
+// lib.mjs (case-insensitive name match, '' when absent); unlike the old
+// regex it also handles unquoted values and ignores tags inside comments.
+function getAttr(element, name) {
+  const attrs = element.attributes || {};
+  const wanted = name.toLowerCase();
+  for (const key of Object.keys(attrs)) {
+    if (key.toLowerCase() === wanted) return attrs[key] ?? '';
+  }
+  return '';
+}
+
+const root = parse(html);
+
 const security = config.security || {};
 const allowed = new Set(Array.isArray(security.allowedIframePermissions) ? security.allowedIframePermissions : []);
-const iframeTags = [...html.matchAll(/<iframe\b[^>]*>/gi)].map((m) => m[0]);
+const iframes = root.querySelectorAll('iframe');
 
-for (let i = 0; i < iframeTags.length; i += 1) {
-  const allow = attr(iframeTags[i], 'allow');
+for (let i = 0; i < iframes.length; i += 1) {
+  const allow = getAttr(iframes[i], 'allow');
   if (!allow) {
     warnings.push(`Iframe ${i + 1} has no allow attribute; verify required capabilities explicitly.`);
     continue;
@@ -35,17 +50,18 @@ for (const permission of allowed) {
 }
 
 if (security.requireNoopenerForBlankTargets !== false) {
-  const anchors = [...html.matchAll(/<a\b[^>]*>/gi)].map((m) => m[0]);
+  const anchors = root.querySelectorAll('a');
   for (let i = 0; i < anchors.length; i += 1) {
-    if (attr(anchors[i], 'target').toLowerCase() !== '_blank') continue;
-    const rel = new Set(attr(anchors[i], 'rel').toLowerCase().split(/\s+/).filter(Boolean));
+    if (getAttr(anchors[i], 'target').toLowerCase() !== '_blank') continue;
+    const rel = new Set(getAttr(anchors[i], 'rel').toLowerCase().split(/\s+/).filter(Boolean));
     if (!rel.has('noopener')) errors.push(`target="_blank" link ${i + 1} is missing rel="noopener".`);
   }
 }
 
 if (security.allowInlineScripts === false) {
-  const inlineScripts = [...html.matchAll(/<script\b(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/gi)];
-  const executable = inlineScripts.filter((match) => !/type=["']application\/ld\+json["']/i.test(match[0]));
+  const scripts = root.querySelectorAll('script');
+  const inlineScripts = scripts.filter((el) => getAttr(el, 'src') === '');
+  const executable = inlineScripts.filter((el) => getAttr(el, 'type').toLowerCase() !== 'application/ld+json');
   if (executable.length > 0) errors.push(`Inline executable scripts are disallowed by config, but found ${executable.length}.`);
 }
 
