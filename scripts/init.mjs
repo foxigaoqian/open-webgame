@@ -122,7 +122,7 @@ const config = {
   security: {
     allowedIframePermissions: ['autoplay', 'fullscreen', 'gamepad'],
     requireNoopenerForBlankTargets: true,
-    allowInlineScripts: true,
+    allowInlineScripts: false,
   },
   status: {
     research: 'pending',

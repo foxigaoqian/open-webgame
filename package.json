@@ -41,6 +41,7 @@
     "ajv": "^8.17.1",
     "chrome-launcher": "^1.0.0",
     "lighthouse": "^13.4.1",
+    "node-html-parser": "^9.0.4",
     "playwright": "^1.54.2"
   }
 }
